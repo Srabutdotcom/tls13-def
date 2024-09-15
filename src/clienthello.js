@@ -64,7 +64,7 @@ export class ClientHello extends Struct {
     * @param  {...string} serverNames 
     * @returns Promise for ClientHello
     */
-   static async new(...serverNames) {
+   static new(...serverNames) {
       return new ClientHello(...serverNames)
    }
 
@@ -103,6 +103,6 @@ export class ClientHello extends Struct {
    }
 }
 
-const ch = await ClientHello.new(..."localhost")
+const ch = ClientHello.new(..."localhost")
 
 debugger

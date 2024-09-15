@@ -96,12 +96,12 @@ export class Minmax extends Uint8Array {
     * @param  {...Uint8Array} b 
     */
    constructor(m, M, ...b) {
-      const l = b.reduce((ac,ar)=>ac + (ar?.length ?? 0) , 0);
+      const l = b.reduce((ac, ar) => ac + (ar?.length ?? 0), 0);
       if (l < m) throw TypeError(`bytes should have a min length of ${m}`)
       if (l > M) throw TypeError(`bytes should have a max length of ${M}`)
-      const byteLength = maxBytes(M); 
-      if(byteLength>4)throw TypeError(`maximum byte length is 4 in Minmax class`);
-      const length = Uints[`Uint${8*byteLength}`].new(l)//Uint8BE(l, maxBytes(M));
+      const byteLength = maxBytes(M);
+      if (byteLength > 4) throw TypeError(`maximum byte length is 4 in Minmax class`);
+      const length = Uints[`Uint${8 * byteLength}`](l)//Uint8BE(l, maxBytes(M));
 
       super(concat(length, ...b))
       this.#member = [length, ...b]
@@ -119,7 +119,7 @@ export class Minmax extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint8 extends Uint8Array {
-   static new(v){return new Uint8(v)}
+   static new(v) { return new Uint8(v) }
    /**
     * 
     * @param {uint} int 
@@ -136,7 +136,7 @@ export class Uint8 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint16 extends Uint8Array {
-   static new(v){return new Uint16(v)}
+   static new(v) { return new Uint16(v) }
    /**
     * 
     * @param {uint} int 
@@ -153,7 +153,7 @@ export class Uint16 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint24 extends Uint8Array {
-   static new(v){return new Uint24(v)}
+   static new(v) { return new Uint24(v) }
    /**
     * 
     * @param {uint} int 
@@ -170,7 +170,7 @@ export class Uint24 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint32 extends Uint8Array {
-   static new(v){return new Uint32(v)}
+   static new(v) { return new Uint32(v) }
    /**
     * 
     * @param {uint} int 
@@ -273,9 +273,9 @@ export class Enum {
 }
 
 export class Uints {
-   static Uint8 = Uint8
-   static Uint16 = Uint16
-   static Uint24 = Uint24
-   static Uint32 = Uint32
+   static Uint8(v) { class Length extends Uint8 { constructor(v) { super(v) } }; return new Length(v) }
+   static Uint16(v) { class Length extends Uint16 { constructor(v) { super(v) } }; return new Length(v) }
+   static Uint24(v) { class Length extends Uint24 { constructor(v) { super(v) } }; return new Length(v) }
+   static Uint32(v) { class Length extends Uint32 { constructor(v) { super(v) } }; return new Length(v) }
 }
 

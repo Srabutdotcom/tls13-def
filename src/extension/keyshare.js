@@ -4,7 +4,9 @@
 
 import { Minmax, Struct } from "../base.js";
 import { NamedGroupList, NamedGroup } from "./namedgroup.js";
-import { p521 } from 'npm:@noble/curves/p521';
+import { p521 } from "../deps.js";
+
+
 
 /**
  * LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8

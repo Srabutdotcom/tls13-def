@@ -8,7 +8,7 @@ import { SupportedVersions } from "./supportedversion.js"
 import { NamedGroupList } from "./namedgroup.js";
 import { Enum, Struct, Uint16, Minmax } from "../base.js";
 import { ServerNameList } from "./servername.js"
-import { uint8array } from "../dep.js"
+import { uint8array } from "../deps.js"
 
 class ExtensionType extends Uint16 {
    #value

@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "exports": "./src/mod.js",
   "publish": {
-    "exclude": []
+    "exclude": ["./dist"]
   },
   "lint": {
     "include": ["src/"],
