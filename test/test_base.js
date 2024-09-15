@@ -1,4 +1,4 @@
-import { Struct, VectorFix, VectorVar, Uint32, Uint24, Uint16, Uint8, Enum } from "../src/mod.js";
+import { Struct, Fixed, Minmax, Uint32, Uint24, Uint16, Uint8, Enum } from "../src/base.js";
 import { assertEquals, equal } from "@std/assert";
 
 Deno.test(
@@ -10,14 +10,14 @@ Deno.test(
       equal(actual, expected)
 
       const member = [new Uint8Array([0, 1, 2]), new Uint8Array([3, 7, 10])]
-      assertEquals(actual.member(), member)
+      assertEquals(actual.member, member)
    }
 )
 
 Deno.test(
-   "VectorFix",
+   "Fixed",
    () => {
-      const actual = new VectorFix(new Uint8Array([1, 2, 3, 4]), 4);
+      const actual = new Fixed(2,new Uint8Array([1, 2]), new Uint8Array([ 3, 4]));
       const expected = new Uint8Array([1, 2, 3, 4]);
 
       equal(actual, expected)
@@ -25,9 +25,9 @@ Deno.test(
 )
 
 Deno.test(
-   "VectorVar",
+   "Minmax",
    () => {
-      const actual = new VectorVar(new Uint8Array([1, 2, 3, 4]), 0, 2 ** (8 * 4) - 1);
+      const actual = new Minmax(0, 2 ** (8 * 4) - 1,new Uint8Array([1, 2, 3, 4]));
       const expected = new Uint8Array([0, 0, 0, 4, 1, 2, 3, 4]);
 
       equal(actual, expected)
@@ -69,15 +69,23 @@ Deno.test(
          [Enum.max]: 255
       });
       assertEquals(level.key(1),"warning");
-      assertEquals(level.value("fatal"), 2);
+      equal(level.value("fatal"), new Uint8Array([2]));
       assertEquals(level.maxvalue(), 255)
+      equal(new Uint8Array([1]), level.warning);
    }
 )
 
-const level = new Enum({
-   warning: 1,
-   fatal: 2,
-   [Enum.max]: 255
-});
+Deno.test(
+   "Fixed and Minmax",
+   ()=>{
+      const fixed4 = Fixed.length(4).bytes(new Uint8(1), new Uint8(2), new Uint8(3), new Uint8(4));
+      assertEquals(fixed4.length, 4);
 
-debugger;
+      const minmax = Minmax.min(0).max(10).byte(new Uint16(12));
+      assertEquals(minmax.min, 0);
+      assertEquals(minmax.max, 10);
+
+      const m = Minmax.min(0).max(12).byte(); 
+      equal(m, new Uint8(0))
+   }
+)

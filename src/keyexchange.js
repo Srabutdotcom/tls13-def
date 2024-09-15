@@ -3,19 +3,22 @@
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.1
  */
 
-import { Enum, OpaqueFix, OpaqueVar, Uint16 } from "./mod.js";
-import { concat, getUint16, uint8array } from "@aicone/byte"
+import { Minmax, Uint16 } from "./base.js";
 
 /**
  * ProtocolVersion -> 0x0303 - TLS v1.2 or 0x0304 - TLS v1.3
  */
 export class ProtocolVersion extends Uint16 {
+   static version = {
+      TLS12 : new ProtocolVersion(0x0303),
+      TLS13 : new ProtocolVersion(0x0304),
+      legacy : new ProtocolVersion(0x0303),
+   }
    /**
     * 
     * @param {0x0303|0x0304} ver - TLS version (1.2 or 1.3) 
     */
    constructor(ver) {
-      ver = version(ver);
       super(ver)
    }
    meaning() {
@@ -25,27 +28,22 @@ export class ProtocolVersion extends Uint16 {
    }
 }
 
-function version(ver) {
-   if ([0x0303, 0x0304].includes(ver) == false) throw TypeError(`Unexpected version - ${ver}`);
-   return ver;
-}
-
-export const legacy_version = new ProtocolVersion(0x0303);
-
 /**
  * opaque Random[32]
  */
-export class Random extends OpaqueFix {
+export class Random extends Uint8Array {
+   static new(){return new Random()}
    constructor() {
-      const rnd32 = crypto.getRandomValues(new Uint8Array(32));
-      super(rnd32, 32)
+      super(crypto.getRandomValues(new Uint8Array(32)))
    }
 }
 
 /**
- * CipherSuite selector
+ * uint8 CipherSuite[2];    Cryptographic suite selector 
  */
 export class CipherSuite extends Uint8Array {
+   static TLS_AES_128_GCM_SHA256 = new CipherSuite(0x01)
+   static TLS_AES_256_GCM_SHA384 = new CipherSuite(0x02)
    /**
     * @param {0x01|0x02} code 
     */
@@ -55,28 +53,30 @@ export class CipherSuite extends Uint8Array {
    meaning() {
       if (this.at(1) == 0x01) return 'TLS_AES_128_GCM_SHA256[0x13, 0x01]'
       if (this.at(1) == 0x02) return 'TLS_AES_256_GCM_SHA384[0x13, 0x02]'
-      throw TypeError(`Uknown cipher - ${this[1]}`)
+      throw TypeError(`Unknown cipher - ${this[1]}`)
+   }
+   get AEAD(){
+      if (this.at(1) == 0x01) return 128
+      if (this.at(1) == 0x02) return 256
+      return -1
+   }
+   get SHA(){
+      if (this.at(1) == 0x01) return 256
+      if (this.at(1) == 0x02) return 384
+      return -1
    }
 }
 
-export class CipherSuites extends OpaqueVar {
+export class CipherSuites extends Minmax {
    ciphers = {
-      TLS_AES_128_GCM_SHA256(){return new CipherSuite(0x01)},
-      TLS_AES_256_GCM_SHA384(){return new CipherSuite(0x02)}
+      TLS_AES_128_GCM_SHA256: new CipherSuite(0x01),
+      TLS_AES_256_GCM_SHA384: new CipherSuite(0x02)
    }
+   static new(){ return new CipherSuites }
    constructor() {
-      const uint8s = concat(new CipherSuite(0x01), new CipherSuite(0x02));
-      super(uint8s, 2, 65534)// <2..2^16-2>
+      super(2, 65534, new CipherSuite(0x01), new CipherSuite(0x02))// <2..2^16-2>
    }
 }
 
-export function cipherSuite(){
-   return {
-      TLS_AES_128_GCM_SHA256(){return new CipherSuite(0x01)},
-      TLS_AES_256_GCM_SHA384(){return new CipherSuite(0x02)}
-   }
-}
 
-const a = cipherSuite().TLS_AES_128_GCM_SHA256();
-debugger
 

@@ -1,47 +1,108 @@
-import { Extension, ExtensionType, HandshakeType, NamedGroupList, OpaqueVar, Random, ServerName, ServerNameList, SignatureSchemeList, Struct, Uint8 } from "./mod.js";
+import { Extension, Extensions } from "./extension/extension.js";
+import { ProtocolVersion, Random } from "./keyexchange.js"
+import { Minmax, Struct, Uint8 } from "./base.js";
+import { ClientShares } from "./extension/keyshare.js";
+import { CipherSuites } from "./keyexchange.js";
+
+var clientShares = await ClientShares.keyShareClientHello();
 
 /**
  * SessionId
  */
-export class SessionId extends OpaqueVar {
+class SessionId extends Minmax {
+   static new() { return new SessionId }
    constructor() {
-      const uuid = crypto.randomUUID().replaceAll('-', '')
-      const sessionId = new Uint8Array(Array.from(uuid, e => e.charCodeAt(0)));
-      super(sessionId, 0, 32)
+      super(
+         0,
+         32,
+         new Uint8Array(Array.from(
+            crypto.randomUUID().replaceAll('-', ''),
+            e => e.charCodeAt(0)))
+      )
+   }
+}
+/**
+ * opaque legacy_compression_methods<1..2^8-1>;
+ */
+class LegacyCompressionMethods extends Minmax {
+   static new(){return new LegacyCompressionMethods}
+   constructor() {
+      super(1, 2 ** 8 - 1, new Uint8(0))
    }
 }
 
 /**
- * ClientHello
+ * 
+ * ``` 
+ * uint16 ProtocolVersion;
+   opaque Random[32];
+
+   uint8 CipherSuite[2];    // Cryptographic suite selector 
+   
+   struct {
+      ProtocolVersion legacy_version = 0x0303;    // TLS v1.2 
+      Random random;
+      opaque legacy_session_id<0..32>;
+      CipherSuite cipher_suites<2..2^16-2>;
+      opaque legacy_compression_methods<1..2^8-1>;
+      Extension extensions<8..2^16-1>;
+   } ClientHello;
+   ```
+
+   When a client first connects to a server, it is REQUIRED to send the
+   ClientHello as its first TLS message.  The client will also send a
+   ClientHello when the server has responded to its ClientHello with a
+   HelloRetryRequest. 
+
+   https://datatracker.ietf.org/doc/html/rfc8446#section-4.1.2
+
  */
 export class ClientHello extends Struct {
-   type = HandshakeType.client_hello;
+   clientShares
    /**
     * 
-    * @param {string} SNI - Server Name Indication i.e. "localhost"
+    * @param  {...string} serverNames 
+    * @returns Promise for ClientHello
     */
-   constructor(SNI, keyShareEntries) {
-      const random = new Random;
-      const sessionId = new SessionId;
-      const compression = new Uint8Array([1, 0]);
-      const cipherSuites = new Uint8Array([0, 4, 0x13, 0x01, 0x13, 0x02])
-      const extensions = [
-         new Extension(ExtensionType.server_name, new ServerNameList(new ServerName(SNI))),
-         new Extension(ExtensionType.supported_groups, new NamedGroupList),
-         new Extension(ExtensionType.signature_algorithms, new SignatureSchemeList),
-         new Extension(ExtensionType.supported_versions, new SupportedVersions('client')),
-         new Extension(ExtensionType.psk_key_exchange_modes, new PskKeyExchangeModes),
-         new Extension(ExtensionType.key_share, new KeyShareClientHello(keyShareEntries)),
+   static async new(...serverNames) {
+      return new ClientHello(...serverNames)
+   }
+
+   /**
+    *
+    * @param {...string} serverNames - Server Name Indication i.e. "localhost"
+    */
+   constructor(...serverNames) {
+      //const compression = new Uint8Array([1, 0]);
+      const exts = [
+         Extension.extensions.server_name.serverNames(...serverNames),
+         Extension.extensions.supported_groups,
+         Extension.extensions.signature_algorithms,
+         Extension.extensions.supported_versions.client,
+         Extension.extensions.psk_key_exchange_modes,
+         Extension.new(clientShares, Extension.types.key_share)
       ]
 
       super(
-         protocolVersion,
-         random,
-         sessionId,
-         cipherSuites,
-         compression,
-         new OpaqueVar(concat(...extensions), 8, 2 ** 16 - 1)
+         ProtocolVersion.version.legacy,
+         Random.new(),
+         SessionId.new(),
+         CipherSuites.new(),
+         LegacyCompressionMethods.new(),
+         Extensions.new(
+            8,
+            2 ** 16 - 1,
+            ...exts
+         )
       )
+
+      this.clientShares = clientShares
+      this.sessionId = this.member[2];
+      this.cipherSuites = this.member[3];
 
    }
 }
+
+const ch = await ClientHello.new(..."localhost")
+
+debugger

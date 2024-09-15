@@ -1,25 +1,40 @@
 /**
  * ! 3.  Server Name Indication
  * LINK - https://datatracker.ietf.org/doc/html/rfc6066#section-3
+ * TLS does not provide a mechanism for a client to tell a server the
+   name of the server it is contacting.  It may be desirable for clients
+   to provide this information to facilitate secure connections to
+   servers that host multiple 'virtual' servers at a single underlying
+   network address.
  */
 
-import { OpaqueVar, Struct } from "../mod.js";
-import { uint8array } from "@aicone/byte"
+import { Minmax, Struct, Uint8 } from "../base.js";
+import { concat, uint8array } from "@aicone/byte"
 
 /**
- * ServerName - SNI
+ * enum {
+ * 
+          host_name(0), (255)
+      } NameType;
+
+ * struct {
+ * 
+          NameType name_type;
+          select (name_type) {
+              case host_name: HostName;
+          } name;
+      } ServerName;
  */
 export class ServerName extends Struct {
    /**
     * 
-    * @param {string|Uint8Array} hostname 
+    * @param {...Uint8Array|string} hostname 
     */
-   constructor(hostname) {
-      hostname = uint8array(hostname)
-      const NameType = new Uint8(0)
+   constructor(...hostname) {
+      hostname = hostname.map(e=>uint8array(e))
       super(
-         NameType,
-         new OpaqueVar(hostname, 1, 65535)//<1..2^16-1>
+         new Uint8(0), // NameType - host_name(0)
+         Minmax.min(1).max(65535).byte(...hostname)//new OpaqueVar(hostname, 1, 65535)//<1..2^16-1>
       )
    }
 }
@@ -28,12 +43,21 @@ export class ServerName extends Struct {
  */
 export class ServerNameList extends Struct {
    /**
+    * ServerNameList
+    * @param  {...string} serverName
+    * @return ServerNameList 
+    */
+   static list(...serverName) {
+      serverName = serverName.map(name => new ServerName(name));
+      return new ServerNameList(...serverName)
+   }
+   /**
     * 
     * @param {ServerName} server_name_list <1..2^16-1>
     */
-   constructor(server_name_list) {
+   constructor(...server_name_list) {
       super(
-         new OpaqueVar(server_name_list,1, 2 ** 16 - 1)
+         Minmax.min(1).max(2**16-1).byte(...server_name_list)//new OpaqueVar(server_name_list, 1, 2 ** 16 - 1)
       )
    }
 }

@@ -4,71 +4,97 @@
  * *DONE - verified
  */
 
-import { Enum, legacy_version, Struct, Uint16, Uint8 } from "./mod.js";
+import { Enum, Struct, Uint16, Uint8 } from "./base.js";
+import { ProtocolVersion } from "./keyexchange.js"
 import { concat } from "@aicone/byte"
 
-const contentType = {
-   /**@type {0} invalid */
-   invalid: 0,
-   /**@type {20} change_cipher_spec */
-   change_cipher_spec: 20,
-   /**@type {21} alert */
-   alert: 21,
-   /**@type {22} handshake */
-   handshake: 22,
-   /**@type {23} application_data */
-   application_data: 23,
-   /**@type {24} heartbeat */
-   heartbeat: 24, /* RFC 6520 */
-   /**@type {255} [Enum.max] */
-   [Enum.max]: 255
+class ContentType extends Uint8 {
+   constructor(value) { super(value) }
 }
+
 /**
- * @type {contentType} ContentType - type of content
- */
-export const ContentType = new Enum(contentType)
-/**
- * TLSPlaintext
+ * struct {
+ * 
+          ContentType type;
+          ProtocolVersion legacy_record_version;
+          uint16 length;
+          opaque fragment[TLSPlaintext.length];
+      } TLSPlaintext;
  */
 export class TLSPlaintext extends Struct {
+   static {
+      const types = {
+         /**@type {Uint8[0]} invalid - description */
+         invalid: 0,
+         /**@type {Uint8[20]} change_cipher_spec - description */
+         change_cipher_spec: 20,
+         /**@type {Uint8[21]} alert - description */
+         alert: 21,
+         /**@type {Uint8[22]} handshake - description */
+         handshake: 22,
+         /**@type {Uint8[23]} application_data - description */
+         application_data: 23,
+         /**@type {Uint8[24]} heartbeat - description */
+         heartbeat: 24, /* RFC 6520 */
+         [Enum.max]: 255,
+         [Enum.class]: ContentType
+      }
+      /**
+       * @type {types} this.contentType - description
+       */
+      this.contentType = new Enum(types)
+      this.alert = function (fragment) { return new TLSPlaintext(fragment, this.contentType.alert) }
+      this.application_data = function (fragment) { return new TLSPlaintext(fragment, this.contentType.application_data) }
+      this.change_cipher_spec = function (fragment) { return new TLSPlaintext(fragment, this.contentType.change_cipher_spec) }
+      this.handshake = function (fragment) { return new TLSPlaintext(fragment, this.contentType.handshake) }
+      this.heartbeat = function (fragment) { return new TLSPlaintext(fragment, this.contentType.heartbeat) }
+      this.invalid = function (fragment) { return new TLSPlaintext(fragment, this.contentType.invalid) }
+   }
    /**
     * 
     * @param {Uint8Array} fragment - the data being transmitted
+    * @param {ContentType} type - description
     */
-   constructor(fragment) {
-      fragment = fragment_(fragment);
+   constructor(fragment, type) {
       const length = new Uint16(fragment.length)
       super(
-         fragment.type,
-         legacy_version, //*uint16
+         type,
+         ProtocolVersion.version.legacy, //*uint16
          length, //*uint16
          fragment
       )
    }
 }
 
-function fragment_(fragment) {
-   const { type } = fragment
-   if (!type) throw TypeError(`Fragment doesn't have type`);
-   if (ContentType.keys().includes(type) == false) throw TypeError(`Unknown fragment type - ${type}`);
-   return fragment;
-}
-
 /**
- * TLSPlaintext format to be encrypted
+ * struct {
+ * 
+          opaque content[TLSPlaintext.length];
+          ContentType type;
+          uint8 zeros[length_of_padding];
+      } TLSInnerPlaintext;
  */
 export class TLSInnerPlaintext extends Struct {
+   static {
+      const { contentType } = TLSPlaintext
+      this.alert = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.alert, zeros) }
+      this.application_data = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.application_data, zeros) }
+      this.change_cipher_spec = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.change_cipher_spec, zeros) }
+      this.handshake = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.handshake, zeros) }
+      this.heartbeat = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.heartbeat, zeros) }
+      this.invalid = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.invalid, zeros) }
+   }
    /**
     * 
     * @param {TLSPlaintext} content 
-    * @param {string|number} contentType 
+    * @param {ContentType} type 
     * @param {number} zeros 
     */
-   constructor(content, contentType, zeros) {
+   constructor(content, type, zeros) {
       content = content_(content)
-      contentType = contentType_(contentType);
+      type = contentType_(type);
       zeros = zeros_(zeros)
-      const args = [content, contentType]
+      const args = [content, type]
       if (zeros && zeros.length) args.push(zeros)
       super(...args)
    }
@@ -80,21 +106,31 @@ function content_(content) {
 }
 
 function contentType_(type) {
-   const typeOf = typeof type
-   if (typeOf == "number" && (ContentType.values().includes(type) == false)) throw TypeError(`Uknown type - ${type}`);
-   if (typeOf == "string" && (ContentType.keys().includes(type) == false)) throw TypeError(`Uknown type - ${type}`);
-   return new Uint8(type)
+   if (type instanceof ContentType) return type
+   throw TypeError(`Uknown type - ${type}`);
 }
 
 function zeros_(length) {
-   if (length) return new Uint8Array(length);
+   length = Number(length)
+   if (length && typeof (length) == 'number') return new Uint8Array(length);
    return false
 }
 
 /**
- * Application data contain encryptedRecord
+ * struct {
+ * 
+         ContentType opaque_type = application_data;  23 
+         ProtocolVersion legacy_record_version = 0x0303;  TLS v1.2 
+         uint16 length;
+         opaque encrypted_record[TLSCiphertext.length];
+   } TLSCiphertext;
  */
 export class TLSCiphertext extends Struct {
+   /**
+    * 
+    * @param {Uint8Array} encryptedRecord 
+    */
+   static new(encryptedRecord) { return new TLSCiphertext(encryptedRecord) }
    /**
     * 
     * @param {Uint8Array} encryptedRecord 
@@ -102,14 +138,17 @@ export class TLSCiphertext extends Struct {
    constructor(encryptedRecord) {
       const length = new Uint16(encryptedRecord.length);
       super(
-         new Uint8(23), /* ContentType.application_data[23] */
-         legacy_version, /* TLS v1.2 */
+         TLSPlaintext.contentType.application_data, /* type.application_data[23] */
+         ProtocolVersion.version.legacy, /* TLS v1.2 */
          length, //*uint16
          encryptedRecord
       )
       this.encryptedRecord = encryptedRecord;
-      this.header = concat(new Uint8(23), legacy_version, length)
+      this.header = concat(TLSPlaintext.contentType.application_data, ProtocolVersion.version.legacy, length)
    }
 }
+
+export function tlsCiphertext(encryptedRecord) { return new TLSCiphertext(encryptedRecord) }
+
 /**@type { Uint8Array([20, 3, 3, 0, 1, 1]) } ChangeCipherSpec*/
 export const ChangeCipherSpec = new Uint8Array([20, 3, 3, 0, 1, 1]) 

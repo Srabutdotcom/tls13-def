@@ -1,0 +1,1 @@
+export { concat, uint8array } from "@aicone/byte"
