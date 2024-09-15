@@ -1,4 +1,4 @@
-import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint, Uint } from "@aicone/byte";
+import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint} from "@aicone/byte";
 import { getUint8, getUint16, getUint24, getUint32 } from "@aicone/byte";
 
 /**
@@ -11,14 +11,11 @@ export class Struct extends Uint8Array {
     * @param  {...Uint8Array} uint8s  
     */
    constructor(...uint8s) {
-      if (!uint8s || uint8s.length == 0) {
-         super();
-      } else if (uint8s.some(e => (e instanceof Uint8Array) == false)) {
+      super(uint8s && uint8s.length > 0 ? concat(...uint8s) : undefined);
+   
+      if (uint8s && uint8s.length > 0 && uint8s.some(e => !(e instanceof Uint8Array))) {
          throw TypeError(`all arguments must be Uint8Array`);
-      } else {
-         super(concat(...uint8s))
       }
-      this.#member = uint8s;
    }
    /**
     * 

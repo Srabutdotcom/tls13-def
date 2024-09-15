@@ -1,7 +1,7 @@
 import { Uint8 } from "./base.js";
 import { Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
-import { CipherSuite, ProtocolVersion, Random } from "./keyexchange.js";
+import { ProtocolVersion, Random } from "./keyexchange.js";
 
 /**
  * 

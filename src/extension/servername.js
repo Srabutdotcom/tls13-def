@@ -9,7 +9,7 @@
  */
 
 import { Minmax, Struct, Uint8 } from "../base.js";
-import { concat, uint8array } from "@aicone/byte"
+import { uint8array } from "@aicone/byte"
 
 /**
  * enum {

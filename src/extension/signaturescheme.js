@@ -2,7 +2,7 @@
  * !B.3.1.3.  Signature Algorithm Extension
  * LINK https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.1.3
  */
-import { concat } from "@aicone/byte"
+
 import { Enum, Minmax, Struct, Uint16 } from "../base.js";
 
 class SignatureAlgorithm extends Uint16 {

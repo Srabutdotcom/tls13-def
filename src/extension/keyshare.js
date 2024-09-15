@@ -18,6 +18,7 @@ import { p521 } from "../deps.js";
       } KeyShareEntry;
  */
 class KeyShareEntry extends Struct {
+   #NamedGroup = NamedGroup
    /**
     * 
     * @param {NamedGroup} group - NamedGroup 

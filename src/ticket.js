@@ -53,6 +53,7 @@ import { Extension, Extensions } from "./extension/extension.js";
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.1
  */
 export class NewSessionTicket extends Struct {
+   #Extension = Extension
    /**
     * 
     * @param {Uint8Array} ticket 
