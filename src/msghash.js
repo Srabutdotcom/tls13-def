@@ -1,4 +1,4 @@
-import { uint8array } from "./dep.js";
+import { uint8array } from "./deps.js";
 
 /**
  * return messageHash using specified hash algorithm

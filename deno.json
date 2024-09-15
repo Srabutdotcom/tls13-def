@@ -3,10 +3,11 @@
   "version": "0.1.1",
   "exports": "./src/mod.js",
   "publish": {
-    "exclude": ["./dist"]
+    "exclude": ["dist/"]
   },
   "lint": {
     "include": ["src/"],
+    "exclude": ["dist/"],
     "rules": {
       "exclude": ["no-var", "no-explicit-any", "no-slow-types"]
     }
