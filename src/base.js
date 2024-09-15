@@ -16,6 +16,8 @@ export class Struct extends Uint8Array {
       if (uint8s && uint8s.length > 0 && uint8s.some(e => !(e instanceof Uint8Array))) {
          throw TypeError(`all arguments must be Uint8Array`);
       }
+
+      this.#member = uint8s
    }
    /**
     * 
