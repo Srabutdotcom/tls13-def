@@ -6,7 +6,6 @@
 
 import { Uint8 } from "./base.js";
 import { Minmax, Struct } from "./base.js";
-import { uint8array } from "./dep.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { SignatureSchemeList } from "./extension/signaturescheme.js";
 
