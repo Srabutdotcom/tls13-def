@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-slow-types
+// @ts-self-types="./mod.d.ts"
 // ver 0.1.2
 export * from "./base.js"
 export * from "./alert.js"
