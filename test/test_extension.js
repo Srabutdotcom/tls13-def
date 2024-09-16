@@ -17,7 +17,7 @@ Deno.test(
       const svClient = SupportedVersions.client();
       const svServer = SupportedVersions.server();
 
-      assertEquals([2, 3, 4], Array.from(svClient));
+      assertEquals([4, 3, 3, 3, 4], Array.from(svClient));
       assertEquals([3, 4], Array.from(svServer));
    }
 )
@@ -76,7 +76,7 @@ Deno.test(
 
 Deno.test(
    "extension",
-   async() => {
+   async () => {
       const sni = Extension.extensions.server_name.serverNames("example.ulfheim.net");
       const clientShares = await Extension.extensions.key_share.client()
       const serverShare = await Extension.extensions.key_share.server.x25519()
@@ -84,8 +84,8 @@ Deno.test(
       assertEquals(sni instanceof Extension, true)
       assertEquals(clientShares instanceof Extension, true)
       assertEquals(serverShare instanceof Extension, true)
-      const extensions = new Extensions(0,2**16-2);
+      const extensions = new Extensions(0, 2 ** 16 - 2);
 
-      assertEquals(Array.from(extensions),[0,0])
+      assertEquals(Array.from(extensions), [0, 0])
    }
 )

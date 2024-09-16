@@ -30,23 +30,23 @@ export class SupportedVersions extends Struct {
     * 
     * @returns SupportedVersions - for client new Uint8Array([2, 3, 4])
     */
-   static client(){ return new SupportedVersions(true)}
+   static client() { return new SupportedVersions(true) }
    /**
     * 
     * @returns SupportedVersions - for server new Uint8Array([3, 4])
     */
-   static server(){ return new SupportedVersions()}
+   static server() { return new SupportedVersions() }
    /**
     * 
     * @returns SupportedVersions - for server new Uint8Array([3, 4])
     */
-   static retry(){ return new SupportedVersions()}
+   static retry() { return new SupportedVersions() }
    /**
     * 
     * @param {boolean} client - true if it is for client 
     */
    constructor(client) {
-      const versions = client ? new Uint8Array([2, 3, 4]) : new Uint8Array([3, 4])
+      const versions = client ? new Uint8Array([4, 3, 3, 3, 4]) : new Uint8Array([3, 4])
       super(versions)
    }
 }
