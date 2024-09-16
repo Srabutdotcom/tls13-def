@@ -68,7 +68,7 @@ Deno.test(
       const ss = await ServerShare.x25519();
 
       assertEquals(cs instanceof KeyShareClientHello, true);
-      assertEquals(cs.length, 38);
+      assertEquals(cs.length, 279);
       assertEquals(ss instanceof KeyShareServerHello, true);
       assertEquals(ss.length, 36);
    }
