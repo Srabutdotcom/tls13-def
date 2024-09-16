@@ -3,6 +3,7 @@ import { ProtocolVersion, Random } from "./keyexchange.js"
 import { Minmax, Struct, Uint8 } from "./base.js";
 import { ClientShares } from "./extension/keyshare.js";
 import { CipherSuites } from "./keyexchange.js";
+import { Handshake } from "./handshake.js";
 
 var clientShares = await ClientShares.keyShareClientHello();
 
@@ -95,14 +96,20 @@ export class ClientHello extends Struct {
             ...exts
          )
       )
-
       this.clientShares = clientShares
       this.sessionId = this.member[2];
       this.cipherSuites = this.member[3];
-
+   }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap(){
+      return Handshake.client_hello(this)
    }
 }
 
 /* const ch = ClientHello.new("localhost")
+const hs = ch.wrap();
 
 debugger */

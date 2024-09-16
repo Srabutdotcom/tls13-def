@@ -5,6 +5,7 @@
  */
 
 import { Enum, Struct, Uint8 } from "./base.js";
+import { Handshake } from "./handshake.js";
 
 /**
  * EndOfEarlyData - If the server sent an "early_data" extension in EncryptedExtensions,
@@ -26,17 +27,24 @@ import { Enum, Struct, Uint8 } from "./base.js";
     } EndOfEarlyData;
  */
 export class EndOfEarlyData extends Struct {
-   static new(){return new EndOfEarlyData}
+   static new() { return new EndOfEarlyData }
    constructor() { super() }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap() {
+      return Handshake.end_of_early_data(this)
+   }
 }
 
-class KeyUpdateRequest extends Uint8 { 
+class KeyUpdateRequest extends Uint8 {
    /**
     * 
     * @param {0|1} v 
     */
-   constructor(v){
-      if([0,1].includes(v)==false) throw TypeError(`Expected value 0 or 1`)
+   constructor(v) {
+      if ([0, 1].includes(v) == false) throw TypeError(`Expected value 0 or 1`)
       super(v)
    }
 }
@@ -107,19 +115,26 @@ export class KeyUpdate extends Struct {
       /**
        * @type {types} this.types - description
        */
-      this.types =  new Enum(types)
+      this.types = new Enum(types)
    }
    static {
-      this.update_not_requested= new KeyUpdate(KeyUpdate.types.update_not_requested),
-      this.update_requested= new KeyUpdate(KeyUpdate.types.update_requested)
+      this.update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested),
+         this.update_requested = new KeyUpdate(KeyUpdate.types.update_requested)
    }
    /**
     * 
     * @param {KeyUpdateRequest} request_update //Uint8[0]|Uint8[1]
     */
    constructor(request_update) {
-      if((request_update instanceof KeyUpdateRequest)==false)throw TypeError(`Expected KeyUpdateRequest type`)
+      if ((request_update instanceof KeyUpdateRequest) == false) throw TypeError(`Expected KeyUpdateRequest type`)
       super(request_update)
+   }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap() {
+      return Handshake.key_update(this)
    }
 }
 

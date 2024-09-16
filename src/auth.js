@@ -6,6 +6,7 @@
 
 import { Enum, Minmax, Struct, Uint16, Uint8 } from "./base.js";
 import { SignatureSchemeList } from "./extension/signaturescheme.js";
+import { Handshake } from "./handshake.js";
 
 class CertificateType extends Uint8 {
     constructor(value) { super(value) }
@@ -98,6 +99,13 @@ export class Certificate extends Struct {
             certificate_list
         )
     }
+    /**
+    * 
+    * @returns Hanshake message
+    */
+    wrap() {
+        return Handshake.certificate(this)
+    }
 }
 
 /**
@@ -147,6 +155,13 @@ export class CertificateVerify extends Struct {
             Minmax.min(0).max(2 ** 16 - 1).byte(signature)
         )
     }
+    /**
+    * 
+    * @returns Hanshake message
+    */
+    wrap() {
+        return Handshake.certificate_verify(this)
+    }
 }
 /**
  * struct {
@@ -162,6 +177,13 @@ export class Finished extends Struct {
      */
     constructor(verify_data) {
         super(verify_data)
+    }
+    /**
+    * 
+    * @returns Hanshake message
+    */
+    wrap() {
+        return Handshake.finished(this)
     }
 }
 

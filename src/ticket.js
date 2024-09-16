@@ -6,6 +6,7 @@
 
 import { Minmax, Struct, Uint32, Uint8 } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
+import { Handshake } from "./handshake.js";
 
 /**
  * struct {
@@ -80,6 +81,13 @@ export class NewSessionTicket extends Struct {
          opaqueTicket,
          Extensions.new(0, 2**16-2, ...extensions)
       )
+   }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap(){
+      return Handshake.new_session_ticket(this)
    }
 }
 

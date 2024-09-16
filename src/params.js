@@ -8,6 +8,7 @@ import { Uint8 } from "./base.js";
 import { Minmax, Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { SignatureSchemeList } from "./extension/signaturescheme.js";
+import { Handshake } from "./handshake.js";
 
 /**
  * 
@@ -145,6 +146,13 @@ export class EncryptedExtensions extends Struct {
          Extensions.new(0, 2 ** 16 - 1, ...extensions)
       )
    }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap(){
+      return Handshake.encrypted_extensions(this)
+   }
 }
 
 /**
@@ -180,6 +188,13 @@ export class CertificateRequest extends Struct {
          new Uint8(0),
          Extensions.new(2, 2 ** 16 - 1, Extension.new(signature_algorithms, Extension.types.signature_algorithms))
       )
+   }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap(){
+      return Handshake.certificate_request(this)
    }
 }
 

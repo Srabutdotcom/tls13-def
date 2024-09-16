@@ -1,4 +1,5 @@
 import { uint8array } from "./deps.js";
+import { Handshake } from "./handshake.js";
 
 /**
  * return messageHash using specified hash algorithm
@@ -35,5 +36,12 @@ export class MessageHash extends Uint8Array {
     * @param {ArrayBuffer} msg 
     */
    constructor(msg){super(msg)}
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap() {
+      return Handshake.message_hash(this)
+  }
 }
 

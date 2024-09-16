@@ -1,6 +1,7 @@
 import { Uint8 } from "./base.js";
 import { Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
+import { Handshake } from "./handshake.js";
 import { ProtocolVersion, Random } from "./keyexchange.js";
 
 /**
@@ -52,6 +53,13 @@ export class ServerHello extends Struct {
          LegacyCompressionMethod.new(),
          extensions
       )
+   }
+   /**
+    * 
+    * @returns Hanshake message
+    */
+   wrap(){
+      return Handshake.server_hello(this)
    }
 }
 
