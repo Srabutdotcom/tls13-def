@@ -224,9 +224,9 @@ class Keys {
    async keyShareClientHello() {
       return new KeyShareClientHello(
          await this.x25519.keyShareEntry(),
-         /* await this.ecdh521.keyShareEntry(),
+         await this.ecdh521.keyShareEntry(),
          await this.ecdh384.keyShareEntry(),
-         await this.ecdh256.keyShareEntry() */
+         await this.ecdh256.keyShareEntry()
       )
    }
 }
