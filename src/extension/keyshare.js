@@ -215,13 +215,18 @@ class Keys {
    /**
     * 
     * @returns KeyShareClientHello
+    * Clients MUST NOT offer multiple KeyShareEntry values
+   for the same group.  Clients MUST NOT offer any KeyShareEntry values
+   for groups not listed in the client's "supported_groups" extension.
+   Servers MAY check for violations of these rules and abort the
+   handshake with an "illegal_parameter" alert if one is violated.
     */
    async keyShareClientHello() {
       return new KeyShareClientHello(
          await this.x25519.keyShareEntry(),
-         await this.ecdh521.keyShareEntry(),
+         /* await this.ecdh521.keyShareEntry(),
          await this.ecdh384.keyShareEntry(),
-         await this.ecdh256.keyShareEntry()
+         await this.ecdh256.keyShareEntry() */
       )
    }
 }
