@@ -56,7 +56,7 @@ Deno.test(
    () => {
       //NamedGroupList
       const ngL = NamedGroupList.list();
-      assertEquals(Array.from(ngL), [0, 8, 0, 23, 0, 24, 0, 25, 0, 29])
+      assertEquals(Array.from(ngL), [0, 8, 0, 29, 0, 25, 0, 24, 0, 23])
    }
 )
 
@@ -68,7 +68,7 @@ Deno.test(
       const ss = await ServerShare.x25519();
 
       assertEquals(cs instanceof KeyShareClientHello, true);
-      assertEquals(cs.length, 279);
+      assertEquals(cs.length, 38);
       assertEquals(ss instanceof KeyShareServerHello, true);
       assertEquals(ss.length, 36);
    }
