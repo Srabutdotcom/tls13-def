@@ -56,7 +56,7 @@ Deno.test(
    () => {
       //NamedGroupList
       const ngL = NamedGroupList.list();
-      assertEquals(Array.from(ngL), [0, 8, 0, 29, 0, 25, 0, 24, 0, 23])
+      assertEquals(Array.from(ngL), [0, 8, 0, 23, 0, 24, 0, 25, 0, 29])
    }
 )
 

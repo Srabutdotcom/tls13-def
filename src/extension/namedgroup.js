@@ -56,10 +56,10 @@ export class NamedGroupList extends Struct {
    constructor() {
       const { namedGroup } = NamedGroupList;
       const named_group_list = [
-         namedGroup.x25519,
-         namedGroup.secp521r1,
-         namedGroup.secp384r1,
          namedGroup.secp256r1,
+         namedGroup.secp384r1,
+         namedGroup.secp521r1,
+         namedGroup.x25519,
       ]
 
       super(
