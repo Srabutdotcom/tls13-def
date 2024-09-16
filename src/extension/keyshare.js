@@ -39,6 +39,14 @@ class KeyShareEntry extends Struct {
  * 
          KeyShareEntry client_shares<0..2^16-1>;
       } KeyShareClientHello;
+
+   client_shares:  A list of offered KeyShareEntry values in descending
+      order of client preference.
+
+      Each KeyShareEntry value MUST correspond to a
+   group offered in the "supported_groups" extension and MUST appear in
+   the same order.
+
  * 
  */
 class KeyShareClientHello extends Struct {
