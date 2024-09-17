@@ -5,6 +5,7 @@
  */
 
 import { Enum, Struct, Uint16, Uint8 } from "./base.js";
+import { ClientHello } from "./clienthello.js";
 import { ProtocolVersion } from "./keyexchange.js"
 import { concat } from "@aicone/byte"
 
@@ -167,6 +168,6 @@ export class ChangeCipherSpec extends Uint8 {
       super(1)
    }
 }
-/**@type { Uint8Array([20, 3, 3, 0, 1, 1]) } ChangeCipherSpec*/
-/* const changeCipherSpec = new ChangeCipherSpec
-; debugger;  */
+
+const chrecord = TLSPlaintext.handshake(ClientHello.new('smtp'));
+debugger;

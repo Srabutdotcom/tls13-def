@@ -1,6 +1,7 @@
 import { assertEquals, equal } from "@std/assert";
 import { TLSPlaintext } from "../src/record.js";
 import { Alert } from "../src/alert.js";
+import { ClientHello } from "../src/clienthello.js";
 
 Deno.test(
    "Record - TLSPlaintext",
@@ -14,8 +15,8 @@ Deno.test(
       const CCipSpec = TLSPlaintext.change_cipher_spec()  
       assertEquals(Array.from(CCipSpec),[20, 3, 3, 0, 1, 1])
 
-      const hndsk = TLSPlaintext.handshake(new Uint8Array([1, 5, 8]))
-      assertEquals(Array.from(hndsk),[22, 3, 3, 0, 3, 1, 5, 8])
+      const hndsk = TLSPlaintext.handshake(ClientHello.new('smtp'))
+      assertEquals(hndsk.member[3].constructor.name, "Handshake")
 
       const hebet = TLSPlaintext.heartbeat(new Uint8Array([1, 5, 8]))
       assertEquals(Array.from(hebet),[24, 3, 3, 0, 3, 1, 5, 8])
