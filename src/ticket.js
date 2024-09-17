@@ -64,6 +64,8 @@ export class NewSessionTicket extends Struct {
    static new(ticket, ...extensions) {
       return new NewSessionTicket(ticket, ...extensions)
    }
+   payload = this.wrap
+   handshake = this.wrap
    /**
     * 
     * @param {Uint8Array} ticket 

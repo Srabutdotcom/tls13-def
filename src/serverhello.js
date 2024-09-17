@@ -38,6 +38,17 @@ export class ServerHello extends Struct {
     * @param {CipherSuite} cipher 
     * @param {Extension} serverShareExtension 
     */
+   static new(sessionId, cipher, serverShareExtension){
+      return new ServerHello(sessionId, cipher, serverShareExtension)
+   }
+   payload = this.wrap
+   handshake = this.wrap
+   /**
+    * 
+    * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
+    * @param {CipherSuite} cipher 
+    * @param {Extension} serverShareExtension 
+    */
    constructor(sessionId, cipher, serverShareExtension){
       const extensions = Extensions.new(
          6,

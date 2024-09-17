@@ -134,6 +134,9 @@ export class PostHandshakeAuth extends Struct {
    } EncryptedExtensions;
  */
 export class EncryptedExtensions extends Struct {
+   static new(...extensions){ return new EncryptedExtensions(...extensions)}
+   payload = this.wrap
+   handshake = this.wrap
    /**
     * 
     * @param {...Extension} extensions 
@@ -179,6 +182,8 @@ export class CertificateRequest extends Struct {
     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
     */
    static new(signature_algorithms=SignatureSchemeList.list()) { return new CertificateRequest(signature_algorithms) }
+   payload = this.wrap
+   handshake = this.wrap
    /**
     * 
     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm

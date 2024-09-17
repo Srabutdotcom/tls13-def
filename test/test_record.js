@@ -11,8 +11,8 @@ Deno.test(
       const app = TLSPlaintext.application_data(new Uint8Array([1, 5, 8]))
       assertEquals(Array.from(app),[23, 3, 3, 0, 3, 1, 5, 8])
 
-      const CCipSpec = TLSPlaintext.change_cipher_spec(new Uint8Array([1, 5, 8]))  
-      assertEquals(Array.from(CCipSpec),[20, 3, 3, 0, 3, 1, 5, 8])
+      const CCipSpec = TLSPlaintext.change_cipher_spec()  
+      assertEquals(Array.from(CCipSpec),[20, 3, 3, 0, 1, 1])
 
       const hndsk = TLSPlaintext.handshake(new Uint8Array([1, 5, 8]))
       assertEquals(Array.from(hndsk),[22, 3, 3, 0, 3, 1, 5, 8])

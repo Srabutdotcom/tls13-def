@@ -68,6 +68,8 @@ export class ClientHello extends Struct {
    static new(...serverNames) {
       return new ClientHello(...serverNames)
    }
+   payload = this.wrap
+   handshake = this.wrap
 
    /**
     *

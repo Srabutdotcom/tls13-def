@@ -5,10 +5,17 @@
 ### Usage
 
 ```javascript
-import * as tls13def from 'tls13def.js';
-//create Alert
-const tlsAlert = alert().level.fatal().description.bad_certificate()
-const meaning = tlsAlert.meaning() // "fatal[2]-bad_certificate[42]"
+import { ClientHello, ServerHello } from 'mod.js';
+
+//create ClientHello message
+const clientHello = ClientHello.new('smpt.hello.mail')
+//create record of clientHello
+const recordCH = TLSPlainText.handshake(clientHello)
+
+//create ServerHello message
+const serverHello = ServerHello.new(sessionId, cipher, serverShareExtension);
+//create record of serverHello 
+const recordSH = TLSPlainText.handshake(serverHello)
 
 ```
 

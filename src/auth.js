@@ -69,6 +69,7 @@ export class Certificate extends Struct {
         /**@type {types} this.type - description */
         this.types = new Enum(types)
     }
+    static new(certificate_list, certificate_request_context = new Uint8(0)){return new Certificate(certificate_list, certificate_request_context )}
     /**
      * 
      * @param  {...Uint8Array} certs 
@@ -88,6 +89,8 @@ export class Certificate extends Struct {
             }
         }
     }
+    payload = this.wrap
+    handshake = this.wrap
     /**
      * 
      * @param {CertificateEntry[]} certificate_list - list of CertificateEntry
@@ -144,6 +147,11 @@ export class CertificateVerify extends Struct {
         }
     }
 
+    static new(algorithm, signature){return new CertificateVerify(algorithm, signature)}
+
+    payload = this.wrap;
+    handshake = this.wrap
+
     /**
      * 
      * @param {Uint8Array} algorithm SignatureScheme algorithm
@@ -170,6 +178,9 @@ export class CertificateVerify extends Struct {
     } Finished;
  */
 export class Finished extends Struct {
+    static new(verify_data){ return new Finished(verify_data)}
+    payload = this.wrap
+    handshake = this.wrap
 
     /**
      * 

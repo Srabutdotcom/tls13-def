@@ -28,6 +28,8 @@ import { Handshake } from "./handshake.js";
  */
 export class EndOfEarlyData extends Struct {
    static new() { return new EndOfEarlyData }
+   payload = this.wrap
+   handshake = this.wrap
    constructor() { super() }
    /**
     * 
@@ -118,9 +120,11 @@ export class KeyUpdate extends Struct {
       this.types = new Enum(types)
    }
    static {
-      this.update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested),
-         this.update_requested = new KeyUpdate(KeyUpdate.types.update_requested)
+      this.update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested)
+      this.update_requested = new KeyUpdate(KeyUpdate.types.update_requested)
    }
+   payload = this.wrap
+   handshake = this.wrap
    /**
     * 
     * @param {KeyUpdateRequest} request_update //Uint8[0]|Uint8[1]

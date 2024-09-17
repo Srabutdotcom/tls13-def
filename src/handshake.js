@@ -85,48 +85,48 @@ export class Handshake extends Struct {
        * @type {types} this.type - description
        */
       this.types = new Enum(types)
-      this.client_hello = function(msg){
-         if(msg instanceof ClientHello == true)return new Handshake(msg, this.types.client_hello);
+      this.client_hello = function (msg) {
+         if (msg instanceof ClientHello == true) return new Handshake(msg, this.types.client_hello);
          throw TypeError(`msg is not ClientHello class`)
       }
-      this.server_hello= function(msg){
-         if(msg instanceof ServerHello == true)return new Handshake(msg, this.types.server_hello);
+      this.server_hello = function (msg) {
+         if (msg instanceof ServerHello == true) return new Handshake(msg, this.types.server_hello);
          throw TypeError(`msg is not ServerHello class`)
       }
-      this.new_session_ticket= function(msg){ 
-         if(msg instanceof NewSessionTicket == true)return  new Handshake(msg, this.types.new_session_ticket);
+      this.new_session_ticket = function (msg) {
+         if (msg instanceof NewSessionTicket == true) return new Handshake(msg, this.types.new_session_ticket);
          throw TypeError(`msg is not NewSessionTicket class`)
       }
-      this.end_of_early_data= function(msg){ 
-         if(msg instanceof EndOfEarlyData == true)return new Handshake(msg, this.types.end_of_early_data);
+      this.end_of_early_data = function (msg) {
+         if (msg instanceof EndOfEarlyData == true) return new Handshake(msg, this.types.end_of_early_data);
          throw TypeError(`msg is not EndOfEarlyData class`)
       }
-      this.encrypted_extensions= function(msg){
-         if(msg instanceof EncryptedExtensions == true)return new Handshake(msg, types.encrypted_extensions)
+      this.encrypted_extensions = function (msg) {
+         if (msg instanceof EncryptedExtensions == true) return new Handshake(msg, types.encrypted_extensions)
          throw TypeError(`msg is not EncryptedExtensions class`)
       }
-      this.certificate=function(msg){
-         if(msg instanceof Certificate == true)return  new Handshake(msg, this.types.certificate)
+      this.certificate = function (msg) {
+         if (msg instanceof Certificate == true) return new Handshake(msg, this.types.certificate)
          throw TypeError(`msg is not Certificate class`)
       }
-      this.certificate_request= function(msg){
-         if(msg instanceof CertificateRequest == true)return  new Handshake(msg, this.types.certificate_request)
-            throw TypeError(`msg is not CertificateRequest class`)
+      this.certificate_request = function (msg) {
+         if (msg instanceof CertificateRequest == true) return new Handshake(msg, this.types.certificate_request)
+         throw TypeError(`msg is not CertificateRequest class`)
       }
-      this.certificate_verify= function(msg){
-         if(msg instanceof CertificateVerify == true)return          new Handshake(msg, this.types.certificate_verify)
-            throw TypeError(`msg is not CertificateVerify class`)
+      this.certificate_verify = function (msg) {
+         if (msg instanceof CertificateVerify == true) return new Handshake(msg, this.types.certificate_verify)
+         throw TypeError(`msg is not CertificateVerify class`)
       }
-      this.finished= function(msg){
-         if(msg instanceof Finished == true)return   new Handshake(msg, this.types.finished)
-            throw TypeError(`msg is not Finished class`)
+      this.finished = function (msg) {
+         if (msg instanceof Finished == true) return new Handshake(msg, this.types.finished)
+         throw TypeError(`msg is not Finished class`)
       }
-      this.key_update= function(msg){
-         if(msg instanceof KeyUpdate == true)return  new Handshake(msg, this.types.key_update)
-            throw TypeError(`msg is not KeyUpdate class`)
+      this.key_update = function (msg) {
+         if (msg instanceof KeyUpdate == true) return new Handshake(msg, this.types.key_update)
+         throw TypeError(`msg is not KeyUpdate class`)
       }
-      this.message_hash= function(msg){
-         if(msg instanceof MessageHash == true)return new Handshake(msg, this.types.message_hash)
+      this.message_hash = function (msg) {
+         if (msg instanceof MessageHash == true) return new Handshake(msg, this.types.message_hash)
          throw TypeError(`msg is not MessageHash class`)
       }
    }
@@ -141,9 +141,9 @@ export class Handshake extends Struct {
          type,
          length, //*uint24 
          message
-      ) 
+      )
    }
-   get sequence(){
+   get sequence() {
       return {
          type: new Uint8,
          length: new Uint24,

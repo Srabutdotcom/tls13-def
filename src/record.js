@@ -45,8 +45,8 @@ export class TLSPlaintext extends Struct {
       this.contentType = new Enum(types)
       this.alert = function (fragment) { return new TLSPlaintext(fragment, this.contentType.alert) }
       this.application_data = function (fragment) { return new TLSPlaintext(fragment, this.contentType.application_data) }
-      this.change_cipher_spec = function (fragment) { return new TLSPlaintext(fragment, this.contentType.change_cipher_spec) }
-      this.handshake = function (fragment) { return new TLSPlaintext(fragment, this.contentType.handshake) }
+      this.change_cipher_spec = function (payload = ChangeCipherSpec.new()) { return new TLSPlaintext(payload, this.contentType.change_cipher_spec) }
+      this.handshake = function (msg) { return new TLSPlaintext(msg.wrap(), this.contentType.handshake) }
       this.heartbeat = function (fragment) { return new TLSPlaintext(fragment, this.contentType.heartbeat) }
       this.invalid = function (fragment) { return new TLSPlaintext(fragment, this.contentType.invalid) }
    }
@@ -67,12 +67,16 @@ export class TLSPlaintext extends Struct {
 }
 
 /**
+ * content format to be protected
+ * 
  * struct {
  * 
           opaque content[TLSPlaintext.length];
           ContentType type;
           uint8 zeros[length_of_padding];
       } TLSInnerPlaintext;
+
+   https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
  */
 export class TLSInnerPlaintext extends Struct {
    static {
@@ -117,6 +121,8 @@ function zeros_(length) {
 }
 
 /**
+ * Application Data
+ * 
  * struct {
  * 
          ContentType opaque_type = application_data;  23 
@@ -124,6 +130,8 @@ function zeros_(length) {
          uint16 length;
          opaque encrypted_record[TLSCiphertext.length];
    } TLSCiphertext;
+
+   https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
  */
 export class TLSCiphertext extends Struct {
    /**
@@ -148,7 +156,17 @@ export class TLSCiphertext extends Struct {
    }
 }
 
-export function tlsCiphertext(encryptedRecord) { return new TLSCiphertext(encryptedRecord) }
-
+/**
+ * ChangeCipherSpec 
+ * [1]
+ * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
+ */
+export class ChangeCipherSpec extends Uint8 {
+   static new(){return new ChangeCipherSpec}
+   constructor(){
+      super(1)
+   }
+}
 /**@type { Uint8Array([20, 3, 3, 0, 1, 1]) } ChangeCipherSpec*/
-export const ChangeCipherSpec = new Uint8Array([20, 3, 3, 0, 1, 1]) 
+/* const changeCipherSpec = new ChangeCipherSpec
+; debugger;  */

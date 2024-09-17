@@ -31,6 +31,8 @@ export class MessageHash extends Uint8Array {
          }
       }
    }
+   payload = this.wrap
+   handshake = this.wrap
    /**
     * 
     * @param {ArrayBuffer} msg 
