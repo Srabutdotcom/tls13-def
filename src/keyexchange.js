@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/keyexchange.d.ts"
 /**
  * !SECTION B.3.1.  Key Exchange Messages
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.1

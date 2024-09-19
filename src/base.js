@@ -1,4 +1,6 @@
-import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint} from "@aicone/byte";
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/base.d.ts"
+import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint } from "@aicone/byte";
 import { getUint8, getUint16, getUint24, getUint32 } from "@aicone/byte";
 
 /**
@@ -12,11 +14,11 @@ export class Struct extends Uint8Array {
     */
    constructor(...uint8s) {
       super(uint8s && uint8s.length > 0 ? concat(...uint8s) : undefined);
-   
+
       if (uint8s && uint8s.length > 0 && uint8s.some(e => !(e instanceof Uint8Array))) {
          throw TypeError(`all arguments must be Uint8Array`);
       }
-
+      
       this.#member = uint8s
    }
    /**
@@ -118,15 +120,23 @@ export class Minmax extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint8 extends Uint8Array {
+   /**
+    * 
+    * @param {number} int 
+    */
    static new(v) { return new Uint8(v) }
    /**
     * 
-    * @param {uint} int 
+    * @param {number} int 
     */
    constructor(int) {
       int = uint(int)
       super(Uint8BE(int, 1).buffer)
    }
+   /**
+    * 
+    * @returns {number}
+    */
    value() { return getUint8(this) }
 }
 
@@ -135,15 +145,23 @@ export class Uint8 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint16 extends Uint8Array {
+   /**
+    * 
+    * @param {number} int 
+    */
    static new(v) { return new Uint16(v) }
    /**
     * 
-    * @param {uint} int 
+    * @param {number} int 
     */
    constructor(int) {
       int = uint(int)
       super(Uint16BE(int).buffer)
    }
+   /**
+    * 
+    * @returns {number}
+    */
    value() { return getUint16(this) }
 }
 
@@ -152,15 +170,23 @@ export class Uint16 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint24 extends Uint8Array {
+   /**
+    * 
+    * @param {number} int 
+    */
    static new(v) { return new Uint24(v) }
    /**
     * 
-    * @param {uint} int 
+    * @param {number} int 
     */
    constructor(int) {
       int = uint(int)
       super(Uint24BE(int).buffer)
    }
+   /**
+    * 
+    * @returns {number}
+    */
    value() { return getUint24(this) }
 }
 
@@ -169,15 +195,23 @@ export class Uint24 extends Uint8Array {
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint32 extends Uint8Array {
+   /**
+    * 
+    * @param {number} int 
+    */
    static new(v) { return new Uint32(v) }
    /**
     * 
-    * @param {uint} int 
+    * @param {number} int 
     */
    constructor(int) {
       int = uint(int)
       super(Uint32BE(int).buffer)
    }
+   /**
+    * 
+    * @returns {number}
+    */
    value() { return getUint32(this) }
 }
 
@@ -271,10 +305,35 @@ export class Enum {
    }
 }
 
+/**
+ * Uint[s] method container
+ */
 export class Uints {
+   /**
+    * 
+    * @param {number} v 
+    * @returns {Uint8}
+    */
    static Uint8(v) { class Length extends Uint8 { constructor(v) { super(v) } }; return new Length(v) }
+   /**
+    * 
+    * @param {number} v 
+    * @returns {Uint16}
+    */
    static Uint16(v) { class Length extends Uint16 { constructor(v) { super(v) } }; return new Length(v) }
+   /**
+    * 
+    * @param {number} v 
+    * @returns {Uint24}
+    */
    static Uint24(v) { class Length extends Uint24 { constructor(v) { super(v) } }; return new Length(v) }
+   /**
+    * 
+    * @param {number} v 
+    * @returns {Uint32}
+    */
    static Uint32(v) { class Length extends Uint32 { constructor(v) { super(v) } }; return new Length(v) }
 }
+
+// npx -p typescript tsc base.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../dist
 

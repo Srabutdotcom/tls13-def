@@ -7,10 +7,18 @@
 import { Struct, Uint8, Enum } from "./base.js";
 
 class AlertLevel extends Uint8 {
+   /**
+    * 
+    * @param {number} value 
+    */
    constructor(value) { super(value) }
 }
 
 class AlertDescription extends Uint8 {
+   /**
+    * 
+    * @param {number} value 
+    */
    constructor(value) { super(value) }
 }
 
@@ -18,7 +26,12 @@ class AlertDescription extends Uint8 {
  * Alert handshake message
  */
 export class Alert extends Struct {
-   static level = new Enum({
+   /**
+    * A static enum representing level
+    * @static
+    * @enum { number }
+    */
+   static levelCore = {
       /**@type {1} warning */
       warning: 1,
       /**@type {2} fatal */
@@ -26,8 +39,14 @@ export class Alert extends Struct {
       /**@type {255} [Enum.max] */
       [Enum.max]: 255,
       [Enum.class]: AlertLevel
-   })
-   static description = new Enum({
+   }
+   static level = new Enum(Alert.levelCore)
+   /**
+    * A static enum representing description
+    * @static
+    * @enum { number }
+    */
+   static desCore = {
       /**@type {0} close_notify */
       close_notify: 0,
       /**@type {10} unexpected_message */
@@ -99,48 +118,47 @@ export class Alert extends Struct {
       /**@type {255} Enum.max */
       [Enum.max]: 255,
       [Enum.class]: AlertDescription
-   })
-   static {
-      const { level, description } = Alert; 
-      this.close_notify= new Alert(level.warning, description.close_notify)
-      this.unexpected_message= new Alert(level.fatal, description.unexpected_message)
-      this.bad_record_mac= new Alert(level.fatal, description.bad_record_mac)
-      this.decryption_failed_RESERVED= new Alert(level.warning, description.decryption_failed_RESERVED)
-      this.record_overflow= new Alert(level.fatal, description.record_overflow)
-      this.decompression_failure_RESERVED= new Alert(level.warning, description.decompression_failure_RESERVED)
-      this.handshake_failure= new Alert(level.fatal, description.handshake_failure)
-      this.no_certificate_RESERVED= new Alert(level.warning, description.no_certificate_RESERVED)
-      this.bad_certificate= new Alert(level.fatal, description.bad_certificate)
-      this.unsupported_certificate= new Alert(level.fatal, description.unsupported_certificate)
-      this.certificate_revoked= new Alert(level.fatal, description.certificate_revoked)
-      this.certificate_expired= new Alert(level.fatal, description.certificate_expired)
-      this.certificate_unknown= new Alert(level.fatal, description.certificate_unknown)
-      this.illegal_parameter= new Alert(level.fatal, description.illegal_parameter)
-      this.unknown_ca= new Alert(level.fatal, description.unknown_ca)
-      this.access_denied= new Alert(level.fatal, description.access_denied)
-      this.decode_error= new Alert(level.fatal, description.decode_error)
-      this.decrypt_error= new Alert(level.fatal, description.decrypt_error)
-      this.export_restriction_RESERVED= new Alert(level.warning, description.export_restriction_RESERVED)
-      this.protocol_version= new Alert(level.fatal, description.protocol_version)
-      this.insufficient_security= new Alert(level.fatal, description.insufficient_security)
-      this.internal_error= new Alert(level.fatal, description.internal_error)
-      this.inappropriate_fallback= new Alert(level.fatal, description.inappropriate_fallback)
-      this.user_canceled= new Alert(level.warning, description.user_canceled)
-      this.no_renegotiation_RESERVED= new Alert(level.warning, description.no_renegotiation_RESERVED)
-      this.missing_extension= new Alert(level.fatal, description.missing_extension)
-      this.unsupported_extension= new Alert(level.fatal, description.unsupported_extension)
-      this.certificate_unobtainable_RESERVED= new Alert(level.warning, description.certificate_unobtainable_RESERVED)
-      this.unrecognized_name= new Alert(level.fatal, description.unrecognized_name)
-      this.bad_certificate_status_response= new Alert(level.fatal, description.bad_certificate_status_response)
-      this.bad_certificate_hash_value_RESERVED= new Alert(level.warning, description.bad_certificate_hash_value_RESERVED)
-      this.unknown_psk_identity= new Alert(level.fatal, description.unknown_psk_identity)
-      this.certificate_required= new Alert(level.fatal, description.certificate_required)
-      this.no_application_protocol= new Alert(level.fatal, description.no_application_protocol)
    }
+   static description = new Enum(Alert.desCore)
+
+   static close_notify = new Alert(Alert.level.warning, Alert.description.close_notify)
+   static unexpected_message = new Alert(Alert.level.fatal, Alert.description.unexpected_message)
+   static bad_record_mac = new Alert(Alert.level.fatal, Alert.description.bad_record_mac)
+   static decryption_failed_RESERVED = new Alert(Alert.level.warning, Alert.description.decryption_failed_RESERVED)
+   static record_overflow = new Alert(Alert.level.fatal, Alert.description.record_overflow)
+   static decompression_failure_RESERVED = new Alert(Alert.level.warning, Alert.description.decompression_failure_RESERVED)
+   static handshake_failure = new Alert(Alert.level.fatal, Alert.description.handshake_failure)
+   static no_certificate_RESERVED = new Alert(Alert.level.warning, Alert.description.no_certificate_RESERVED)
+   static bad_certificate = new Alert(Alert.level.fatal, Alert.description.bad_certificate)
+   static unsupported_certificate = new Alert(Alert.level.fatal, Alert.description.unsupported_certificate)
+   static certificate_revoked = new Alert(Alert.level.fatal, Alert.description.certificate_revoked)
+   static certificate_expired = new Alert(Alert.level.fatal, Alert.description.certificate_expired)
+   static certificate_unknown = new Alert(Alert.level.fatal, Alert.description.certificate_unknown)
+   static illegal_parameter = new Alert(Alert.level.fatal, Alert.description.illegal_parameter)
+   static unknown_ca = new Alert(Alert.level.fatal, Alert.description.unknown_ca)
+   static access_denied = new Alert(Alert.level.fatal, Alert.description.access_denied)
+   static decode_error = new Alert(Alert.level.fatal, Alert.description.decode_error)
+   static decrypt_error = new Alert(Alert.level.fatal, Alert.description.decrypt_error)
+   static export_restriction_RESERVED = new Alert(Alert.level.warning, Alert.description.export_restriction_RESERVED)
+   static protocol_version = new Alert(Alert.level.fatal, Alert.description.protocol_version)
+   static insufficient_security = new Alert(Alert.level.fatal, Alert.description.insufficient_security)
+   static internal_error = new Alert(Alert.level.fatal, Alert.description.internal_error)
+   static inappropriate_fallback = new Alert(Alert.level.fatal, Alert.description.inappropriate_fallback)
+   static user_canceled = new Alert(Alert.level.warning, Alert.description.user_canceled)
+   static no_renegotiation_RESERVED = new Alert(Alert.level.warning, Alert.description.no_renegotiation_RESERVED)
+   static missing_extension = new Alert(Alert.level.fatal, Alert.description.missing_extension)
+   static unsupported_extension = new Alert(Alert.level.fatal, Alert.description.unsupported_extension)
+   static certificate_unobtainable_RESERVED = new Alert(Alert.level.warning, Alert.description.certificate_unobtainable_RESERVED)
+   static unrecognized_name = new Alert(Alert.level.fatal, Alert.description.unrecognized_name)
+   static bad_certificate_status_response = new Alert(Alert.level.fatal, Alert.description.bad_certificate_status_response)
+   static bad_certificate_hash_value_RESERVED = new Alert(Alert.level.warning, Alert.description.bad_certificate_hash_value_RESERVED)
+   static unknown_psk_identity = new Alert(Alert.level.fatal, Alert.description.unknown_psk_identity)
+   static certificate_required = new Alert(Alert.level.fatal, Alert.description.certificate_required)
+   static no_application_protocol = new Alert(Alert.level.fatal, Alert.description.no_application_protocol)
+
    /**
-    * @typedef {number} uint 
-    * @param {("warning"|"fatal")|(1|2)|Uint8Array} _level 
-    * @param {("close_notify"|"unexpected_message"|"bad_record_mac"|"decryption_failed_RESERVED"|"record_overflow"|"decompression_failure_RESERVED"|"handshake_failure"|"no_certificate_RESERVED"|"bad_certificate"|"unsupported_certificate"|"certificate_revoked"|"certificate_expired"|"certificate_unknown"|"illegal_parameter"|"unknown_ca"|"access_denied"|"decode_error"|"decrypt_error"|"export_restriction_RESERVED"|"protocol_version"|"insufficient_security"|"internal_error"|"inappropriate_fallback"|"user_canceled"|"no_renegotiation_RESERVED"|"missing_extension"|"unsupported_extension"|"certificate_unobtainable_RESERVED"|"unrecognized_name"|"bad_certificate_status_response"|"bad_certificate_hash_value_RESERVED"|"unknown_psk_identity"|"certificate_required"|"no_application_protocol")|(0|10|20|21|22|30|40|41|42|43|44|45|46|47|48|49|50|51|60|70|71|80|86|90|100|109|110|111|112|113|114|115|116|120)} _desc
+    * @param {Uint8} level 
+    * @param {Uint8} desc
     */
    constructor(level, desc) {
       super(level, desc)
@@ -157,4 +175,4 @@ export class Alert extends Struct {
    }
 }
 
-
+// npx -p typescript tsc alert.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../dist

@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-slow-types
-// @ts-self-types="./mod.d.ts"
+// @ts-self-types="../type/record.d.ts"
 // ver 0.1.2
 export * from "./base.js"
 export * from "./alert.js"
@@ -21,7 +21,7 @@ export * from "./serverhello.js"
 export * from "./msghash.js"
 export * from "./params.js"
 
-//`esbuild ./mod.js --bundle --format=esm --target=esnext --outfile=../dist/def.js --legal-comments=inline --external:@aicone*`
+//`esbuild ./mod.js --bundle --format=esm --target=esnext --outfile=../dist/def.js --legal-comments=inline --external:@aicone* --external:npm:@noble/curves@1.6.0/p521`
 //--external:npm:jose* --external:npm:@lapo/*
 // npx -p typescript tsc def.js --declaration --allowJs --emitDeclarationOnly --lib ESNext
 

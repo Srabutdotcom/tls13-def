@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/record.d.ts"
 /**
  * !SECTION B.1.  Record Layer
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.1
@@ -5,11 +7,14 @@
  */
 
 import { Enum, Struct, Uint16, Uint8 } from "./base.js";
-import { ClientHello } from "./clienthello.js";
 import { ProtocolVersion } from "./keyexchange.js"
 import { concat } from "@aicone/byte"
 
 class ContentType extends Uint8 {
+   /**
+    * 
+    * @param {number} value 
+    */
    constructor(value) { super(value) }
 }
 
@@ -23,34 +28,70 @@ class ContentType extends Uint8 {
       } TLSPlaintext;
  */
 export class TLSPlaintext extends Struct {
-   static {
-      const types = {
-         /**@type {Uint8[0]} invalid - description */
-         invalid: 0,
-         /**@type {Uint8[20]} change_cipher_spec - description */
-         change_cipher_spec: 20,
-         /**@type {Uint8[21]} alert - description */
-         alert: 21,
-         /**@type {Uint8[22]} handshake - description */
-         handshake: 22,
-         /**@type {Uint8[23]} application_data - description */
-         application_data: 23,
-         /**@type {Uint8[24]} heartbeat - description */
-         heartbeat: 24, /* RFC 6520 */
-         [Enum.max]: 255,
-         [Enum.class]: ContentType
-      }
-      /**
-       * @type {types} this.contentType - description
-       */
-      this.contentType = new Enum(types)
-      this.alert = function (fragment) { return new TLSPlaintext(fragment, this.contentType.alert) }
-      this.application_data = function (fragment) { return new TLSPlaintext(fragment, this.contentType.application_data) }
-      this.change_cipher_spec = function (payload = ChangeCipherSpec.new()) { return new TLSPlaintext(payload, this.contentType.change_cipher_spec) }
-      this.handshake = function (msg) { return new TLSPlaintext(msg.wrap(), this.contentType.handshake) }
-      this.heartbeat = function (fragment) { return new TLSPlaintext(fragment, this.contentType.heartbeat) }
-      this.invalid = function (fragment) { return new TLSPlaintext(fragment, this.contentType.invalid) }
+   /**
+    * A static enum representing type of content
+    * @static
+    * @enum { number }
+    */
+   static types = {
+      /**@type {0} invalid - description */
+      invalid: 0,
+      /**@type {20} change_cipher_spec - description */
+      change_cipher_spec: 20,
+      /**@type {21} alert - description */
+      alert: 21,
+      /**@type {22} handshake - description */
+      handshake: 22,
+      /**@type {23} application_data - description */
+      application_data: 23,
+      /**@type {24} heartbeat - description */
+      heartbeat: 24, /* RFC 6520 */
+      [Enum.max]: 255,
+      [Enum.class]: ContentType
    }
+   /**
+    * A static enum representing type of content
+    * @static
+    * @enum { Uint8 }
+    */
+   static contentType = new Enum(TLSPlaintext.types)
+   /**
+    * 
+    * @param {Uint8Array} fragment 
+    * @returns 
+    */
+   static alert = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.alert) }
+   /**
+    * 
+    * @param {Uint8Array} fragment 
+    * @returns 
+    */
+   static application_data = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.application_data) }
+   /**
+    * 
+    * @param {ChangeCipherSpec} payload 
+    * @returns {TLSPlaintext}
+    */
+   static change_cipher_spec = function (payload = ChangeCipherSpec.new()) { return new TLSPlaintext(payload, TLSPlaintext.contentType.change_cipher_spec) }
+   /**
+    * 
+    * @param {Uint8Array} msg 
+    * @returns 
+    */
+   static handshake = function (msg) { return new TLSPlaintext(msg.wrap(), TLSPlaintext.contentType.handshake) }
+   /**
+    * 
+    * @param {Uint8Array} fragment 
+    * @returns 
+    */
+   static heartbeat = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.heartbeat) }
+   /**
+    * 
+    * @param {Uint8Array} fragment 
+    * @returns 
+    */
+   static invalid = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.invalid) }
+
    /**
     * 
     * @param {Uint8Array} fragment - the data being transmitted
@@ -80,15 +121,49 @@ export class TLSPlaintext extends Struct {
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
  */
 export class TLSInnerPlaintext extends Struct {
-   static {
-      const { contentType } = TLSPlaintext
-      this.alert = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.alert, zeros) }
-      this.application_data = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.application_data, zeros) }
-      this.change_cipher_spec = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.change_cipher_spec, zeros) }
-      this.handshake = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.handshake, zeros) }
-      this.heartbeat = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.heartbeat, zeros) }
-      this.invalid = function (content, zeros) { return new TLSInnerPlaintext(content, contentType.invalid, zeros) }
-   }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static alert = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.alert, zeros) }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static application_data = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.application_data, zeros) }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static change_cipher_spec = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.change_cipher_spec, zeros) }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static handshake = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.handshake, zeros) }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static heartbeat = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.heartbeat, zeros) }
+   /**
+    * 
+    * @param {TLSPlaintext} content 
+    * @param {number} zeros 
+    * @returns 
+    */
+   static invalid = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.invalid, zeros) }
+
    /**
     * 
     * @param {TLSPlaintext} content 
@@ -163,11 +238,10 @@ export class TLSCiphertext extends Struct {
  * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
  */
 export class ChangeCipherSpec extends Uint8 {
-   static new(){return new ChangeCipherSpec}
-   constructor(){
+   static new() { return new ChangeCipherSpec }
+   constructor() {
       super(1)
    }
 }
 
-const chrecord = TLSPlaintext.handshake(ClientHello.new('smtp'));
-debugger;
+// npx -p typescript tsc record.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../type
