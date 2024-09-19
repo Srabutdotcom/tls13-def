@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-slow-types
-// @ts-self-types="../../type/extension/pskeyexchange.d.ts"
+// @ts-self-types="../../type/extension/namedgroup.d.ts"
 
 /**
  * !B.3.1.4.  Supported Groups Extension
