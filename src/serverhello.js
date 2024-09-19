@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/serverhello.d.ts"
 import { Uint8 } from "./base.js";
 import { Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
