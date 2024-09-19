@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-slow-types
-// @ts-self-types="../type/*.d.ts"
-// @ts-self-types="../type/extension*.d.ts"
+// @ts-self-types="../type/record.d.ts"
+// @ts-self-types="../type/clienthello.d.ts"
+// @ts-self-types="../type/serverhello.d.ts"
 // ver 0.1.2
 export * from "./base.js"
 export * from "./alert.js"
