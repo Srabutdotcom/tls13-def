@@ -1,11 +1,13 @@
 /**
+ * TLS1.3 Record data format
+ * ```
  * struct {
- *
-          ContentType type;
-          ProtocolVersion legacy_record_version;
-          uint16 length;
-          opaque fragment[TLSPlaintext.length];
-      } TLSPlaintext;
+      ContentType type;
+      ProtocolVersion legacy_record_version;
+      uint16 length;
+      opaque fragment[TLSPlaintext.length];
+   } TLSPlaintext;
+   ```
  */
 export class TLSPlaintext extends Struct {
     /**
@@ -71,22 +73,21 @@ export class TLSPlaintext extends Struct {
      */
     static invalid: (fragment: Uint8Array) => TLSPlaintext;
     /**
-     *
      * @param {Uint8Array} fragment - the data being transmitted
      * @param {ContentType} type - description
      */
     constructor(fragment: Uint8Array, type: ContentType);
 }
 /**
- * content format to be protected
+ * content wrapper to be encrypted
  *
+ * ```
  * struct {
- *
-          opaque content[TLSPlaintext.length];
-          ContentType type;
-          uint8 zeros[length_of_padding];
-      } TLSInnerPlaintext;
-
+      opaque content[TLSPlaintext.length];
+      ContentType type;
+      uint8 zeros[length_of_padding];
+   } TLSInnerPlaintext;
+   ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
  */
 export class TLSInnerPlaintext extends Struct {
@@ -143,14 +144,15 @@ export class TLSInnerPlaintext extends Struct {
 /**
  * Application Data
  *
+ * encryptedRecord wrapper
+ * ```
  * struct {
- *
-         ContentType opaque_type = application_data;  23
-         ProtocolVersion legacy_record_version = 0x0303;  TLS v1.2
-         uint16 length;
-         opaque encrypted_record[TLSCiphertext.length];
+      ContentType opaque_type = application_data;  23
+      ProtocolVersion legacy_record_version = 0x0303;  TLS v1.2
+      uint16 length;
+      opaque encrypted_record[TLSCiphertext.length];
    } TLSCiphertext;
-
+   ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
  */
 export class TLSCiphertext extends Struct {
@@ -164,21 +166,27 @@ export class TLSCiphertext extends Struct {
      * @param {Uint8Array} encryptedRecord
      */
     constructor(encryptedRecord: Uint8Array);
+    /** @type {Uint8Array} header - [23, 3, 3, Length]    */
+    header: Uint8Array;
     encryptedRecord: Uint8Array;
-    header: any;
 }
+import { Struct } from "../src/base.js";
+/**
+ * Wrapper to TLSPlaintext.types value
+ */
+declare class ContentType extends Uint8 {
+}
+import { Enum } from "../src/base.js";
 /**
  * ChangeCipherSpec
- * [1]
+ * ```
+ * produce Uint8[1]
+ * ```
  * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
  */
-export class ChangeCipherSpec extends Uint8 {
+declare class ChangeCipherSpec extends Uint8 {
     static "new"(): ChangeCipherSpec;
     constructor();
 }
-import { Struct } from "../src/base.js";
-declare class ContentType extends Uint8 {
-}
-import { Enum } from "../src/base.js"
-import { Uint8 } from "../src/base.js"
+import { Uint8 } from "../src/base.js";
 export {};
