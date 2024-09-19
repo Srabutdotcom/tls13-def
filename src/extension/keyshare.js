@@ -22,7 +22,7 @@ class KeyShareEntry extends Struct {
    /**
     * 
     * @param {NamedGroup} group - NamedGroup 
-    * @param {Uint8Array} key_exchange - PublicKey
+    * @param {Uint8Array[]} key_exchange - PublicKey
     */
    constructor(group, ...key_exchange) {
       super(

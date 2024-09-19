@@ -3,6 +3,7 @@ import { Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { Handshake } from "./handshake.js";
 import { ProtocolVersion, Random } from "./keyexchange.js";
+import { CipherSuite } from "./keyexchange.js";
 
 /**
  * 
@@ -32,6 +33,7 @@ import { ProtocolVersion, Random } from "./keyexchange.js";
 
  */
 export class ServerHello extends Struct {
+   #cipherSuite = CipherSuite
    /**
     * 
     * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;

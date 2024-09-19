@@ -1,3 +1,5 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/clienthello.d.ts"
 import { Extension, Extensions } from "./extension/extension.js";
 import { ProtocolVersion, Random } from "./keyexchange.js"
 import { Minmax, Struct, Uint8 } from "./base.js";
@@ -9,6 +11,9 @@ var clientShares = await ClientShares.keyShareClientHello();
 
 /**
  * SessionId
+ * ```
+ * opaque legacy_session_id<0..32>;
+ * ```
  */
 class SessionId extends Minmax {
    static new() { return new SessionId }
@@ -33,7 +38,7 @@ class LegacyCompressionMethods extends Minmax {
 }
 
 /**
- * 
+ * ClientHello message
  * ``` 
  * uint16 ProtocolVersion;
    opaque Random[32];
@@ -59,7 +64,12 @@ class LegacyCompressionMethods extends Minmax {
 
  */
 export class ClientHello extends Struct {
+   /**@type {ClientShares} clientShares -  */
    clientShares
+   /**@type {SessionId} sessionId -  */
+   sessionId
+   /**@type {CipherSuites} cipherSuites -  */
+   cipherSuites
    /**
     * 
     * @param  {...string} serverNames 
@@ -68,7 +78,15 @@ export class ClientHello extends Struct {
    static new(...serverNames) {
       return new ClientHello(...serverNames)
    }
+   /**
+    * Wrapper of message to Handshake
+    * @returns Hanshake message
+    */
    payload = this.wrap
+   /**
+    * Wrapper of message to Handshake
+    * @returns Hanshake message
+    */
    handshake = this.wrap
 
    /**
@@ -103,13 +121,15 @@ export class ClientHello extends Struct {
       this.cipherSuites = this.member[3];
    }
    /**
-    * 
+    * Wrapper of message to Handshake
     * @returns Hanshake message
     */
    wrap(){
       return Handshake.client_hello(this)
    }
 }
+
+// npx -p typescript tsc clienthello.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../type
 
 /* const ch = ClientHello.new("localhost")
 const hs = ch.wrap();

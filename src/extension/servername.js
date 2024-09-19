@@ -53,7 +53,7 @@ export class ServerNameList extends Struct {
    }
    /**
     * 
-    * @param {ServerName} server_name_list <1..2^16-1>
+    * @param {...ServerName} server_name_list <1..2^16-1>
     */
    constructor(...server_name_list) {
       super(
