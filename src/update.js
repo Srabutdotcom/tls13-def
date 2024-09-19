@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/update.d.ts"
+
 /**
  * !B.3.5.  Updating Keys
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.5

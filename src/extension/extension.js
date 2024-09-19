@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../../type/extension/extension.d.ts"
+
 //* the extension below are for tls1.3 only as mentioned in rfc 8446 and iana
 //* https://datatracker.ietf.org/doc/html/rfc8446#section-11
 

@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../../type/extension/signaturescheme.d.ts"
+
 /**
  * !B.3.1.3.  Signature Algorithm Extension
  * LINK https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.1.3

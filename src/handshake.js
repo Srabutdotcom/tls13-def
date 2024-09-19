@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/handshake.d.ts"
+
 /**
  * !SECTION B.3.  Handshake Protocol
  * LINK - static https=//datatracker.ietf.org/doc/html/rfc8446#appendix-B.3

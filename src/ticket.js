@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/ticket.d.ts"
+
 /**
  * !B.3.4.  Ticket Establishment
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.4

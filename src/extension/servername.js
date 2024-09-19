@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../../type/extension/servername.d.ts"
+
 /**
  * ! 3.  Server Name Indication
  * LINK - https://datatracker.ietf.org/doc/html/rfc6066#section-3

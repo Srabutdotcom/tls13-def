@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/params.d.ts"
+
 /**!SECTION
  * !B.3.2.  Server Parameters Messages
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.2

@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../../type/extension/pskeyexchange.d.ts"
+
 /**!SECTION
  * https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.9
  */

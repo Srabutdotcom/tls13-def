@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/auth.d.ts"
+
 /**
  * !SECTION B.3.3.  Authentication Messages
  * LINK - https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.3

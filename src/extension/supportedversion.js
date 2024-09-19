@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../../type/extension/supportedversion.d.ts"
+
 import { Struct } from "../base.js";
 
 /**

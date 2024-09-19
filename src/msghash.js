@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-slow-types
+// @ts-self-types="../type/msghash.d.ts"
+
 import { uint8array } from "./deps.js";
 import { Handshake } from "./handshake.js";
 
