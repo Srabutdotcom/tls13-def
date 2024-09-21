@@ -1,5 +1,6 @@
 /**
  * Struct definition
+ * 
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.6
  */
 export class Struct extends Uint8Array {
@@ -77,6 +78,7 @@ export class Minmax extends Uint8Array {
 }
 /**
  * number definition 1 byte
+ * 
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint8 extends Uint8Array {
@@ -98,6 +100,7 @@ export class Uint8 extends Uint8Array {
 }
 /**
  * number definition 2 bytes
+ * 
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint16 extends Uint8Array {
@@ -119,6 +122,7 @@ export class Uint16 extends Uint8Array {
 }
 /**
  * number definition 3 bytes
+ * 
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint24 extends Uint8Array {
@@ -140,6 +144,7 @@ export class Uint24 extends Uint8Array {
 }
 /**
  * number definition 4 byte
+ * 
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint32 extends Uint8Array {

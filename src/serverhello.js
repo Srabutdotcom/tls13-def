@@ -2,7 +2,6 @@
 // @ts-self-types="../type/serverhello.d.ts"
 import { Uint8 } from "./base.js";
 import { Struct } from "./base.js";
-import { SessionId } from "./clienthello.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { Handshake } from "./handshake.js";
 import { ProtocolVersion, Random } from "./keyexchange.js";
