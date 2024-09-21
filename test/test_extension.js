@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { assertEquals } from "jsr:@std/assert";
 import { SupportedVersions } from "../src/extension/supportedversion.js";
 import { SignatureSchemeList } from "../src/extension/signaturescheme.js";
 import { ServerName, ServerNameList } from "../src/extension/servername.js";
@@ -17,7 +17,7 @@ Deno.test(
       const svClient = SupportedVersions.client();
       const svServer = SupportedVersions.server();
 
-      assertEquals([4, 3, 3, 3, 4], Array.from(svClient));
+      assertEquals([2, 3, 4], Array.from(svClient));
       assertEquals([3, 4], Array.from(svServer));
    }
 )

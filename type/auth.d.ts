@@ -1,25 +1,25 @@
 /**
- * @typedef {Object} certificateType
- * @prop {0} X509
- * @prop {1} OpenPGP
- * @prop {2} RawPublicKey
- */
-/**
- * struct {
-        
+ * CertificateEntry
+ * ```
+ *  struct {
         select (certificate_type) {
-
             case RawPublicKey:
             //From RFC 7250 ASN.1_subjectPublicKeyInfo
             opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
-
             case X509:
             opaque cert_data<1..2^24-1>;
         };
         Extension extensions<0..2^16-1>;
     } CertificateEntry;
+   ```
  */
 export class CertificateEntry extends Struct {
+    /**
+     * new CertificateEntry
+     * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
+     * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
+     */
+    static "new"(certificate: Uint8Array, extensions?: Uint16): CertificateEntry;
     /**
      *
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
@@ -28,27 +28,31 @@ export class CertificateEntry extends Struct {
     constructor(certificate: Uint8Array, extensions?: Uint16);
 }
 /**
- * struct {
- *
+ * Certificate
+ * ```
+ *  struct {
         opaque certificate_request_context<0..2^8-1>;
         CertificateEntry certificate_list<0..2^24-1>;
     } Certificate;
+    ```
  */
 export class Certificate extends Struct {
-    static "new"(certificate_list: any, certificate_request_context?: Uint8): Certificate;
-    /**
-     *
-     * @param  {...Uint8Array} certs
-     * @returns
-     */
-    static certificateEntries(...certs: Uint8Array[]): {
-        /**
-         *
-         * @param  {Uint8Array} reqContexts
-         * @returns
-         */
-        contexts(reqContexts: Uint8Array): Certificate;
+    static typeDesc: {
+        [x: symbol]: number | typeof CertificateType;
+        /**@type {0} X509 - description */
+        X509: 0;
+        /**@type {1} OpenPGP - description */
+        OpenPGP: 1;
+        /**@type {2} RawPublicKey - description */
+        RawPublicKey: 2;
     };
+    static types: Enum;
+    /**
+     * Create Certificate
+     * @param  {...CertificateEntry} certs - list of CertificateEntry
+     * @returns {Certificate}
+     */
+    static certificateEntries(...certs: CertificateEntry[]): Certificate;
     /**
      *
      * @param {CertificateEntry[]} certificate_list - list of CertificateEntry
@@ -59,41 +63,127 @@ export class Certificate extends Struct {
     handshake: () => Handshake;
     /**
     *
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
     wrap(): Handshake;
 }
 /**
+ * CertificateVerify
+ * ```
  * struct {
- *
-        SignatureScheme algorithm;
-        opaque signature<0..2^16-1>;
-    } CertificateVerify;
+     SignatureScheme algorithm;
+     opaque signature<0..2^16-1>;
+   } CertificateVerify;
+   ```
  */
 export class CertificateVerify extends Struct {
-    static "new"(algorithm: any, signature: any): CertificateVerify;
+    /**
+     * Create new CertificateVerify based on specific algorithm
+     *
+     */
+    static new: {
+        ecdsa_secp256r1_sha256: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        ecdsa_secp384r1_sha384: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        ecdsa_secp521r1_sha512: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_rsae_sha256: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_rsae_sha384: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_rsae_sha512: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_pss_sha256: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_pss_sha384: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+        rsa_pss_pss_sha512: {
+            /**
+             *
+             * @param {...Uint8Array} signatures
+             * @returns
+             */
+            signature(...signatures: Uint8Array[]): CertificateVerify;
+        };
+    };
     /**
      *
-     * @param {Uint8Array} algorithm SignatureScheme algorithm
+     * @param {SignatureAlgorithm} algorithm SignatureScheme algorithm
      * @param {Uint8Array} signature
      */
-    constructor(algorithm: Uint8Array, signature: Uint8Array);
+    constructor(algorithm: SignatureAlgorithm, signature: Uint8Array);
     payload: () => Handshake;
     handshake: () => Handshake;
     /**
     *
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
     wrap(): Handshake;
 }
 /**
+ * Finished
+ * ```
  * struct {
- *
-        opaque verify_data[Hash.length];
-    } Finished;
+    opaque verify_data[Hash.length];
+   } Finished;
+   ```
  */
 export class Finished extends Struct {
-    static "new"(verify_data: any): Finished;
+    /**
+     * new Finished
+     * @param {Uint8Array} verify_data
+     * @returns
+     */
+    static "new"(verify_data: Uint8Array): Finished;
     /**
      *
      * @param {Uint8Array} verify_data - with length the same as hash length
@@ -103,16 +193,17 @@ export class Finished extends Struct {
     handshake: () => Handshake;
     /**
     *
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
     wrap(): Handshake;
 }
-export type certificateType = {
-    X509: 0;
-    OpenPGP: 1;
-    RawPublicKey: 2;
-};
 import { Struct } from "../src/base.js";
 import { Uint16 } from "../src/base.js";
 import { Handshake } from "../src/handshake.js";
+declare class CertificateType extends Uint8 {
+    constructor(value: any);
+}
+import { Enum } from "../src/base.js";
 import { Uint8 } from "../src/base.js";
+import { SignatureAlgorithm } from "../src/extension/signaturescheme.js"
+export {};

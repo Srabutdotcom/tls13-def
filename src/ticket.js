@@ -89,7 +89,7 @@ export class NewSessionTicket extends Struct {
    }
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap(){
       return Handshake.new_session_ticket(this)

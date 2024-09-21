@@ -1,18 +1,24 @@
 /**
+ * ServerName
+ * ```
  * enum {
- *
-          host_name(0), (255)
-      } NameType;
+      host_name(0), (255)
+   } NameType;
 
  * struct {
- *
-          NameType name_type;
-          select (name_type) {
-              case host_name: HostName;
-          } name;
-      } ServerName;
+      NameType name_type;
+      select (name_type) {
+         case host_name: HostName;
+      } name;
+   } ServerName;
+   ```
  */
 export class ServerName extends Struct {
+    /**
+     *
+     * @param {...Uint8Array|string} hostname
+     */
+    static "new"(...hostname: (Uint8Array | string)[]): ServerName;
     /**
      *
      * @param {...Uint8Array|string} hostname
@@ -31,7 +37,7 @@ export class ServerNameList extends Struct {
     static list(...serverName: string[]): ServerNameList;
     /**
      *
-     * @param {ServerName} server_name_list <1..2^16-1>
+     * @param {...ServerName} server_name_list <1..2^16-1>
      */
     constructor(...server_name_list: ServerName[]);
 }

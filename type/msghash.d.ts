@@ -11,7 +11,7 @@ export class MessageHash extends Uint8Array {
     handshake: () => Handshake;
     /**
      *
-     * @returns Hanshake message
+     * @return {Handshake} message
      */
     wrap(): Handshake;
 }

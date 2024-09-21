@@ -19,120 +19,130 @@ import { MessageHash } from "./msghash.js";
 class HandshakeType extends Uint8 { constructor(v) { super(v) } }
 
 /**
+ * Handshake
+ * ```
  * struct {
- * 
-          HandshakeType msg_type;    //handshake type
-          uint24 length;             //remaining bytes in message
-          select (Handshake.msg_type) {
-              case client_hello:          ClientHello;
-              case server_hello:          ServerHello;
-              case end_of_early_data:     EndOfEarlyData;
-              case encrypted_extensions:  EncryptedExtensions;
-              case certificate_request:   CertificateRequest;
-              case certificate:           Certificate;
-              case certificate_verify:    CertificateVerify;
-              case finished:              Finished;
-              case new_session_ticket:    NewSessionTicket;
-              case key_update:            KeyUpdate;
-          };
-      } Handshake;
+      HandshakeType msg_type;    //handshake type
+      uint24 length;             //remaining bytes in message
+      select (Handshake.msg_type) {
+         case client_hello:          ClientHello;
+         case server_hello:          ServerHello;
+         case end_of_early_data:     EndOfEarlyData;
+         case encrypted_extensions:  EncryptedExtensions;
+         case certificate_request:   CertificateRequest;
+         case certificate:           Certificate;
+         case certificate_verify:    CertificateVerify;
+         case finished:              Finished;
+         case new_session_ticket:    NewSessionTicket;
+         case key_update:            KeyUpdate;
+      };
+   } Handshake;
+   ```
  */
 export class Handshake extends Struct {
-   static {
-      const types = {
-         /**@type {Uint8[0]} hello_request_RESERVED */
-         hello_request_RESERVED: 0,
-         /**@type {Uint8[1]} client_hello */
-         client_hello: 1,//*Key Exchange
-         /**@type {Uint8[2]} server_hello */
-         server_hello: 2,//*Key Exchange
-         /**@type {Uint8[3]} hello_verify_request_RESERVED */
-         hello_verify_request_RESERVED: 3,
-         /**@type {Uint8[4]} new_session_ticket */
-         new_session_ticket: 4,//*Ticket Establishment
-         /**@type {Uint8[5]} end_of_early_data */
-         end_of_early_data: 5,//*Updating Keys
-         /**@type {Uint8[6]} hello_retry_request_RESERVED */
-         hello_retry_request_RESERVED: 6,
-         /**@type {Uint8[8]} encrypted_extensions */
-         encrypted_extensions: 8,//*Server Parameters Messages
-         /**@type {Uint8[11]} certificate */
-         certificate: 11,//*Authentication Messages
-         /**@type {Uint8[12]} server_key_exchange_RESERVED */
-         server_key_exchange_RESERVED: 12,
-         /**@type {Uint8[13]} certificate_request */
-         certificate_request: 13,//*Server Parameters Messages
-         /**@type {Uint8[14]} server_hello_done_RESERVED */
-         server_hello_done_RESERVED: 14,
-         /**@type {Uint8[15]} certificate_verify */
-         certificate_verify: 15,//*Authentication Messages
-         /**@type {Uint8[16]} client_key_exchange_RESERVED */
-         client_key_exchange_RESERVED: 16,
-         /**@type {Uint8[20]} finished */
-         finished: 20,//*Authentication Messages
-         /**@type {Uint8[21]} certificate_url_RESERVED */
-         ertificate_url_RESERVED: 21,
-         /**@type {Uint8[22]} certificate_status_RESERVED */
-         certificate_status_RESERVED: 22,
-         /**@type {Uint8[23]} supplemental_data_RESERVED */
-         supplemental_data_RESERVED: 23,
-         /**@type {Uint8[24]} key_update */
-         key_update: 24,//*Updating Keys
-         /**@type {Uint8[254]} message_hash */
-         message_hash: 254,
-         /**@type {Uint8[255]} [Enum.max] */
-         [Enum.max]: 255,
-         [Enum.class]: HandshakeType
-      }
-      /**
-       * @type {types} this.type - description
-       */
-      this.types = new Enum(types)
-      this.client_hello = function (msg) {
-         if (msg instanceof ClientHello == true) return new Handshake(msg, this.types.client_hello);
-         throw TypeError(`msg is not ClientHello class`)
-      }
-      this.server_hello = function (msg) {
-         if (msg instanceof ServerHello == true) return new Handshake(msg, this.types.server_hello);
-         throw TypeError(`msg is not ServerHello class`)
-      }
-      this.new_session_ticket = function (msg) {
-         if (msg instanceof NewSessionTicket == true) return new Handshake(msg, this.types.new_session_ticket);
-         throw TypeError(`msg is not NewSessionTicket class`)
-      }
-      this.end_of_early_data = function (msg) {
-         if (msg instanceof EndOfEarlyData == true) return new Handshake(msg, this.types.end_of_early_data);
-         throw TypeError(`msg is not EndOfEarlyData class`)
-      }
-      this.encrypted_extensions = function (msg) {
-         if (msg instanceof EncryptedExtensions == true) return new Handshake(msg, types.encrypted_extensions)
-         throw TypeError(`msg is not EncryptedExtensions class`)
-      }
-      this.certificate = function (msg) {
-         if (msg instanceof Certificate == true) return new Handshake(msg, this.types.certificate)
-         throw TypeError(`msg is not Certificate class`)
-      }
-      this.certificate_request = function (msg) {
-         if (msg instanceof CertificateRequest == true) return new Handshake(msg, this.types.certificate_request)
-         throw TypeError(`msg is not CertificateRequest class`)
-      }
-      this.certificate_verify = function (msg) {
-         if (msg instanceof CertificateVerify == true) return new Handshake(msg, this.types.certificate_verify)
-         throw TypeError(`msg is not CertificateVerify class`)
-      }
-      this.finished = function (msg) {
-         if (msg instanceof Finished == true) return new Handshake(msg, this.types.finished)
-         throw TypeError(`msg is not Finished class`)
-      }
-      this.key_update = function (msg) {
-         if (msg instanceof KeyUpdate == true) return new Handshake(msg, this.types.key_update)
-         throw TypeError(`msg is not KeyUpdate class`)
-      }
-      this.message_hash = function (msg) {
-         if (msg instanceof MessageHash == true) return new Handshake(msg, this.types.message_hash)
-         throw TypeError(`msg is not MessageHash class`)
-      }
+   static typesDesc = {
+      /**@type {0} hello_request_RESERVED */
+      hello_request_RESERVED: 0,
+      /**@type {1} client_hello */
+      client_hello: 1,//*Key Exchange
+      /**@type {2} server_hello */
+      server_hello: 2,//*Key Exchange
+      /**@type {3} hello_verify_request_RESERVED */
+      hello_verify_request_RESERVED: 3,
+      /**@type {4} new_session_ticket */
+      new_session_ticket: 4,//*Ticket Establishment
+      /**@type {5} end_of_early_data */
+      end_of_early_data: 5,//*Updating Keys
+      /**@type {6} hello_retry_request_RESERVED */
+      hello_retry_request_RESERVED: 6,
+      /**@type {8} encrypted_extensions */
+      encrypted_extensions: 8,//*Server Parameters Messages
+      /**@type {11} certificate */
+      certificate: 11,//*Authentication Messages
+      /**@type {12} server_key_exchange_RESERVED */
+      server_key_exchange_RESERVED: 12,
+      /**@type {13} certificate_request */
+      certificate_request: 13,//*Server Parameters Messages
+      /**@type {14} server_hello_done_RESERVED */
+      server_hello_done_RESERVED: 14,
+      /**@type {15} certificate_verify */
+      certificate_verify: 15,//*Authentication Messages
+      /**@type {16} client_key_exchange_RESERVED */
+      client_key_exchange_RESERVED: 16,
+      /**@type {20} finished */
+      finished: 20,//*Authentication Messages
+      /**@type {21} certificate_url_RESERVED */
+      ertificate_url_RESERVED: 21,
+      /**@type {22} certificate_status_RESERVED */
+      certificate_status_RESERVED: 22,
+      /**@type {23} supplemental_data_RESERVED */
+      supplemental_data_RESERVED: 23,
+      /**@type {24} key_update */
+      key_update: 24,//*Updating Keys
+      /**@type {254} message_hash */
+      message_hash: 254,
+      /**@type {255} [Enum.max] */
+      [Enum.max]: 255,
+      [Enum.class]: HandshakeType
    }
+   static types = new Enum(Handshake.typesDesc)
+
+   /**@param {Uint8Array} msg - the message of handshake */
+   static client_hello = function (msg) {
+      if (msg instanceof ClientHello == true) return new Handshake(msg, Handshake.types.client_hello);
+      throw TypeError(`msg is not ClientHello class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static server_hello = function (msg) {
+      if (msg instanceof ServerHello == true) return new Handshake(msg, Handshake.types.server_hello);
+      throw TypeError(`msg is not ServerHello class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static new_session_ticket = function (msg) {
+      if (msg instanceof NewSessionTicket == true) return new Handshake(msg, Handshake.types.new_session_ticket);
+      throw TypeError(`msg is not NewSessionTicket class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static end_of_early_data = function (msg) {
+      if (msg instanceof EndOfEarlyData == true) return new Handshake(msg, Handshake.types.end_of_early_data);
+      throw TypeError(`msg is not EndOfEarlyData class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static encrypted_extensions = function (msg) {
+      if (msg instanceof EncryptedExtensions == true) return new Handshake(msg, types.encrypted_extensions)
+      throw TypeError(`msg is not EncryptedExtensions class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static certificate = function (msg) {
+      if (msg instanceof Certificate == true) return new Handshake(msg, Handshake.types.certificate)
+      throw TypeError(`msg is not Certificate class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static certificate_request = function (msg) {
+      if (msg instanceof CertificateRequest == true) return new Handshake(msg, Handshake.types.certificate_request)
+      throw TypeError(`msg is not CertificateRequest class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static certificate_verify = function (msg) {
+      if (msg instanceof CertificateVerify == true) return new Handshake(msg, Handshake.types.certificate_verify)
+      throw TypeError(`msg is not CertificateVerify class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static finished = function (msg) {
+      if (msg instanceof Finished == true) return new Handshake(msg, Handshake.types.finished)
+      throw TypeError(`msg is not Finished class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static key_update = function (msg) {
+      if (msg instanceof KeyUpdate == true) return new Handshake(msg, Handshake.types.key_update)
+      throw TypeError(`msg is not KeyUpdate class`)
+   }
+   /**@param {Uint8Array} msg - the message of handshake */
+   static message_hash = function (msg) {
+      if (msg instanceof MessageHash == true) return new Handshake(msg, Handshake.types.message_hash)
+      throw TypeError(`msg is not MessageHash class`)
+   }
+
    /**
     * 
     * @param {Uint8Array} message - with additional "type" property

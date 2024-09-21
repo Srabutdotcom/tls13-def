@@ -11,7 +11,13 @@ import { Enum, Struct, Uint8 } from "./base.js";
 import { Handshake } from "./handshake.js";
 
 /**
- * EndOfEarlyData - If the server sent an "early_data" extension in EncryptedExtensions,
+ * EndOfEarlyData 
+ * ```   
+   struct {
+      empty
+   } EndOfEarlyData;
+   ```
+    - If the server sent an "early_data" extension in EncryptedExtensions,
    the client MUST send an EndOfEarlyData message after receiving the
    server Finished.  If the server does not send an "early_data"
    extension in EncryptedExtensions, then the client MUST NOT send an
@@ -22,12 +28,7 @@ import { Handshake } from "./handshake.js";
    terminate the connection with an "unexpected_message" alert.  This
    message is encrypted under keys derived from the
    client_early_traffic_secret.
- * https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
-   
-   struct {
-   
-         empty
-    } EndOfEarlyData;
+   https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
  */
 export class EndOfEarlyData extends Struct {
    static new() { return new EndOfEarlyData }
@@ -36,7 +37,7 @@ export class EndOfEarlyData extends Struct {
    constructor() { super() }
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap() {
       return Handshake.end_of_early_data(this)
@@ -56,25 +57,16 @@ class KeyUpdateRequest extends Uint8 {
 
 
 /**
- * The KeyUpdate handshake message is used to indicate that the sender
-   is updating its sending cryptographic keys.  This message can be sent
-   by either peer after it has sent a Finished message.  Implementations
-   that receive a KeyUpdate message prior to receiving a Finished
-   message MUST terminate the connection with an "unexpected_message"
-   alert.  After sending a KeyUpdate message, the sender SHALL send all
-   its traffic using the next generation of keys, computed as described
-   in Section 7.2.  Upon receiving a KeyUpdate, the receiver MUST update
-   its receiving keys.
- * 
+ * KeyUpdate
+ * ```
    enum {
-
-          update_not_requested(0), update_requested(1), (255)
-      } KeyUpdateRequest;
+      update_not_requested(0), update_requested(1), (255)
+   } KeyUpdateRequest;
 
  * struct {
- * 
-          KeyUpdateRequest request_update;
-      } KeyUpdate;
+      KeyUpdateRequest request_update;
+   } KeyUpdate;
+   ```
 
 request_update:  Indicates whether the recipient of the KeyUpdate
       should respond with its own KeyUpdate.  If an implementation
@@ -104,6 +96,16 @@ request_update:  Indicates whether the recipient of the KeyUpdate
    the old keys.  Additionally, both sides MUST enforce that a KeyUpdate
    with the old key is received before accepting any messages encrypted
    with the new key.  Failure to do so may allow message truncation
+
+   The KeyUpdate handshake message is used to indicate that the sender
+   is updating its sending cryptographic keys.  This message can be sent
+   by either peer after it has sent a Finished message.  Implementations
+   that receive a KeyUpdate message prior to receiving a Finished
+   message MUST terminate the connection with an "unexpected_message"
+   alert.  After sending a KeyUpdate message, the sender SHALL send all
+   its traffic using the next generation of keys, computed as described
+   in Section 7.2.  Upon receiving a KeyUpdate, the receiver MUST update
+   its receiving keys.
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
  */
@@ -138,7 +140,7 @@ export class KeyUpdate extends Struct {
    }
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap() {
       return Handshake.key_update(this)

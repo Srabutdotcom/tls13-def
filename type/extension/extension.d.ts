@@ -1,4 +1,5 @@
 /**
+ * Extension
  * ```
  * extension_data: Uint8Array
  * extensionType: ExtensionType
@@ -7,22 +8,21 @@
  * types: ...ExtensionType
  *
  * extensions: {...}
- * ```
  *
  * struct {
- *
-        ExtensionType extension_type;
-        opaque extension_data<0..2^16-1>;
-    } Extension;
+      ExtensionType extension_type;
+      opaque extension_data<0..2^16-1>;
+   } Extension;
+   ```
  */
 export class Extension extends Struct {
     static types: Enum;
     /**
-     *
-     * @param {number} extensionType
+     * new Extension
+     * @param {ExtensionType} extensionType
      * @param {Uint8Array} extension_data
      */
-    static "new"(extension_data: Uint8Array, extensionType: number): Extension;
+    static "new"(extension_data: Uint8Array, extensionType: ExtensionType): Extension;
     static extensions: {
         server_name: {
             /**
@@ -51,10 +51,10 @@ export class Extension extends Struct {
     };
     /**
      *
-     * @param {number} extensionType
+     * @param {ExtensionType} extensionType
      * @param {Uint8Array} extension_data
      */
-    constructor(extension_data: Uint8Array, extensionType: number);
+    constructor(extension_data: Uint8Array, extensionType: ExtensionType);
 }
 /**
  * Extension extensions<2..2^16-1>;
@@ -73,6 +73,13 @@ export class Extensions extends Minmax {
      */
     constructor(m: number, M: number, ...extensions: Extension[]);
 }
-import { Struct } from "../../src/base.js";
+import { Struct } from "../../src/../src/base.js";
 import { Enum } from "../../src/base.js";
+declare class ExtensionType extends Uint16 {
+    constructor(v: any);
+    get name(): any;
+    #private;
+}
 import { Minmax } from "../../src/base.js";
+import { Uint16 } from "../../src/base.js";
+export {};

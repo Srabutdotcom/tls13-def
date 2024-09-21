@@ -8,6 +8,9 @@
 
 import { Uint16, Enum, Struct, Minmax } from "../base.js";
 
+/**
+ * NamedGroup - a single namedGroup i.e. 0x001D - X25519
+ */
 export class NamedGroup extends Uint16 {
    #value; //
    constructor(v) {
@@ -17,6 +20,9 @@ export class NamedGroup extends Uint16 {
    get name() { return NamedGroupList.namedGroup.key(this.#value) }
 }
 
+/**
+ * NamedGroupList - contain list of NamedGroup from 0x0017 - secp256r1 to 0x0104 - ffdhe8192
+ */
 export class NamedGroupList extends Struct {
    static list() { return new NamedGroupList }
    static namedGroup = new Enum({

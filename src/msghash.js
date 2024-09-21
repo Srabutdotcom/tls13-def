@@ -43,7 +43,7 @@ export class MessageHash extends Uint8Array {
    constructor(msg){super(msg)}
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap() {
       return Handshake.message_hash(this)

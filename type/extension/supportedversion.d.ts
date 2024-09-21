@@ -1,15 +1,16 @@
 /**
- *
+ * SupportedVersions
+ * ```
  * struct {
- *
-          select (Handshake.msg_type) {
-              case client_hello:
-                   ProtocolVersion versions<2..254>;
+      select (Handshake.msg_type) {
+         case client_hello:
+               ProtocolVersion versions<2..254>;
 
-              case server_hello: // and HelloRetryRequest
-              ProtocolVersion selected_version;
-            };
-        } SupportedVersions;
+         case server_hello: // and HelloRetryRequest
+         ProtocolVersion selected_version;
+      };
+   } SupportedVersions;
+   ```
 
  * The "supported_versions" extension is used by the client to indicate
    which versions of TLS it supports and by the server to indicate which

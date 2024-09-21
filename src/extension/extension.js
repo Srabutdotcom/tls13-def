@@ -24,6 +24,7 @@ class ExtensionType extends Uint16 {
 
 //* https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml
 /**
+ * Extension
  * ```
  * extension_data: Uint8Array
  * extensionType: ExtensionType
@@ -32,13 +33,12 @@ class ExtensionType extends Uint16 {
  * types: ...ExtensionType
  * 
  * extensions: {...}
- * ```
  * 
  * struct {
- * 
-        ExtensionType extension_type;
-        opaque extension_data<0..2^16-1>;
-    } Extension;
+      ExtensionType extension_type;
+      opaque extension_data<0..2^16-1>;
+   } Extension;
+   ```
  */
 export class Extension extends Struct {
    static types = new Enum({
@@ -95,8 +95,8 @@ export class Extension extends Struct {
       [Enum.class]: ExtensionType
    })
    /**
-    * 
-    * @param {number} extensionType 
+    * new Extension
+    * @param {ExtensionType} extensionType 
     * @param {Uint8Array} extension_data 
     */
    static new(extension_data, extensionType) { return new Extension(extension_data, extensionType) }
@@ -130,7 +130,7 @@ export class Extension extends Struct {
    }
    /**
     * 
-    * @param {number} extensionType 
+    * @param {ExtensionType} extensionType 
     * @param {Uint8Array} extension_data 
     */
    constructor(extension_data, extensionType) {

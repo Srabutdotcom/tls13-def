@@ -12,13 +12,14 @@ import { p521 } from "../deps.js";
 
 
 /**
- * LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8
- * 
+ * KeyShareEntry
+ * ```
  * struct {
- * 
-         NamedGroup group;
-         opaque key_exchange<1..2^16-1>;
-      } KeyShareEntry;
+      NamedGroup group;
+      opaque key_exchange<1..2^16-1>;
+   } KeyShareEntry;
+   ```
+   LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8
  */
 class KeyShareEntry extends Struct {
    #NamedGroup = NamedGroup
@@ -36,20 +37,19 @@ class KeyShareEntry extends Struct {
 }
 
 /**
- * key_shares extension for client hello
+ * KeyShareClientHello
  * 
+ * ```
  * struct {
- * 
-         KeyShareEntry client_shares<0..2^16-1>;
-      } KeyShareClientHello;
-
+      KeyShareEntry client_shares<0..2^16-1>;
+   } KeyShareClientHello;
+   ```
    client_shares:  A list of offered KeyShareEntry values in descending
       order of client preference.
 
       Each KeyShareEntry value MUST correspond to a
    group offered in the "supported_groups" extension and MUST appear in
    the same order.
-
  * 
  */
 class KeyShareClientHello extends Struct {
@@ -64,11 +64,12 @@ class KeyShareClientHello extends Struct {
    }
 }
 /**
+ * KeyShareHelloRetryRequest
+ * ```
  * struct {
- * 
-         NamedGroup selected_group;
-      } KeyShareHelloRetryRequest;
-       
+      NamedGroup selected_group;
+   } KeyShareHelloRetryRequest;
+   ```
    selected_group:  The mutually supported group the server intends to
       negotiate and is requesting a retried ClientHello/KeyShare for.
  */
@@ -85,10 +86,12 @@ class KeyShareHelloRetryRequest extends Struct {
    }
 }
 /**
+ * KeyShareServerHello
+ * ```
  * struct {
       KeyShareEntry server_share;
    } KeyShareServerHello;
-
+   ```
    server_share:  A single KeyShareEntry value that is in the same group
       as one of the client's shares.
  */
@@ -173,6 +176,9 @@ class Key {
       const sk = await crypto.subtle.deriveBits({ name, public: v }, this.#keypair.privateKey, l);
       return new Uint8Array(sk)
    }
+   /**
+    * @return {Object} algorithm
+    */
    get algorithm() {
       if (this.#keypair instanceof P521) return { name: "ECDH", namedCurve: "P-521" }
       return this.#keypair.privateKey.algorithm
@@ -190,7 +196,7 @@ class Keys {
    #x25519
    /**
     * 
-    * @param {Array<Key>} keys 
+    * @param {...Key} keys 
     */
    constructor(...keys) {
       for (const e of keys) {
@@ -217,7 +223,7 @@ class Keys {
    get x25519() { return this.#x25519 }
    /**
     * 
-    * @returns KeyShareClientHello
+    * @returns {KeyShareClientHello}
     * Clients MUST NOT offer multiple KeyShareEntry values
    for the same group.  Clients MUST NOT offer any KeyShareEntry values
    for groups not listed in the client's "supported_groups" extension.
@@ -235,10 +241,15 @@ class Keys {
 }
 
 /**
- * @prop {Keys} keys
+ * 
+ * ClientShares - contains keys and method to produce KeyShareClientHello
  */
 class ClientShares {
    static keys
+   /**
+    * 
+    * @returns {KeyShareClientHello}
+    */
    static async keyShareClientHello() {
       ClientShares.keys = new Keys(
          new Key(await cryptokey(Algo.x25519)),
@@ -267,8 +278,12 @@ class P521 extends Uint8Array {
       return p521.getSharedSecret(this, publicKey)
    }
 }
-
+/**
+ * 
+ * ServerShare - contains keys and method to produce KeyShareClientHello
+ */
 class ServerShare {
+   /**@type {Key} key - description */
    static key
    static async x25519() {
       ServerShare.key = new Key(await cryptokey(Algo.x25519))

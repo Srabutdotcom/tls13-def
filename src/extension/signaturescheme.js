@@ -8,10 +8,12 @@
 
 import { Enum, Minmax, Struct, Uint16 } from "../base.js";
 
-class SignatureAlgorithm extends Uint16 {
+export class SignatureAlgorithm extends Uint16 {
    constructor(value){super(value)}
 }
-
+/**
+ * SignatureSchemeList
+ */
 export class SignatureSchemeList extends Struct {
    static list(){return new SignatureSchemeList}
    static new(){return new SignatureSchemeList}

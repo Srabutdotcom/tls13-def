@@ -4,17 +4,18 @@
 import { Struct } from "../base.js";
 
 /**
- * 
+ * SupportedVersions
+ * ```
  * struct {
- * 
-          select (Handshake.msg_type) {
-              case client_hello:
-                   ProtocolVersion versions<2..254>;
+      select (Handshake.msg_type) {
+         case client_hello:
+               ProtocolVersion versions<2..254>;
 
-              case server_hello: // and HelloRetryRequest 
-              ProtocolVersion selected_version;
-            };
-        } SupportedVersions;
+         case server_hello: // and HelloRetryRequest 
+         ProtocolVersion selected_version;
+      };
+   } SupportedVersions;
+   ```
 
  * The "supported_versions" extension is used by the client to indicate
    which versions of TLS it supports and by the server to indicate which
@@ -49,7 +50,7 @@ export class SupportedVersions extends Struct {
     * @param {boolean} client - true if it is for client 
     */
    constructor(client) {
-      const versions = client ? new Uint8Array([4, 3, 3, 3, 4]) : new Uint8Array([3, 4])
+      const versions = client ? new Uint8Array([2, 3, 4]) : new Uint8Array([3, 4])
       super(versions)
    }
 }

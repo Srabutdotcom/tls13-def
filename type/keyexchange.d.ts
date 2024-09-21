@@ -22,7 +22,10 @@ export class Random extends Uint8Array {
     constructor();
 }
 /**
+ * CipherSuite
+ * ```
  * uint8 CipherSuite[2];    Cryptographic suite selector
+ * ```
  */
 export class CipherSuite extends Uint8Array {
     static TLS_AES_128_GCM_SHA256: CipherSuite;
@@ -35,7 +38,15 @@ export class CipherSuite extends Uint8Array {
     get AEAD(): -1 | 256 | 128;
     get SHA(): -1 | 256 | 384;
 }
+/**
+ * List of CipherSuite
+ * CipherSuite cipher_suites<2..2^16-2>;
+ */
 export class CipherSuites extends Minmax {
+    /**
+     * new CipherSuites
+     * @return {CipherSuites} list of CipherSuite
+     * */
     static "new"(): CipherSuites;
     constructor();
     ciphers: {

@@ -14,6 +14,9 @@ export class Struct extends Uint8Array {
     get member(): Uint8Array[];
     #private;
 }
+/**
+ * Fixed length of Uint8Array
+ */
 export class Fixed extends Uint8Array {
     /**
      *
@@ -36,6 +39,7 @@ export class Fixed extends Uint8Array {
     constructor(l: number, ...v: Uint8Array[]);
 }
 /**
+ * Variable length between defined min and max of Uint8Array
  */
 export class Minmax extends Uint8Array {
     /**
@@ -63,7 +67,10 @@ export class Minmax extends Uint8Array {
      * @param  {...Uint8Array} b
      */
     constructor(m: number, M: number, ...b: Uint8Array[]);
-    get member(): any[];
+    /**
+     * @return {Array<Uint8Array>}
+     */
+    get member(): Uint8Array[];
     get min(): number;
     get max(): number;
     #private;

@@ -28,6 +28,9 @@ export class Struct extends Uint8Array {
    get member() { return this.#member }
 }
 
+/**
+ * Fixed length of Uint8Array
+ */
 export class Fixed extends Uint8Array {
    /**
     * 
@@ -59,6 +62,7 @@ export class Fixed extends Uint8Array {
    }
 }
 /**
+ * Variable length between defined min and max of Uint8Array
  */
 export class Minmax extends Uint8Array {
    /**
@@ -109,6 +113,9 @@ export class Minmax extends Uint8Array {
       this.#min = m
       this.#max = M
    }
+   /**
+    * @return {Array<Uint8Array>}
+    */
    get member() { return this.#member }
    get min() { return this.#min }
    get max() { return this.#max }

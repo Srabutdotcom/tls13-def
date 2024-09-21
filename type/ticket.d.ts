@@ -61,7 +61,7 @@ export class NewSessionTicket extends Struct {
     handshake: () => Handshake;
     /**
      *
-     * @returns Hanshake message
+     * @return {Handshake} message
      */
     wrap(): Handshake;
     #private;

@@ -27,12 +27,19 @@ export class DistinguishedName extends Minmax {
    }
 }
 /**
- * struct {
  * 
-          DistinguishedName authorities<3..2^16-1>;
-      } CertificateAuthoritiesExtension;
+ * ```
+ * struct {
+*     DistinguishedName authorities<3..2^16-1>;
+   } CertificateAuthoritiesExtension;
+   ```
  */
 export class CertificateAuthoritiesExtension extends Struct {
+   /**
+    * Create CertificateAuthoritiesExtension
+    * @param {...DistinguishedName} authority 
+    */
+   static new(...authority){ return new CertificateAuthoritiesExtension(...authority)}
    /**
     * 
     * @param {...DistinguishedName} authority 
@@ -48,15 +55,25 @@ export class CertificateAuthoritiesExtension extends Struct {
  */
 export class Certificate_extension_oid extends Minmax {
    /**
-    * 
-    * @param  {...Uint8Array} oids 
+    * Create Certificate_extension_oid
+    * @param  {Uint8Array} oids 
     */
-   constructor(...oids) { super(1, 2 ** 8 - 1, ...oids) }
+   static new(oids){ return new Certificate_extension_oid(oids)}
+   /**
+    * 
+    * @param  {Uint8Array} oids 
+    */
+   constructor(oids) { super(1, 2 ** 8 - 1, oids) }
 }
 /**
  * opaque certificate_extension_values<0..2^16-1>;
  */
 export class Certificate_extension_values extends Minmax {
+   /**
+    * Create Certificate_extension_values
+    * @param  {...Uint8Array} values 
+    */
+   static new(...values){ return new Certificate_extension_values(...values)}
    /**
     * 
     * @param  {...Uint8Array} values 
@@ -64,11 +81,13 @@ export class Certificate_extension_values extends Minmax {
    constructor(...values) { super(0, 2 ** 16 - 1, ...values) }
 }
 /**
+ * OIDFilter
+ * ```
  * struct {
- * 
-         opaque certificate_extension_oid<1..2^8-1>;
-         opaque certificate_extension_values<0..2^16-1>;
+      opaque certificate_extension_oid<1..2^8-1>;
+      opaque certificate_extension_values<0..2^16-1>;
    } OIDFilter;
+   ```
  */
 export class OIDFilter extends Struct {
    /**
@@ -76,8 +95,8 @@ export class OIDFilter extends Struct {
     * @param  {...Uint8Array} oids 
     * @returns 
     */
-   static certificate_extension_oid(...oids) {
-      oids = new Certificate_extension_oid(...oids)
+   static certificate_extension_oid(oids) {
+      oids = new Certificate_extension_oid(oids)
       return {
          /**
           * 
@@ -106,15 +125,23 @@ export class OIDFilter extends Struct {
 }
 
 /**
+ * OIDFilterExtension
+ * ```
  * struct {
- * 
-       OIDFilter filters<0..2^16-1>;
-    } OIDFilterExtension;
+      OIDFilter filters<0..2^16-1>;
+   } OIDFilterExtension;
+   ```
  */
 export class OIDFilterExtension extends Struct {
    /**
+    * Create OIDFilterExtension
+    * @param  {...OIDFilter} OIDFilters 
+    * @returns 
+    */
+   static new(...OIDFilters){ return new OIDFilterExtension(...OIDFilters)}
+   /**
     * 
-    * @param {OIDFilter} OIDFilter 
+    * @param {...OIDFilter} OIDFilters 
     */
    constructor(...OIDFilters) {
       super(
@@ -124,19 +151,28 @@ export class OIDFilterExtension extends Struct {
 }
 
 /**
+ * PostHandshakeAuth
+ * ```
  * struct {} PostHandshakeAuth;
+ * ```
  */
 export class PostHandshakeAuth extends Struct {
    constructor() { super() }
 }
 
 /**
+ * EncryptedExtensions
+ * ```
  * struct {
- * 
-       Extension extensions<0..2^16-1>;
+      Extension extensions<0..2^16-1>;
    } EncryptedExtensions;
+   ```
  */
 export class EncryptedExtensions extends Struct {
+   /**
+    * Create EncryptedExtensions
+    * @param {...Extension} extensions 
+    */
    static new(...extensions){ return new EncryptedExtensions(...extensions)}
    payload = this.wrap
    handshake = this.wrap
@@ -154,7 +190,7 @@ export class EncryptedExtensions extends Struct {
    }
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap(){
       return Handshake.encrypted_extensions(this)
@@ -162,11 +198,13 @@ export class EncryptedExtensions extends Struct {
 }
 
 /**
+ * CertificateRequest
+ * ```
  * struct {
- * 
-       opaque certificate_request_context<0..2^8-1>;
-       Extension extensions<2..2^16-1>;
+      opaque certificate_request_context<0..2^8-1>;
+      Extension extensions<2..2^16-1>;
    } CertificateRequest;
+   ```
 
    certificate_request_context:  This field SHALL be zero
       length unless used for the post-handshake authentication exchanges
@@ -181,15 +219,15 @@ export class EncryptedExtensions extends Struct {
  */
 export class CertificateRequest extends Struct {
    /**
-    * 
-    * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
+    * Create CertificateRequest
+    * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
     */
    static new(signature_algorithms=SignatureSchemeList.list()) { return new CertificateRequest(signature_algorithms) }
    payload = this.wrap
    handshake = this.wrap
    /**
     * 
-    * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
+    * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
     */
    constructor(signature_algorithms=SignatureSchemeList.list()) {
       super(
@@ -199,7 +237,7 @@ export class CertificateRequest extends Struct {
    }
    /**
     * 
-    * @returns Hanshake message
+    * @return {Handshake} message
     */
    wrap(){
       return Handshake.certificate_request(this)

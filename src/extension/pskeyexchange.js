@@ -8,15 +8,16 @@
 import { Minmax, Struct, Uint8 } from "../base.js";
 
 /**
+ * PskKeyExchangeModes
+ * ```
  * enum { 
-  
-         psk_ke(0), psk_dhe_ke(1), (255) 
-      } PskKeyExchangeMode;
+      psk_ke(0), psk_dhe_ke(1), (255) 
+   } PskKeyExchangeMode;
  * 
  * struct {
- * 
-          PskKeyExchangeMode ke_modes<1..255>;
-      } PskKeyExchangeModes;
+      PskKeyExchangeMode ke_modes<1..255>;
+   } PskKeyExchangeModes;
+   ```
  */
 export class PskKeyExchangeModes extends Struct {
    /**

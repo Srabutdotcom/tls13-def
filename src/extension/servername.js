@@ -15,20 +15,26 @@ import { Minmax, Struct, Uint8 } from "../base.js";
 import { uint8array } from "@aicone/byte"
 
 /**
+ * ServerName
+ * ```
  * enum {
- * 
-          host_name(0), (255)
-      } NameType;
+      host_name(0), (255)
+   } NameType;
 
  * struct {
- * 
-          NameType name_type;
-          select (name_type) {
-              case host_name: HostName;
-          } name;
-      } ServerName;
+      NameType name_type;
+      select (name_type) {
+         case host_name: HostName;
+      } name;
+   } ServerName;
+   ```
  */
 export class ServerName extends Struct {
+   /**
+    * 
+    * @param {...Uint8Array|string} hostname 
+    */
+   static new(...hostname){ return new ServerName(...hostname)}
    /**
     * 
     * @param {...Uint8Array|string} hostname 

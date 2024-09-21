@@ -23,7 +23,7 @@ export * from "./params.js"
 
 //`esbuild ./mod.js --bundle --format=esm --target=esnext --outfile=../dist/def.js --legal-comments=inline --external:@aicone* --external:npm:@noble/curves@1.6.0/p521`
 //--external:npm:jose* --external:npm:@lapo/*
-// npx -p typescript tsc def.js --declaration --allowJs --emitDeclarationOnly --lib ESNext
+// npx -p typescript tsc ./src/mod.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 
 // add this in the first line in /dist/ file
 // @ts-self-types="./types.d.ts"

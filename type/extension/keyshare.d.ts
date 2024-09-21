@@ -5,13 +5,14 @@
  */
 export function keyShareServerHello(server_share: KeyShareEntry): KeyShareServerHello;
 /**
- * LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8
- *
+ * KeyShareEntry
+ * ```
  * struct {
- *
-         NamedGroup group;
-         opaque key_exchange<1..2^16-1>;
-      } KeyShareEntry;
+      NamedGroup group;
+      opaque key_exchange<1..2^16-1>;
+   } KeyShareEntry;
+   ```
+   LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8
  */
 export class KeyShareEntry extends Struct {
     /**
@@ -23,10 +24,12 @@ export class KeyShareEntry extends Struct {
     #private;
 }
 /**
+ * KeyShareServerHello
+ * ```
  * struct {
       KeyShareEntry server_share;
    } KeyShareServerHello;
-
+   ```
    server_share:  A single KeyShareEntry value that is in the same group
       as one of the client's shares.
  */
@@ -38,11 +41,16 @@ export class KeyShareServerHello extends Struct {
     constructor(server_share: KeyShareEntry);
 }
 /**
- * @prop {Keys} keys
+ *
+ * ClientShares - contains keys and method to produce KeyShareClientHello
  */
 export class ClientShares {
     static keys: any;
-    static keyShareClientHello(): Promise<any>;
+    /**
+     *
+     * @returns {KeyShareClientHello}
+     */
+    static keyShareClientHello(): KeyShareClientHello;
 }
 /**
  * Collection of Key that contain (X25519, ECDH256, ECDH384 and ECDH521 using noble)
@@ -52,23 +60,23 @@ export class ClientShares {
 export class Keys {
     /**
      *
-     * @param {Array<Key>} keys
+     * @param {...Key} keys
      */
-    constructor(...keys: Array<Key>);
+    constructor(...keys: Key[]);
     get ecdh256(): Key;
     get ecdh384(): Key;
     get ecdh521(): Key;
     get x25519(): Key;
     /**
      *
-     * @returns KeyShareClientHello
+     * @returns {KeyShareClientHello}
      * Clients MUST NOT offer multiple KeyShareEntry values
     for the same group.  Clients MUST NOT offer any KeyShareEntry values
     for groups not listed in the client's "supported_groups" extension.
     Servers MAY check for violations of these rules and abort the
     handshake with an "illegal_parameter" alert if one is violated.
      */
-    keyShareClientHello(): Promise<KeyShareClientHello>;
+    keyShareClientHello(): KeyShareClientHello;
     #private;
 }
 /**
@@ -94,11 +102,19 @@ export class Key {
      * @return {Uint8Array} sharedkey
      */
     sharedKey(v: CryptoKey, l: number): Uint8Array;
+    /**
+     * @return {Object} algorithm
+     */
     get algorithm(): any;
     #private;
 }
+/**
+ *
+ * ServerShare - contains keys and method to produce KeyShareClientHello
+ */
 export class ServerShare {
-    static key: any;
+    /**@type {Key} key - description */
+    static key: Key;
     static x25519(): Promise<KeyShareServerHello>;
     static p521(): Promise<KeyShareServerHello>;
     static p384(): Promise<KeyShareServerHello>;
@@ -106,20 +122,19 @@ export class ServerShare {
     static keyShareServerHello(): Promise<KeyShareServerHello>;
 }
 /**
- * key_shares extension for client hello
+ * KeyShareClientHello
  *
+ * ```
  * struct {
- *
-         KeyShareEntry client_shares<0..2^16-1>;
-      } KeyShareClientHello;
-
+      KeyShareEntry client_shares<0..2^16-1>;
+   } KeyShareClientHello;
+   ```
    client_shares:  A list of offered KeyShareEntry values in descending
       order of client preference.
 
       Each KeyShareEntry value MUST correspond to a
    group offered in the "supported_groups" extension and MUST appear in
    the same order.
-
  *
  */
 export class KeyShareClientHello extends Struct {
@@ -130,11 +145,12 @@ export class KeyShareClientHello extends Struct {
     constructor(...clientShares: KeyShareEntry[]);
 }
 /**
+ * KeyShareHelloRetryRequest
+ * ```
  * struct {
- *
-         NamedGroup selected_group;
-      } KeyShareHelloRetryRequest;
-       
+      NamedGroup selected_group;
+   } KeyShareHelloRetryRequest;
+   ```
    selected_group:  The mutually supported group the server intends to
       negotiate and is requesting a retried ClientHello/KeyShare for.
  */
