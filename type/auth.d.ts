@@ -13,7 +13,7 @@
     } CertificateEntry;
    ```
  */
-export class CertificateEntry extends Struct {
+   export class CertificateEntry extends Struct {
     /**
      * new CertificateEntry
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
@@ -81,79 +81,77 @@ export class CertificateVerify extends Struct {
      * Create new CertificateVerify based on specific algorithm
      *
      */
-    static new: {
-        ecdsa_secp256r1_sha256: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        ecdsa_secp384r1_sha384: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        ecdsa_secp521r1_sha512: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_rsae_sha256: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_rsae_sha384: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_rsae_sha512: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_pss_sha256: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_pss_sha384: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
-        rsa_pss_pss_sha512: {
-            /**
-             *
-             * @param {...Uint8Array} signatures
-             * @returns
-             */
-            signature(...signatures: Uint8Array[]): CertificateVerify;
-        };
+    static ecdsa_secp256r1_sha256: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static ecdsa_secp384r1_sha384: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static ecdsa_secp521r1_sha512: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_rsae_sha256: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_rsae_sha384: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_rsae_sha512: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_pss_sha256: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_pss_sha384: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
+    };
+    static rsa_pss_pss_sha512: {
+        /**
+         *
+         * @param {...Uint8Array} signatures
+         * @returns
+         */
+        signature(...signatures: Uint8Array[]): CertificateVerify;
     };
     /**
      *
@@ -168,6 +166,7 @@ export class CertificateVerify extends Struct {
     * @return {Handshake} message
     */
     wrap(): Handshake;
+    #private;
 }
 /**
  * Finished
@@ -197,6 +196,8 @@ export class Finished extends Struct {
     */
     wrap(): Handshake;
 }
+
+
 import { Struct } from "../src/base.js";
 import { Uint16 } from "../src/base.js";
 import { Handshake } from "../src/handshake.js";

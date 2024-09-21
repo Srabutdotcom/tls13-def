@@ -36,7 +36,7 @@ export class CertificateEntry extends Struct {
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
      * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
      */
-    static new(certificate, extensions = new Uint16(0)){ return new CertificateEntry(certificate, extensions)}
+    static new(certificate, extensions = new Uint16(0)) { return new CertificateEntry(certificate, extensions) }
     /**
      * 
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
@@ -127,30 +127,30 @@ export class CertificateVerify extends Struct {
      * Create new CertificateVerify based on specific algorithm
      * 
      */
-    static new = {
-        /* RSASSA-PKCS1-v1_5 algorithms */
-        /* rsa_pkcs1_sha256(0x0401),
-        rsa_pkcs1_sha384(0x0501),
-        rsa_pkcs1_sha512(0x0601), */
 
-        /* ECDSA algorithms */
-        ecdsa_secp256r1_sha256: sign(SignatureSchemeList.SignatureScheme.ecdsa_secp256r1_sha256),
-        ecdsa_secp384r1_sha384: sign(SignatureSchemeList.SignatureScheme.ecdsa_secp384r1_sha384),
-        ecdsa_secp521r1_sha512: sign(SignatureSchemeList.SignatureScheme.ecdsa_secp521r1_sha512),
+    /* RSASSA-PKCS1-v1_5 algorithms */
+    /* rsa_pkcs1_sha256(0x0401),
+    rsa_pkcs1_sha384(0x0501),
+    rsa_pkcs1_sha512(0x0601), */
 
-        /* RSASSA-PSS algorithms with public key OID rsaEncryption */
-        rsa_pss_rsae_sha256: sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha256),
-        rsa_pss_rsae_sha384: sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384),
-        rsa_pss_rsae_sha512: sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha512),
-        /* EdDSA algorithms */
-        /* ed25519(0x0807),
-        ed448(0x0808), */
+    /* ECDSA algorithms */
+    static ecdsa_secp256r1_sha256 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp256r1_sha256)
+    static ecdsa_secp384r1_sha384 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp384r1_sha384)
+    static ecdsa_secp521r1_sha512 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp521r1_sha512)
 
-        /* RSASSA-PSS algorithms with public key OID RSASSA-PSS */
-        rsa_pss_pss_sha256: sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha256),
-        rsa_pss_pss_sha384: sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384),
-        rsa_pss_pss_sha512: sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha512),
-    }
+    /* RSASSA-PSS algorithms with public key OID rsaEncryption */
+    static rsa_pss_rsae_sha256 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha256)
+    static rsa_pss_rsae_sha384 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384)
+    static rsa_pss_rsae_sha512 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha512)
+    /* EdDSA algorithms */
+    /* ed25519(0x0807),
+    ed448(0x0808), */
+
+    /* RSASSA-PSS algorithms with public key OID RSASSA-PSS */
+    static rsa_pss_pss_sha256 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha256)
+    static rsa_pss_pss_sha384 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384)
+    static rsa_pss_pss_sha512 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha512)
+
 
     payload = this.wrap;
     handshake = this.wrap
@@ -188,7 +188,7 @@ export class Finished extends Struct {
      * @param {Uint8Array} verify_data 
      * @returns 
      */
-    static new(verify_data){ return new Finished(verify_data)}
+    static new(verify_data) { return new Finished(verify_data) }
     payload = this.wrap
     handshake = this.wrap
 
@@ -218,4 +218,6 @@ function sign(algorithm) {
         signature(...signatures) { return new CertificateVerify(algorithm, ...signatures) }
     }
 }
+
+// npx -p typescript tsc ./src/auth.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 
