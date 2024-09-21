@@ -84,7 +84,3 @@ class LegacyCompressionMethod extends Uint8 {
    static new(){ return new LegacyCompressionMethod}
    constructor(){super(0)}
 }
-
-const sh = ServerHello.new(
-   SessionId.new()
-)

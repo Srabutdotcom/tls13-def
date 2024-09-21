@@ -1,3 +1,6 @@
+export class SignatureAlgorithm extends Uint16 {
+    constructor(value: any);
+}
 /**
  * SignatureSchemeList
  */
@@ -8,4 +11,4 @@ export class SignatureSchemeList extends Struct {
     constructor();
 }
 import { Struct } from "../../src/base.js";
-import { Enum } from "../../src/base.js";
+import { Enum, Uint16 } from "../../src/base.js";

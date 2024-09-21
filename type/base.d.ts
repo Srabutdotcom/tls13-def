@@ -82,9 +82,9 @@ export class Minmax extends Uint8Array {
 export class Uint8 extends Uint8Array {
     /**
      *
-     * @param {number} int
+     * @param {number} v
      */
-    static "new"(v: any): Uint8;
+    static "new"(v: number): Uint8;
     /**
      *
      * @param {number} int
@@ -103,9 +103,9 @@ export class Uint8 extends Uint8Array {
 export class Uint16 extends Uint8Array {
     /**
      *
-     * @param {number} int
+     * @param {number} v
      */
-    static "new"(v: any): Uint16;
+    static "new"(v: number): Uint16;
     /**
      *
      * @param {number} int
@@ -124,9 +124,9 @@ export class Uint16 extends Uint8Array {
 export class Uint24 extends Uint8Array {
     /**
      *
-     * @param {number} int
+     * @param {number} v
      */
-    static "new"(v: any): Uint24;
+    static "new"(v: number): Uint24;
     /**
      *
      * @param {number} int
@@ -145,9 +145,9 @@ export class Uint24 extends Uint8Array {
 export class Uint32 extends Uint8Array {
     /**
      *
-     * @param {number} int
+     * @param {number} v
      */
-    static "new"(v: any): Uint32;
+    static "new"(v: number): Uint32;
     /**
      *
      * @param {number} int
