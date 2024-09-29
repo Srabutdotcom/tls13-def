@@ -17,6 +17,6 @@ Deno.test(
       assertEquals(tls12.value(),0x0303)
 
       equal(CipherSuite.TLS_AES_128_GCM_SHA256, new Uint8Array([19, 1]))
-      equal(CipherSuites.new, new Uint8Array([0, 4, 19, 1, 19, 2]))
+      equal(CipherSuites.a, new Uint8Array([0, 4, 19, 1, 19, 2]))
    }
 )

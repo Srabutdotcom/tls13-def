@@ -26,6 +26,10 @@
  */
 export class SupportedVersions extends Struct {
     /**
+     * @param {SelectedVersion|Versions} versions - description
+     */
+    static a(versions: SelectedVersion | Versions): SupportedVersions;
+    /**
      *
      * @returns SupportedVersions - for client new Uint8Array([2, 3, 4])
      */
@@ -41,9 +45,40 @@ export class SupportedVersions extends Struct {
      */
     static retry(): SupportedVersions;
     /**
-     *
-     * @param {boolean} client - true if it is for client
+     * @param {Uint8Array} data
+     * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} klas - description
      */
-    constructor(client: boolean);
+    static parse(data: Uint8Array, klas: "ClientHello" | "ServerHello" | "KeyShareHelloRetryRequest"): SupportedVersions | SelectedVersion;
+    /**
+     * @param {SelectedVersion|Versions} versions - description
+     */
+    constructor(versions: SelectedVersion | Versions);
 }
 import { Struct } from "../../src/base.js";
+declare class SelectedVersion extends ProtocolVersion {
+    /**
+     *
+     * @param {ProtocolVersion} val
+     */
+    static a(val: ProtocolVersion): SelectedVersion;
+    /**
+     *
+     * @param {ProtocolVersion} val
+     */
+    constructor(val: ProtocolVersion);
+}
+declare class Versions extends Minmax {
+    /**
+     *
+     * @param  {...ProtocolVersion} versions
+     */
+    static a(...versions: ProtocolVersion[]): Versions;
+    /**
+     *
+     * @param  {...ProtocolVersion} versions
+     */
+    constructor(...versions: ProtocolVersion[]);
+}
+import { ProtocolVersion } from "../../src/keyexchange.js";
+import { Minmax } from "../../src/base.js";
+export {};

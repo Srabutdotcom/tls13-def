@@ -1,9 +1,13 @@
 /**
  * Struct definition
- * 
+ *
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.6
  */
 export class Struct extends Uint8Array {
+    /**
+     * @param  {...Uint8Array} uint8s
+     */
+    static a(...uint8s: Uint8Array[]): Struct;
     /**
      * @param  {...Uint8Array} uint8s
      */
@@ -78,7 +82,7 @@ export class Minmax extends Uint8Array {
 }
 /**
  * number definition 1 byte
- * 
+ *
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint8 extends Uint8Array {
@@ -86,7 +90,7 @@ export class Uint8 extends Uint8Array {
      *
      * @param {number} v
      */
-    static "new"(v: number): Uint8;
+    static a(v: number): Uint8;
     /**
      *
      * @param {number} int
@@ -100,7 +104,7 @@ export class Uint8 extends Uint8Array {
 }
 /**
  * number definition 2 bytes
- * 
+ *
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint16 extends Uint8Array {
@@ -108,7 +112,7 @@ export class Uint16 extends Uint8Array {
      *
      * @param {number} v
      */
-    static "new"(v: number): Uint16;
+    static a(v: number): Uint16;
     /**
      *
      * @param {number} int
@@ -122,37 +126,33 @@ export class Uint16 extends Uint8Array {
 }
 /**
  * number definition 3 bytes
- * 
+ *
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint24 extends Uint8Array {
     /**
-     *
      * @param {number} v
      */
-    static "new"(v: number): Uint24;
+    static a(v: number): Uint24;
     /**
-     *
      * @param {number} int
      */
     constructor(int: number);
     /**
-     *
      * @returns {number}
      */
     value(): number;
 }
 /**
  * number definition 4 byte
- * 
+ *
  * https://datatracker.ietf.org/doc/html/rfc8446#section-3.3
  */
 export class Uint32 extends Uint8Array {
     /**
-     *
      * @param {number} v
      */
-    static "new"(v: number): Uint32;
+    static a(v: number): Uint32;
     /**
      *
      * @param {number} int
@@ -168,10 +168,15 @@ export class Uint32 extends Uint8Array {
  * Enum in Javascript
  */
 export class Enum {
+    /**
+     * @param {{any:any}} object
+     */
+    static a(object: {
+        any: any;
+    }): Enum;
     static max: symbol;
     static class: symbol;
     /**
-     *
      * @param {{any:any}} object
      */
     constructor(object: {

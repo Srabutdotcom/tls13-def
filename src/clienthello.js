@@ -6,6 +6,8 @@ import { Minmax, Struct, Uint8 } from "./base.js";
 import { ClientShares } from "./extension/keyshare.js";
 import { CipherSuites } from "./keyexchange.js";
 import { Handshake } from "./handshake.js";
+import { Byte } from "./deps.js"
+
 
 var clientShares = await ClientShares.keyShareClientHello();
 
@@ -22,24 +24,32 @@ var clientShares = await ClientShares.keyShareClientHello();
  * ```
  */
 export class SessionId extends Minmax {
-   /**@return {SessionId} sessionId - 33 bytes length */
-   static new() { return new SessionId }
-   /**@return {SessionId} sessionId - 33 bytes length */
-   constructor() {
+   #sid
+   /**
+    * @param {Uint8Array} sid 
+    * @return {SessionId} sessionId - 33 bytes length */
+   static a(sid) { return new SessionId(sid) }
+   /**
+    * @param {Uint8Array} sid
+    * @return {SessionId} sessionId - 33 bytes length */
+   constructor(sid) {
       super(
          0,
          32,
+         sid ??
          new Uint8Array(Array.from(
             crypto.randomUUID().replaceAll('-', ''),
             e => e.charCodeAt(0)))
       )
+      this.#sid = sid
    }
+   get sid() { return this.#sid }
 }
 /**
  * opaque legacy_compression_methods<1..2^8-1>;
  */
 class LegacyCompressionMethods extends Minmax {
-   static new(){return new LegacyCompressionMethods}
+   static a() { return new LegacyCompressionMethods }
    constructor() {
       super(1, 2 ** 8 - 1, new Uint8(0))
    }
@@ -90,7 +100,7 @@ export class ClientHello extends Struct {
     * @param  {...string} serverNames 
     * @returns {ClientHello}
     */
-   static new(...serverNames) {
+   static a(...serverNames) {
       return new ClientHello(...serverNames)
    }
    /**
@@ -109,30 +119,26 @@ export class ClientHello extends Struct {
     * ```js
     * const clientHello = ClientHello.new('serverName1','serverName2')
     * ```
-    * @param {...string} serverNames - Server Name Indication i.e. "localhost"
+    * @param {...string} serverNames - i.e. 'smtp.gmail.com'
     */
    constructor(...serverNames) {
       //const compression = new Uint8Array([1, 0]);
       const exts = [
-         Extension.extensions.server_name.serverNames(...serverNames),
-         Extension.extensions.supported_groups,
-         Extension.extensions.signature_algorithms,
-         Extension.extensions.supported_versions.client,
-         Extension.extensions.psk_key_exchange_modes,
-         Extension.new(clientShares, Extension.types.key_share)
+         Extension.server_name.serverNames(...serverNames),
+         Extension.supported_groups,
+         Extension.signature_algorithms,
+         Extension.supported_versions.client,
+         Extension.psk_key_exchange_modes,
+         Extension.a(clientShares, Extension.types.key_share)
       ]
 
       super(
-         ProtocolVersion.version.legacy,
-         Random.new(),
-         SessionId.new(),
-         CipherSuites.new(),
-         LegacyCompressionMethods.new(),
-         Extensions.new(
-            8,
-            2 ** 16 - 1,
-            ...exts
-         )
+         ProtocolVersion.version.legacy, //Uint16
+         Random.a(), //32 bytes
+         SessionId.a(),
+         CipherSuites.a(),
+         LegacyCompressionMethods.a(),
+         Extensions.clientHello(...exts)
       )
       this.clientShares = clientShares
       this.sessionId = this.member[2];
@@ -142,10 +148,102 @@ export class ClientHello extends Struct {
     * Wrapper of message to Handshake
     * @returns {Handshake} message
     */
-   wrap(){
+   wrap() {
       return Handshake.client_hello(this)
    }
+   static sequence = [
+      {
+         name: "version",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const value = Byte.get.BE.b16(message);
+            return ProtocolVersion.a(value)
+         }
+      },
+      {
+         name: "random",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const value = message.subarray(2, 34);
+            return Random.a(value)
+         }
+      },
+      {
+         name: "sessionId",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const length = Byte.get.BE.b8(message, 34);
+            if (length > 0) {
+               const value = message.subarray(35, 67)//34+33
+               return SessionId.a(value)
+            }
+            return new Uint8(0)
+         }
+      },
+      {
+         name: "ciphers",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message, pos) {
+            const length = Byte.get.BE.b16(message, pos);
+            pos += 2
+            const value = message.subarray(pos, pos + length);
+            return CipherSuites.a(value)
+         }
+      },
+      {
+         name: "compressions",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message, pos) {
+            const value = message.subarray(pos, pos + 2)
+            return value
+         }
+      },
+      {
+         name: "extensions",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message, pos) {
+            const length = Byte.get.BE.b16(message, pos);
+            pos += 2
+            const value = message.subarray(pos, pos + length);
+            return Extension.parse(value, "ClientHello")
+         }
+      }
+   ]
+   /**
+    * parse a message of ClientHello
+    * @param {Uint8Array} message - message aka ClientHello 
+    * @return {ClientHello} ClientHello data structure
+    */
+   static parse(message) {
+      const data = { message }
+      let offset = 0;
+      for (const { name, value } of ClientHello.sequence) {
+         data[name] = value(message, offset);
+         offset += data[name].length
+      }
+      return data
+   }
 }
+
+
 
 // npx -p typescript tsc ./src/clienthello.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 

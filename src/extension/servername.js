@@ -12,7 +12,12 @@
  */
 
 import { Minmax, Struct, Uint8 } from "../base.js";
-import { uint8array } from "@aicone/byte"
+import { Byte, uint8array } from "../deps.js"
+
+class HostName extends Uint8 {
+   static a = new HostName
+   constructor(){super(0)}
+}
 
 /**
  * ServerName
@@ -27,28 +32,56 @@ import { uint8array } from "@aicone/byte"
          case host_name: HostName;
       } name;
    } ServerName;
+   
+   opaque HostName<1..2^16-1>;
    ```
  */
 export class ServerName extends Struct {
+   #hostname
    /**
     * 
-    * @param {...Uint8Array|string} hostname 
+    * @param {Uint8Array|string} hostname 
     */
-   static new(...hostname){ return new ServerName(...hostname)}
+   static a(hostname) { return new ServerName(hostname) }
    /**
-    * 
-    * @param {...Uint8Array|string} hostname 
+    * @param {Uint8Array|string} hostname 
     */
-   constructor(...hostname) {
-      hostname = hostname.map(e=>uint8array(e))
+   constructor(hostname) {
+      hostname = uint8array(hostname)
       super(
-         new Uint8(0), // NameType - host_name(0)
-         Minmax.min(1).max(65535).byte(...hostname)//new OpaqueVar(hostname, 1, 65535)//<1..2^16-1>
+         HostName.a, // NameType - host_name(0)
+         Minmax.min(1).max(65535).byte(hostname)//new OpaqueVar(hostname, 1, 65535)//<1..2^16-1>
       )
+      this.#hostname = hostname
+   }
+   /**
+    * @return {string} hostname
+    */
+   get hostname() {
+      const dec = new TextDecoder;
+      return dec.decode(this.#hostname)
    }
 }
 /**
  * ServerNameList
+ * ```
+ * struct {
+      NameType name_type;
+      select (name_type) {
+         case host_name: HostName;
+      } name;
+   } ServerName;
+
+   enum {
+         host_name(0), (255)
+   } NameType;
+
+   opaque HostName<1..2^16-1>;
+
+   struct {
+         ServerName server_name_list<1..2^16-1>
+   } ServerNameList;
+   ```
  */
 export class ServerNameList extends Struct {
    /**
@@ -61,12 +94,33 @@ export class ServerNameList extends Struct {
       return new ServerNameList(...serverName)
    }
    /**
-    * 
     * @param {...ServerName} server_name_list <1..2^16-1>
     */
    constructor(...server_name_list) {
       super(
-         Minmax.min(1).max(2**16-1).byte(...server_name_list)//new OpaqueVar(server_name_list, 1, 2 ** 16 - 1)
+         Minmax.min(1).max(2 ** 16 - 1).byte(...server_name_list)//new OpaqueVar(server_name_list, 1, 2 ** 16 - 1)
       )
    }
+
+   /**
+    * 
+    * @param {Uint8Array} data 
+    */
+   static parse(data) {
+      let pos = 0;
+      const serverNames = []
+      const lengthTotal = Byte.get.BE.b16(data); pos += 2;
+      while (true) {
+         /* const name_type = Byte.get.BE.b8(data, pos) */; pos += 1
+         // TODO throw Error if name_type !== 0 
+         const length = Byte.get.BE.b16(data, pos); pos += 2;
+         const hostname = data.subarray(pos, pos + length); pos += length;
+         //serverNames.push(ServerName.a(hostname));
+         serverNames.push({hostname})
+         if (pos >= lengthTotal - 1) break
+      }
+      return serverNames
+      //return ServerNameList.list(...serverNames)
+   }
+
 }

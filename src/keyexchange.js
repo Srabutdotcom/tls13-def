@@ -6,24 +6,38 @@
  */
 
 import { Minmax, Uint16 } from "./base.js";
+import { concat } from "./deps.js"
 
 /**
  * ProtocolVersion -> 0x0303 - TLS v1.2 or 0x0304 - TLS v1.3
  */
 export class ProtocolVersion extends Uint16 {
    static version = {
-      TLS12 : new ProtocolVersion(0x0303),
-      TLS13 : new ProtocolVersion(0x0304),
-      legacy : new ProtocolVersion(0x0303),
+      SSL30: new ProtocolVersion(0x0300),
+      TLS10: new ProtocolVersion(0x0301),
+      TLS11: new ProtocolVersion(0x0302),
+      TLS12: new ProtocolVersion(0x0303),
+      TLS13: new ProtocolVersion(0x0304),
+      legacy: new ProtocolVersion(0x0303),
    }
    /**
+    * @param {number} ver - 0x0300[SSL30] to 0x0304[TLS13] 
+    * @return {ProtocolVersion} description
+    */
+   static a(ver) { return new ProtocolVersion(ver) }
+   /**
     * 
-    * @param {0x0303|0x0304} ver - TLS version (1.2 or 1.3) 
+    * @param {number} ver - 0x0300[SSL30] to 0x0304[TLS13] 
+    * @return {ProtocolVersion} description
     */
    constructor(ver) {
+      if (ver < 0x0300 || ver > 0x0304) throw TypeError(`Unexpected TLS version value`)
       super(ver)
    }
    meaning() {
+      if (this.value() == 0x0300) return `SSL v3.0 - [0x0300]`;
+      if (this.value() == 0x0301) return `TLS v1.0 - [0x0301]`;
+      if (this.value() == 0x0302) return `TLS v1.1 - [0x0302]`;
       if (this.value() == 0x0303) return `TLS v1.2 - legacy_version[0x0303]`
       if (this.value() == 0x0304) return `TLS v1.3 - [0x0304]`;
       throw TypeError(`Uknown version ${this.value}`)
@@ -34,9 +48,17 @@ export class ProtocolVersion extends Uint16 {
  * opaque Random[32]
  */
 export class Random extends Uint8Array {
-   static new(){return new Random()}
-   constructor() {
-      super(crypto.getRandomValues(new Uint8Array(32)))
+   /**
+    * 
+    * @param {Uint8Array} rnd - 32 bytes random 
+    */
+   static a(rnd) { return new Random(rnd) }
+   /**
+    * 
+    * @param {Uint8Array} rnd - 32 bytes random 
+    */
+   constructor(rnd) {
+      super(rnd ?? crypto.getRandomValues(new Uint8Array(32)))
    }
 }
 
@@ -60,12 +82,12 @@ export class CipherSuite extends Uint8Array {
       if (this.at(1) == 0x02) return 'TLS_AES_256_GCM_SHA384[0x13, 0x02]'
       throw TypeError(`Unknown cipher - ${this[1]}`)
    }
-   get AEAD(){
+   get AEAD() {
       if (this.at(1) == 0x01) return 128
       if (this.at(1) == 0x02) return 256
       return -1
    }
-   get SHA(){
+   get SHA() {
       if (this.at(1) == 0x01) return 256
       if (this.at(1) == 0x02) return 384
       return -1
@@ -83,13 +105,19 @@ export class CipherSuites extends Minmax {
    }
    /**
     * new CipherSuites 
+    * @param {Uint8Array} cips - cipherSuites 
     * @return {CipherSuites} list of CipherSuite
     * */
-   static new(){ return new CipherSuites }
-   constructor() {
-      super(2, 65534, new CipherSuite(0x01), new CipherSuite(0x02))// <2..2^16-2>
+   static a(cips) { return new CipherSuites(cips) }
+   /**
+    * 
+    * @param {Uint8Array} cips - cipherSuites 
+    */
+   constructor(cips = concat(new CipherSuite(0x01), new CipherSuite(0x02))) {
+      super(2, 65534, cips)// <2..2^16-2>
    }
 }
 
+//npx -p typescript tsc ./src/keyexchange.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 
 

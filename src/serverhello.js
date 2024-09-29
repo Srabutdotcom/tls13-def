@@ -43,7 +43,7 @@ export class ServerHello extends Struct {
     * @param {CipherSuite} cipher 
     * @param {Extension} serverShareExtension 
     */
-   static new(sessionId, cipher, serverShareExtension){
+   static a(sessionId, cipher, serverShareExtension){
       return new ServerHello(sessionId, cipher, serverShareExtension)
    }
    payload = this.wrap
@@ -55,18 +55,16 @@ export class ServerHello extends Struct {
     * @param {Extension} serverShareExtension 
     */
    constructor(sessionId, cipher, serverShareExtension){
-      const extensions = Extensions.new(
-         6,
-         2**16-1, 
+      const extensions = Extensions.serverHello(
          Extension.SupportedVersions.server,
          serverShareExtension
       )
       super(
          ProtocolVersion.version.legacy,
-         Random.new(),
+         Random.a(),
          sessionId,
          cipher,
-         LegacyCompressionMethod.new(),
+         LegacyCompressionMethod.a(),
          extensions
       )
    }
@@ -80,6 +78,6 @@ export class ServerHello extends Struct {
 }
 
 class LegacyCompressionMethod extends Uint8 {
-   static new(){ return new LegacyCompressionMethod}
+   static a(){ return new LegacyCompressionMethod}
    constructor(){super(0)}
 }

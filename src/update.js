@@ -31,7 +31,7 @@ import { Handshake } from "./handshake.js";
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
  */
 export class EndOfEarlyData extends Struct {
-   static new() { return new EndOfEarlyData }
+   static a() { return new EndOfEarlyData }
    payload = this.wrap
    handshake = this.wrap
    constructor() { super() }

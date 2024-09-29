@@ -6,10 +6,35 @@
  */
 
 import { Minmax, Struct } from "../base.js";
-import { NamedGroupList, NamedGroup } from "./namedgroup.js";
-import { p521 } from "../deps.js";
+import { NamedGroup } from "./namedgroup.js";
+import { p521, Byte } from "../deps.js";
 
-
+/**
+ * KeyExchange
+ * ```
+ * opaque key_exchange<1..2^16-1>;
+ * ```
+ * @property {Uint8Array} type.key - return the key
+ */
+export class KeyExchange extends Minmax {
+   #key
+   /**
+    * @param {Uint8Array} key - the KeyShare
+    * @return {KeyExchange} description
+    */
+   static a(key) { return KeyExchange.a(key) }
+   /**
+    * @param {Uint8Array} key - the KeyShare
+    */
+   constructor(key) {
+      super(1, 2 ** 16 - 1, key)
+      this.#key = key
+   }
+   /**
+    * @return {Uint8Array} description
+    */
+   get key() { return this.member[1] }
+}
 
 /**
  * KeyShareEntry
@@ -23,17 +48,52 @@ import { p521 } from "../deps.js";
  */
 class KeyShareEntry extends Struct {
    #NamedGroup = NamedGroup
+   #group
+   #key_exchange
+   /**
+    * @param {KeyExchange} key_exchange 
+    * @return 
+    */
+   static secp256r1(key_exchange) { return new KeyShareEntry(NamedGroup.secp256r1, key_exchange) }
+   /**
+    * @param {KeyExchange} key_exchange 
+    * @return 
+    */
+   static secp384r1(key_exchange) { return new KeyShareEntry(NamedGroup.secp384r1, key_exchange) }
+   /**
+    * @param {KeyExchange} key_exchange 
+    * @return 
+    */
+   static secp521r1(key_exchange) { return new KeyShareEntry(NamedGroup.secp521r1, key_exchange) }
+   /**
+    * @param {KeyExchange} key_exchange 
+    * @return 
+    */
+   static x25519(key_exchange) { return new KeyShareEntry(NamedGroup.x25519, key_exchange) }
    /**
     * 
     * @param {NamedGroup} group - NamedGroup 
-    * @param {Uint8Array[]} key_exchange - PublicKey
+    * @param {KeyExchange} key_exchange -  contain public key - opaque key_exchange<1..2^16-1>;
     */
-   constructor(group, ...key_exchange) {
+   static a(group, key_exchange) { return new KeyShareEntry(group, key_exchange) }
+
+   /**
+    * 
+    * @param {NamedGroup} group - NamedGroup 
+    * @param {KeyExchange} key_exchange - contain public key - opaque key_exchange<1..2^16-1>;
+    */
+   constructor(group, key_exchange) {
       super(
-         group,
-         Minmax.min(1).max(2 ** 16 - 1).byte(...key_exchange)//new OpaqueVar(key_exchange, 1, 2 ** 16 - 1)
+         group, //NamedGroup - Uint16
+         key_exchange
       )
+      this.#group = group;
+      this.#key_exchange = key_exchange
    }
+   /**@return {NamedGroup} description */
+   get group() { return this.#group }
+   /**@return {KeyExchange} description */
+   get key_exchange() { return this.#key_exchange }
 }
 
 /**
@@ -54,15 +114,38 @@ class KeyShareEntry extends Struct {
  */
 class KeyShareClientHello extends Struct {
    /**
-    * 
-    * @param {...KeyShareEntry} clientShares -A list of offered KeyShareEntry values in descending order of client preference.
+    * @param {...KeyShareEntry} keyShareEntry -A list of offered KeyShareEntry values in descending order of client preference.
     */
-   constructor(...clientShares) {
+   static a(...keyShareEntry) { return new KeyShareClientHello(...keyShareEntry) }
+   /**
+    * 
+    * @param {...KeyShareEntry} keyShareEntry -A list of offered KeyShareEntry values in descending order of client preference.
+    */
+   constructor(...keyShareEntry) {
       super(
-         Minmax.min(0).max(2 ** 16 - 1).byte(...clientShares)//new OpaqueVar(concat(...clientShares), 0, 2 ** 16 - 1)
+         Minmax.min(0).max(2 ** 16 - 1).byte(...keyShareEntry)
       )
    }
+   /**
+    * 
+    * @param {Uint8Array} data 
+    */
+   static parse(data) {
+      let pos = 0
+      const keys = []
+      /* const length = Byte.get.BE.b16(data) */; pos += 2;
+      while (true) {
+         const group = NamedGroup.a(Byte.get.BE.b16(data, pos)); pos += 2;
+         const length = Byte.get.BE.b16(data, pos); pos += 2;
+         const key = KeyShareEntry.a(group, data.subarray(pos, pos + length)); pos += length
+         keys.push(key);
+         if (pos >= data.length - 1) break
+      }
+      return keys
+      //return KeyShareClientHello.a(...keys)
+   }
 }
+
 /**
  * KeyShareHelloRetryRequest
  * ```
@@ -74,15 +157,31 @@ class KeyShareClientHello extends Struct {
       negotiate and is requesting a retried ClientHello/KeyShare for.
  */
 class KeyShareHelloRetryRequest extends Struct {
-   static {
-      const { namedGroup } = NamedGroupList
-      this.secp256r1 = function () { return new KeyShareHelloRetryRequest(namedGroup.secp256r1) }
-      this.secp384r1 = function () { return new KeyShareHelloRetryRequest(namedGroup.secp384r1) }
-      this.secp521r1 = function () { return new KeyShareHelloRetryRequest(namedGroup.secp521r1) }
-      this.x25519 = function () { return new KeyShareHelloRetryRequest(namedGroup.x25519) }
-   }
+   /**
+    * 
+    * @param {NamedGroup} selected_group 
+    */
+   static a(selected_group) { return new KeyShareHelloRetryRequest(selected_group) }
+
+   static secp256r1 = new KeyShareHelloRetryRequest(NamedGroup.secp256r1)
+   static secp384r1 = new KeyShareHelloRetryRequest(NamedGroup.secp384r1)
+   static secp521r1 = new KeyShareHelloRetryRequest(NamedGroup.secp521r1)
+   static x25519 = new KeyShareHelloRetryRequest(NamedGroup.x25519)
+
+   /**
+    * 
+    * @param {NamedGroup} selected_group 
+    */
    constructor(selected_group) {
       super(selected_group)
+   }
+   /**
+    * 
+    * @param {Uint8Array} data 
+    */
+   static parse(data) {
+      if (data.length !== 2) throw TypeError(`Expected length 2 in KeyShareHelloRetryRequest.parse method`)
+      return KeyShareHelloRetryRequest.a(NamedGroup.a(Byte.get.BE.b16(data)))
    }
 }
 /**
@@ -100,17 +199,26 @@ class KeyShareServerHello extends Struct {
     * 
     * @param {KeyShareEntry} server_share
     */
+   static a(server_share) { return new KeyShareServerHello(server_share) }
+   /**
+    * 
+    * @param {KeyShareEntry} server_share
+    */
    constructor(server_share) {
       if ((server_share instanceof KeyShareEntry) == false) throw TypeError(`Expected KeyShareEntry Object`)
       super(server_share)
    }
+   /**
+    * 
+    * @param {Uint8Array} data 
+    */
+   static parse(data) {
+      let pos = 0;
+      const group = NamedGroup.a(Byte.get.BE.b16(data)); pos += 2;
+      /* const length = Byte.get.BE.b16(data, pos) */; pos += 2;
+      return KeyShareServerHello.a(KeyShareEntry.a(group, data.subarray(pos)))
+   }
 }
-/**
- * 
- * @param {KeyShareEntry} server_share 
- * @returns KeyShareServerHello
- */
-export function keyShareServerHello(server_share) { return new KeyShareServerHello(server_share) }
 
 async function cryptokey(algo) {
    return await crypto.subtle.generateKey(algo, true, ["deriveKey", "deriveBits"])
@@ -148,11 +256,11 @@ class Key {
       if (this.#keypair instanceof P521) return this.#keypair.keyShareEntry()
       const arrayBufferPublicKey = await crypto.subtle.exportKey("raw", this.#keypair.publicKey);
       const { name, namedCurve } = this.#keypair.publicKey.algorithm;
-      const { namedGroup } = NamedGroupList
-      if (name == "X25519") return new KeyShareEntry(namedGroup.x25519, new Uint8Array(arrayBufferPublicKey));
+
+      if (name == "X25519") return new KeyShareEntry(NamedGroup.x25519, new Uint8Array(arrayBufferPublicKey));
       if (name == "ECDH") {
          const algo = namedCurve.split("-")[1];
-         return new KeyShareEntry(namedGroup[`secp${algo}r1`], new Uint8Array(arrayBufferPublicKey));
+         return new KeyShareEntry(NamedGroup[`secp${algo}r1`], new Uint8Array(arrayBufferPublicKey));
       }
       return false
    }
@@ -177,7 +285,7 @@ class Key {
       return new Uint8Array(sk)
    }
    /**
-    * @return {Object} algorithm
+    * @return {{name:string, namedCurve:string}} {name, namedCurve} algorithm
     */
    get algorithm() {
       if (this.#keypair instanceof P521) return { name: "ECDH", namedCurve: "P-521" }
@@ -245,10 +353,10 @@ class Keys {
  * ClientShares - contains keys and method to produce KeyShareClientHello
  */
 class ClientShares {
+   /**@type {Keys} keys - description */
    static keys
    /**
-    * 
-    * @returns {KeyShareClientHello}
+    * @return {Promise<KeyShareClientHello>} KeyShareClientHello
     */
    static async keyShareClientHello() {
       ClientShares.keys = new Keys(
@@ -266,8 +374,7 @@ class P521 extends Uint8Array {
       super(p521.utils.randomPrivateKey())
    }
    keyShareEntry() {
-      const { namedGroup } = NamedGroupList
-      return new KeyShareEntry(namedGroup.secp521r1, p521.getPublicKey(this))
+      return new KeyShareEntry(NamedGroup.secp521r1, p521.getPublicKey(this))
    }
    /**
     * 
@@ -279,7 +386,6 @@ class P521 extends Uint8Array {
    }
 }
 /**
- * 
  * ServerShare - contains keys and method to produce KeyShareClientHello
  */
 class ServerShare {
@@ -306,3 +412,4 @@ class ServerShare {
 
 export { ClientShares, KeyShareEntry, Keys, Key, ServerShare, KeyShareClientHello, KeyShareServerHello, KeyShareHelloRetryRequest }
 
+//npx -p typescript tsc ./src/extension/keyshare.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

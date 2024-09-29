@@ -15,8 +15,29 @@ import { EndOfEarlyData, KeyUpdate } from "./update.js";
 import { CertificateRequest, EncryptedExtensions } from "./params.js";
 import { Certificate, CertificateVerify, Finished } from "./auth.js";
 import { MessageHash } from "./msghash.js";
+import { Byte } from "./deps.js"
 
-class HandshakeType extends Uint8 { constructor(v) { super(v) } }
+export class HandshakeType extends Uint8 {
+   /**
+    * @param {number} v 
+    */
+   constructor(v) { super(v) }
+   get klas() {
+      switch (this.value()) {
+         case 1: return ClientHello
+         case 2: return ServerHello
+         case 4: return NewSessionTicket
+         case 5: return EndOfEarlyData
+         case 8: return EncryptedExtensions
+         case 11: return Certificate
+         case 13: return CertificateRequest
+         case 15: return CertificateVerify
+         case 20: return Finished
+         case 24: return KeyUpdate
+         default: return TypeError(`Unsupported handshake type ${this.value()}`)
+      }
+   }
+}
 
 /**
  * Handshake
@@ -151,17 +172,65 @@ export class Handshake extends Struct {
    constructor(message, type) {
       const length = new Uint24(message.length);
       super(
-         type,
+         type, //*uint8 
          length, //*uint24 
          message
       )
    }
-   get sequence() {
-      return {
-         type: new Uint8,
-         length: new Uint24,
-         message: new Uint8Array
+   static sequence = [
+      {
+         name: "type",
+         /**
+          * @param {Uint8Array} content 
+          * @param {number} length 
+          * @param {HandshakeType} type 
+          * @return 
+          */
+         value(content) {
+            return new HandshakeType(Byte.get.BE.b8(content));
+         }
+      },
+      {
+         name: "length",
+         /**
+          * @param {Uint8Array} content 
+          * @param {number} length 
+          * @param {HandshakeType} type 
+          * @return {number}
+          */
+         value(content) {
+            return Byte.get.BE.b24(content, 1);
+         }
+      },
+      {
+         name: "message",
+         /**
+          * @param {Uint8Array} content 
+          * @param {number} length 
+          * @param {HandshakeType} type 
+          * @return 
+          */
+         value(content, length, type) {
+            const message = content.subarray(4, length); 
+            return type.klas.parse(message)
+         }
       }
+   ]
+   /**
+    * parse a Content or Handshake
+    * @param {Uint8Array} content - Content or Handshake 
+    * @return {Handshake} Handshake data structure
+    */
+   static parse(content) {
+      const data = { content }
+      let offset = 0;
+      for (const { name, value } of Handshake.sequence) {
+         data[name] = value(content, data['length'], data['type']);
+         offset += data[name].length
+      }
+      return data
+      //return new Handshake(data['message'], data['type'])
    }
 }
 
+// npx -p typescript tsc ./src/handshake.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

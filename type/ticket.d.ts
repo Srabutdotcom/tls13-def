@@ -47,20 +47,19 @@ export class NewSessionTicket extends Struct {
     /**
      *
      * @param {Uint8Array} ticket
-     * @param {Uint8Array} extension
-     * @returns
+     * @param {...Extension} extension
+     * @return
      */
-    static "new"(ticket: Uint8Array, ...extensions: any[]): NewSessionTicket;
+    static a(ticket: Uint8Array, ...extension: Extension[]): NewSessionTicket;
     /**
      *
      * @param {Uint8Array} ticket
-     * @param {...Extension} extensions
+     * @param {...Extension} extension
      */
-    constructor(ticket: Uint8Array, ...extensions: Extension[]);
+    constructor(ticket: Uint8Array, ...extension: Extension[]);
     payload: () => Handshake;
     handshake: () => Handshake;
     /**
-     *
      * @return {Handshake} message
      */
     wrap(): Handshake;

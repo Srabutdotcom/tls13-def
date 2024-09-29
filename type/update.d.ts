@@ -19,7 +19,7 @@
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
  */
 export class EndOfEarlyData extends Struct {
-    static "new"(): EndOfEarlyData;
+    static a(): EndOfEarlyData;
     constructor();
     payload: () => Handshake;
     handshake: () => Handshake;

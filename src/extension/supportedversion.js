@@ -1,7 +1,9 @@
 // deno-lint-ignore-file no-slow-types
 // @ts-self-types="../../type/extension/supportedversion.d.ts"
 
-import { Struct } from "../base.js";
+import { Minmax, Struct } from "../base.js";
+import { ProtocolVersion } from "../keyexchange.js";
+import { Byte } from "../deps.js"
 
 /**
  * SupportedVersions
@@ -31,26 +33,76 @@ import { Struct } from "../base.js";
  */
 export class SupportedVersions extends Struct {
    /**
+    * @param {SelectedVersion|Versions} versions - description 
+    */
+   static a(versions) { return new SupportedVersions(versions) }
+   /**
     * 
     * @returns SupportedVersions - for client new Uint8Array([2, 3, 4])
     */
-   static client() { return new SupportedVersions(true) }
+   static client() { return new SupportedVersions(Versions.a(ProtocolVersion.version.TLS13)) }
    /**
     * 
     * @returns SupportedVersions - for server new Uint8Array([3, 4])
     */
-   static server() { return new SupportedVersions() }
+   static server() { return new SupportedVersions(SelectedVersion.a()) }
    /**
     * 
     * @returns SupportedVersions - for server new Uint8Array([3, 4])
     */
-   static retry() { return new SupportedVersions() }
+   static retry() { return new SupportedVersions(SelectedVersion.a()) }
    /**
-    * 
-    * @param {boolean} client - true if it is for client 
+    * @param {SelectedVersion|Versions} versions - description 
     */
-   constructor(client) {
-      const versions = client ? new Uint8Array([2, 3, 4]) : new Uint8Array([3, 4])
+   constructor(versions) {
       super(versions)
+   }
+   /**
+    * @param {Uint8Array} data 
+    * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} klas - description
+    */
+   static parse(data, klas) {
+      if (klas == "ClientHello") {
+         let pos = 0;
+         const versions = []
+         /* const length = Byte.get.BE.b8(data) */; pos += 1;
+         while (true) {
+            const code = Byte.get.BE.b16(data, pos); pos += 2;
+            versions.push(ProtocolVersion.a(code));
+            if (pos >= data.length - 1) break
+         }
+         return SupportedVersions.a(Versions.a(...versions))
+      }
+      return SelectedVersion.a(Byte.get.BE.b16(data))
+   }
+}
+
+class Versions extends Minmax {
+   /**
+    * 
+    * @param  {...ProtocolVersion} versions 
+    */
+   static a(...versions) { return new Versions(...versions) }
+   /**
+    * 
+    * @param  {...ProtocolVersion} versions 
+    */
+   constructor(...versions) {
+      super(2, 254, ...versions)
+   }
+}
+
+class SelectedVersion extends ProtocolVersion {
+   /**
+    * 
+    * @param {ProtocolVersion} val 
+    */
+   static a(val) { return new SelectedVersion(val) }
+   /**
+    * 
+    * @param {ProtocolVersion} val 
+    */
+   constructor(val) {
+      super(val ?? ProtocolVersion.version.TLS13.value())
    }
 }

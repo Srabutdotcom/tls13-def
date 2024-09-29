@@ -39,7 +39,7 @@ export class CertificateAuthoritiesExtension extends Struct {
     * Create CertificateAuthoritiesExtension
     * @param {...DistinguishedName} authority 
     */
-   static new(...authority){ return new CertificateAuthoritiesExtension(...authority)}
+   static a(...authority){ return new CertificateAuthoritiesExtension(...authority)}
    /**
     * 
     * @param {...DistinguishedName} authority 
@@ -58,7 +58,7 @@ export class Certificate_extension_oid extends Minmax {
     * Create Certificate_extension_oid
     * @param  {Uint8Array} oids 
     */
-   static new(oids){ return new Certificate_extension_oid(oids)}
+   static a(oids){ return new Certificate_extension_oid(oids)}
    /**
     * 
     * @param  {Uint8Array} oids 
@@ -73,7 +73,7 @@ export class Certificate_extension_values extends Minmax {
     * Create Certificate_extension_values
     * @param  {...Uint8Array} values 
     */
-   static new(...values){ return new Certificate_extension_values(...values)}
+   static a(...values){ return new Certificate_extension_values(...values)}
    /**
     * 
     * @param  {...Uint8Array} values 
@@ -138,7 +138,7 @@ export class OIDFilterExtension extends Struct {
     * @param  {...OIDFilter} OIDFilters 
     * @returns 
     */
-   static new(...OIDFilters){ return new OIDFilterExtension(...OIDFilters)}
+   static a(...OIDFilters){ return new OIDFilterExtension(...OIDFilters)}
    /**
     * 
     * @param {...OIDFilter} OIDFilters 
@@ -173,7 +173,7 @@ export class EncryptedExtensions extends Struct {
     * Create EncryptedExtensions
     * @param {...Extension} extensions 
     */
-   static new(...extensions){ return new EncryptedExtensions(...extensions)}
+   static a(...extensions){ return new EncryptedExtensions(...extensions)}
    payload = this.wrap
    handshake = this.wrap
    /**
@@ -185,7 +185,7 @@ export class EncryptedExtensions extends Struct {
          if (extensions.every(e => e instanceof Extension) == false) throw TypeError(`Expected ...Extension`)
       }
       super(
-         Extensions.new(0, 2 ** 16 - 1, ...extensions)
+         Extensions.encryptedExtensions(...extensions)
       )
    }
    /**
@@ -222,7 +222,7 @@ export class CertificateRequest extends Struct {
     * Create CertificateRequest
     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
     */
-   static new(signature_algorithms=SignatureSchemeList.list()) { return new CertificateRequest(signature_algorithms) }
+   static a(signature_algorithms=SignatureSchemeList.list()) { return new CertificateRequest(signature_algorithms) }
    payload = this.wrap
    handshake = this.wrap
    /**
@@ -232,7 +232,7 @@ export class CertificateRequest extends Struct {
    constructor(signature_algorithms=SignatureSchemeList.list()) {
       super(
          new Uint8(0),
-         Extensions.new(2, 2 ** 16 - 1, Extension.new(signature_algorithms, Extension.types.signature_algorithms))
+         Extensions.certificateRequest(Extension.a(signature_algorithms, Extension.types.signature_algorithms))
       )
    }
    /**

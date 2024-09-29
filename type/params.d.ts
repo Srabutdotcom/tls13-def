@@ -22,7 +22,7 @@ export class CertificateAuthoritiesExtension extends Struct {
      * Create CertificateAuthoritiesExtension
      * @param {...DistinguishedName} authority
      */
-    static "new"(...authority: DistinguishedName[]): CertificateAuthoritiesExtension;
+    static a(...authority: DistinguishedName[]): CertificateAuthoritiesExtension;
     /**
      *
      * @param {...DistinguishedName} authority
@@ -37,7 +37,7 @@ export class Certificate_extension_oid extends Minmax {
      * Create Certificate_extension_oid
      * @param  {Uint8Array} oids
      */
-    static "new"(oids: Uint8Array): Certificate_extension_oid;
+    static a(oids: Uint8Array): Certificate_extension_oid;
     /**
      *
      * @param  {Uint8Array} oids
@@ -52,7 +52,7 @@ export class Certificate_extension_values extends Minmax {
      * Create Certificate_extension_values
      * @param  {...Uint8Array} values
      */
-    static "new"(...values: Uint8Array[]): Certificate_extension_values;
+    static a(...values: Uint8Array[]): Certificate_extension_values;
     /**
      *
      * @param  {...Uint8Array} values
@@ -103,7 +103,7 @@ export class OIDFilterExtension extends Struct {
      * @param  {...OIDFilter} OIDFilters
      * @returns
      */
-    static "new"(...OIDFilters: OIDFilter[]): OIDFilterExtension;
+    static a(...OIDFilters: OIDFilter[]): OIDFilterExtension;
     /**
      *
      * @param {...OIDFilter} OIDFilters
@@ -132,7 +132,7 @@ export class EncryptedExtensions extends Struct {
      * Create EncryptedExtensions
      * @param {...Extension} extensions
      */
-    static "new"(...extensions: Extension[]): EncryptedExtensions;
+    static a(...extensions: Extension[]): EncryptedExtensions;
     /**
      *
      * @param {...Extension} extensions
@@ -171,7 +171,7 @@ export class CertificateRequest extends Struct {
      * Create CertificateRequest
      * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    static "new"(signature_algorithms?: SignatureSchemeList): CertificateRequest;
+    static a(signature_algorithms?: SignatureSchemeList): CertificateRequest;
     /**
      *
      * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm

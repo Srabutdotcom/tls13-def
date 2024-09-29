@@ -3,23 +3,34 @@
  */
 export class ProtocolVersion extends Uint16 {
     static version: {
+        SSL30: ProtocolVersion;
+        TLS10: ProtocolVersion;
+        TLS11: ProtocolVersion;
         TLS12: ProtocolVersion;
         TLS13: ProtocolVersion;
         legacy: ProtocolVersion;
     };
     /**
-     *
-     * @param {0x0303|0x0304} ver - TLS version (1.2 or 1.3)
+     * @param {number} ver - 0x0300[SSL30] to 0x0304[TLS13]
+     * @return {ProtocolVersion} description
      */
-    constructor(ver: 771 | 772);
-    meaning(): "TLS v1.2 - legacy_version[0x0303]" | "TLS v1.3 - [0x0304]";
+    static a(ver: number): ProtocolVersion;
+    meaning(): "SSL v3.0 - [0x0300]" | "TLS v1.0 - [0x0301]" | "TLS v1.1 - [0x0302]" | "TLS v1.2 - legacy_version[0x0303]" | "TLS v1.3 - [0x0304]";
 }
 /**
  * opaque Random[32]
  */
 export class Random extends Uint8Array {
-    static "new"(): Random;
-    constructor();
+    /**
+     *
+     * @param {Uint8Array} rnd - 32 bytes random
+     */
+    static a(rnd: Uint8Array): Random;
+    /**
+     *
+     * @param {Uint8Array} rnd - 32 bytes random
+     */
+    constructor(rnd: Uint8Array);
 }
 /**
  * CipherSuite
@@ -45,10 +56,15 @@ export class CipherSuite extends Uint8Array {
 export class CipherSuites extends Minmax {
     /**
      * new CipherSuites
+     * @param {Uint8Array} cips - cipherSuites
      * @return {CipherSuites} list of CipherSuite
      * */
-    static "new"(): CipherSuites;
-    constructor();
+    static a(cips: Uint8Array): CipherSuites;
+    /**
+     *
+     * @param {Uint8Array} cips - cipherSuites
+     */
+    constructor(cips?: Uint8Array);
     ciphers: {
         TLS_AES_128_GCM_SHA256: CipherSuite;
         TLS_AES_256_GCM_SHA384: CipherSuite;

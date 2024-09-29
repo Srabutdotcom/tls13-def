@@ -33,7 +33,7 @@ export class ServerHello extends Struct {
      * @param {CipherSuite} cipher
      * @param {Extension} serverShareExtension
      */
-    static "new"(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension): ServerHello;
+    static a(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension): ServerHello;
     /**
      *
      * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;

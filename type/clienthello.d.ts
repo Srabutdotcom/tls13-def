@@ -11,10 +11,16 @@
  * ```
  */
 export class SessionId extends Minmax {
-    /**@return {SessionId} sessionId - 33 bytes length */
-    static "new"(): SessionId;
-    /**@return {SessionId} sessionId - 33 bytes length */
-    constructor();
+    /**
+     * @param {Uint8Array} sid
+     * @return {SessionId} sessionId - 33 bytes length */
+    static a(sid: Uint8Array): SessionId;
+    /**
+     * @param {Uint8Array} sid
+     * @return {SessionId} sessionId - 33 bytes length */
+    constructor(sid: Uint8Array);
+    get sid(): Uint8Array;
+    #private;
 }
 /**
  * ClientHello message
@@ -55,13 +61,27 @@ export class ClientHello extends Struct {
      * @param  {...string} serverNames
      * @returns {ClientHello}
      */
-    static "new"(...serverNames: string[]): ClientHello;
+    static a(...serverNames: string[]): ClientHello;
+    static sequence: {
+        name: string;
+        /**
+         * @param {Uint8Array} message - description
+         * @param {number} pos - description
+         **/
+        value(message: Uint8Array, pos: number): {};
+    }[];
+    /**
+     * parse a message of ClientHello
+     * @param {Uint8Array} message - message aka ClientHello
+     * @return {ClientHello} ClientHello data structure
+     */
+    static parse(message: Uint8Array): ClientHello;
     /**
      * create ClientHello
      * ```js
      * const clientHello = ClientHello.new('serverName1','serverName2')
      * ```
-     * @param {...string} serverNames - Server Name Indication i.e. "localhost"
+     * @param {...string} serverNames - i.e. 'smtp.gmail.com'
      */
     constructor(...serverNames: string[]);
     /**@type {ClientShares} clientShares -  */

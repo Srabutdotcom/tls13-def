@@ -6,8 +6,8 @@ import { PskKeyExchangeModes } from "../src/extension/pskeyexchange.js";
 import { NamedGroupList } from "../src/extension/namedgroup.js";
 import { ClientShares, ServerShare } from "../src/extension/keyshare.js";
 import { KeyShareClientHello, KeyShareServerHello } from "../src/extension/keyshare.js";
-import { Extension } from "../src/mod.js";
-import { Extensions } from "../src/extension/extension.js";
+import { Extensions, Extension } from "../src/extension/extension.js";
+import { KeyExchange } from "../src/extension/keyshare.js";
 
 
 Deno.test(
@@ -68,9 +68,13 @@ Deno.test(
       const ss = await ServerShare.x25519();
 
       assertEquals(cs instanceof KeyShareClientHello, true);
-      assertEquals(cs.length, 279);
+      assertEquals(cs.length, 271);
       assertEquals(ss instanceof KeyShareServerHello, true);
-      assertEquals(ss.length, 36);
+      assertEquals(ss.length, 34);
+
+      //key_exchange
+      const key = KeyExchange.a(new Uint8Array([1,2,3]));
+      assertEquals(Array.from(key.key),[1,2,3])
    }
 )
 
@@ -84,8 +88,9 @@ Deno.test(
       assertEquals(sni instanceof Extension, true)
       assertEquals(clientShares instanceof Extension, true)
       assertEquals(serverShare instanceof Extension, true)
-      const extensions = new Extensions(0, 2 ** 16 - 2);
+      const extensions = new Extensions;
 
       assertEquals(Array.from(extensions), [0, 0])
    }
 )
+

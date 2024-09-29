@@ -3,6 +3,33 @@
  */
 export class MessageHash extends Uint8Array {
     /**
+     * @param {Uint8Array} msg
+     * @return
+     */
+    static SHA256(msg: Uint8Array): Promise<{
+        /**@type {ArrayBuffer} buffer - description */
+        buffer: ArrayBuffer;
+        messageHash: MessageHash;
+    }>;
+    /**
+     * @param {Uint8Array} msg
+     * @return
+     */
+    static SHA384(msg: Uint8Array): Promise<{
+        /**@type {ArrayBuffer} buffer - description */
+        buffer: ArrayBuffer;
+        messageHash: MessageHash;
+    }>;
+    /**
+     * @param {Uint8Array} msg
+     * @return
+     */
+    static SHA512(msg: Uint8Array): Promise<{
+        /**@type {ArrayBuffer} buffer - description */
+        buffer: ArrayBuffer;
+        messageHash: MessageHash;
+    }>;
+    /**
      *
      * @param {ArrayBuffer} msg
      */

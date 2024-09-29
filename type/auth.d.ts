@@ -13,13 +13,13 @@
     } CertificateEntry;
    ```
  */
-   export class CertificateEntry extends Struct {
+export class CertificateEntry extends Struct {
     /**
      * new CertificateEntry
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
      * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
      */
-    static "new"(certificate: Uint8Array, extensions?: Uint16): CertificateEntry;
+    static a(certificate: Uint8Array, extensions?: Uint16): CertificateEntry;
     /**
      *
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
@@ -155,10 +155,10 @@ export class CertificateVerify extends Struct {
     };
     /**
      *
-     * @param {SignatureAlgorithm} algorithm SignatureScheme algorithm
+     * @param {SignatureScheme} algorithm SignatureScheme algorithm
      * @param {Uint8Array} signature
      */
-    constructor(algorithm: SignatureAlgorithm, signature: Uint8Array);
+    constructor(algorithm: SignatureScheme, signature: Uint8Array);
     payload: () => Handshake;
     handshake: () => Handshake;
     /**
@@ -166,7 +166,6 @@ export class CertificateVerify extends Struct {
     * @return {Handshake} message
     */
     wrap(): Handshake;
-    #private;
 }
 /**
  * Finished
@@ -196,15 +195,14 @@ export class Finished extends Struct {
     */
     wrap(): Handshake;
 }
-
-
 import { Struct } from "../src/base.js";
 import { Uint16 } from "../src/base.js";
 import { Handshake } from "../src/handshake.js";
 declare class CertificateType extends Uint8 {
-    constructor(value: any);
+    static X509: CertificateType;
+    static RawPublicKey: CertificateType;
 }
 import { Enum } from "../src/base.js";
+import { SignatureScheme } from "../src/extension/signaturescheme.js";
 import { Uint8 } from "../src/base.js";
-import { SignatureAlgorithm } from "../src/extension/signaturescheme.js"
 export {};

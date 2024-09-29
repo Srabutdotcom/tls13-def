@@ -1,3 +1,6 @@
+export class HandshakeType extends Uint8 {
+    get klas(): TypeError | typeof ClientHello | typeof ServerHello | typeof KeyUpdate | typeof EncryptedExtensions | typeof Certificate | typeof CertificateVerify | typeof Finished;
+}
 /**
  * Handshake
  * ```
@@ -86,23 +89,36 @@ export class Handshake extends Struct {
     static key_update: (msg: Uint8Array) => Handshake;
     /**@param {Uint8Array} msg - the message of handshake */
     static message_hash: (msg: Uint8Array) => Handshake;
+    static sequence: {
+        name: string;
+        /**
+         * @param {Uint8Array} content
+         * @param {number} length
+         * @param {HandshakeType} type
+         * @return
+         */
+        value(content: Uint8Array, length: number, type: HandshakeType): any;
+    }[];
+    /**
+     * parse a Content or Handshake
+     * @param {Uint8Array} content - Content or Handshake
+     * @return {Handshake} Handshake data structure
+     */
+    static parse(content: Uint8Array): Handshake;
     /**
      *
      * @param {Uint8Array} message - with additional "type" property
      * @param {HandshakeType} type - description
      */
     constructor(message: Uint8Array, type: HandshakeType);
-    get sequence(): {
-        type: Uint8;
-        length: Uint24;
-        message: Uint8Array;
-    };
 }
-import { Struct } from "../src/base.js";
 import { Uint8 } from "../src/base.js";
-import { Uint24 } from "../src/base.js";
-declare class HandshakeType extends Uint8 {
-    constructor(v: any);
-}
+import { ClientHello } from "../src/clienthello.js";
+import { ServerHello } from "../src/serverhello.js";
+import { KeyUpdate } from "../src/update.js";
+import { EncryptedExtensions } from "../src/params.js";
+import { Certificate } from "../src/auth.js";
+import { CertificateVerify } from "../src/auth.js";
+import { Finished } from "../src/auth.js";
+import { Struct } from "../src/base.js";
 import { Enum } from "../src/base.js";
-export {};

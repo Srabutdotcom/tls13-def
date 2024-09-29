@@ -1,6 +1,6 @@
 {
   "name": "@tls/def",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "exports": "./src/mod.js",
   "publish": {
     "exclude": ["dist/"]
@@ -13,7 +13,7 @@
     }
   },
   "imports": {
-    "@aicone/byte": "jsr:@aicone/byte@^0.2.1",
+    "@aicone/byte": "jsr:@aicone/byte@^0.3.3",
     "@std/assert": "jsr:@std/assert@^1.0.2"
   }
 }

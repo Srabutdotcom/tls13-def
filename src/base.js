@@ -13,6 +13,10 @@ export class Struct extends Uint8Array {
    /**
     * @param  {...Uint8Array} uint8s  
     */
+   static a(...uint8s){return new Struct(...uint8s)}
+   /**
+    * @param  {...Uint8Array} uint8s  
+    */
    constructor(...uint8s) {
       super(uint8s && uint8s.length > 0 ? concat(...uint8s) : undefined);
 
@@ -122,7 +126,6 @@ export class Minmax extends Uint8Array {
    get max() { return this.#max }
 }
 
-
 /**
  * number definition 1 byte
  * 
@@ -133,7 +136,7 @@ export class Uint8 extends Uint8Array {
     * 
     * @param {number} v 
     */
-   static new(v) { return new Uint8(v) }
+   static a(v) { return new Uint8(v) }
    /**
     * 
     * @param {number} int 
@@ -159,7 +162,7 @@ export class Uint16 extends Uint8Array {
     * 
     * @param {number} v 
     */
-   static new(v) { return new Uint16(v) }
+   static a(v) { return new Uint16(v) }
    /**
     * 
     * @param {number} int 
@@ -175,6 +178,8 @@ export class Uint16 extends Uint8Array {
    value() { return getUint16(this) }
 }
 
+
+
 /**
  * number definition 3 bytes
  * 
@@ -182,12 +187,10 @@ export class Uint16 extends Uint8Array {
  */
 export class Uint24 extends Uint8Array {
    /**
-    * 
     * @param {number} v 
     */
-   static new(v) { return new Uint24(v) }
+   static a(v) { return new Uint24(v) }
    /**
-    * 
     * @param {number} int 
     */
    constructor(int) {
@@ -195,7 +198,6 @@ export class Uint24 extends Uint8Array {
       super(Uint24BE(int).buffer)
    }
    /**
-    * 
     * @returns {number}
     */
    value() { return getUint24(this) }
@@ -208,10 +210,9 @@ export class Uint24 extends Uint8Array {
  */
 export class Uint32 extends Uint8Array {
    /**
-    * 
     * @param {number} v 
     */
-   static new(v) { return new Uint32(v) }
+   static a(v) { return new Uint32(v) }
    /**
     * 
     * @param {number} int 
@@ -231,6 +232,10 @@ export class Uint32 extends Uint8Array {
  * Enum in Javascript
  */
 export class Enum {
+   /**
+    * @param {{any:any}} object 
+    */
+   static a(object){ return new Enum(object)}
    // store value -> key map
    #reverse = {}
    // property for sign of max value in Enum
@@ -244,7 +249,6 @@ export class Enum {
    // bytes length (if any)
    #byteLength
    /**
-    * 
     * @param {{any:any}} object 
     */
    constructor(object) {

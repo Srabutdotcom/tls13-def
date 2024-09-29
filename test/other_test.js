@@ -28,7 +28,7 @@ Deno.test(
 Deno.test(
    "NewSessionTicket",
    () => {
-      const tiket = NewSessionTicket.new(new Uint8Array([1, 5, 6]));
+      const tiket = NewSessionTicket.a(new Uint8Array([1, 5, 6]));
       assertEquals(Array.from(tiket), [0, 0, 28, 32, 0, 0, 0, 0, 1, 0, 0, 3, 1, 5, 6, 0, 0])
    }
 )

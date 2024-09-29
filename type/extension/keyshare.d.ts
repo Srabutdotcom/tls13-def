@@ -1,9 +1,39 @@
 /**
- *
- * @param {KeyShareEntry} server_share
- * @returns KeyShareServerHello
+ * KeyExchange
+ * ```
+ * opaque key_exchange<1..2^16-1>;
+ * ```
+ * @property {Uint8Array} type.key - return the key
  */
-export function keyShareServerHello(server_share: KeyShareEntry): KeyShareServerHello;
+export class KeyExchange extends Minmax {
+    /**
+     * @param {Uint8Array} key - the KeyShare
+     * @return {KeyExchange} description
+     */
+    static a(key: Uint8Array): KeyExchange;
+    /**
+     * @param {Uint8Array} key - the KeyShare
+     */
+    constructor(key: Uint8Array);
+    /**
+     * @return {Uint8Array} description
+     */
+    get key(): Uint8Array;
+    #private;
+}
+import { Minmax } from "../../src/base.js";
+/**
+ *
+ * ClientShares - contains keys and method to produce KeyShareClientHello
+ */
+export class ClientShares {
+    /**@type {Keys} keys - description */
+    static keys: Keys;
+    /**
+     * @return {Promise<KeyShareClientHello>} KeyShareClientHello
+     */
+    static keyShareClientHello(): Promise<KeyShareClientHello>;
+}
 /**
  * KeyShareEntry
  * ```
@@ -16,41 +46,42 @@ export function keyShareServerHello(server_share: KeyShareEntry): KeyShareServer
  */
 export class KeyShareEntry extends Struct {
     /**
+     * @param {KeyExchange} key_exchange
+     * @return
+     */
+    static secp256r1(key_exchange: KeyExchange): KeyShareEntry;
+    /**
+     * @param {KeyExchange} key_exchange
+     * @return
+     */
+    static secp384r1(key_exchange: KeyExchange): KeyShareEntry;
+    /**
+     * @param {KeyExchange} key_exchange
+     * @return
+     */
+    static secp521r1(key_exchange: KeyExchange): KeyShareEntry;
+    /**
+     * @param {KeyExchange} key_exchange
+     * @return
+     */
+    static x25519(key_exchange: KeyExchange): KeyShareEntry;
+    /**
      *
      * @param {NamedGroup} group - NamedGroup
-     * @param {Uint8Array[]} key_exchange - PublicKey
+     * @param {KeyExchange} key_exchange -  contain public key - opaque key_exchange<1..2^16-1>;
      */
-    constructor(group: NamedGroup, ...key_exchange: Uint8Array[]);
+    static a(group: NamedGroup, key_exchange: KeyExchange): KeyShareEntry;
+    /**
+     *
+     * @param {NamedGroup} group - NamedGroup
+     * @param {KeyExchange} key_exchange - contain public key - opaque key_exchange<1..2^16-1>;
+     */
+    constructor(group: NamedGroup, key_exchange: KeyExchange);
+    /**@return {NamedGroup} description */
+    get group(): NamedGroup;
+    /**@return {KeyExchange} description */
+    get key_exchange(): KeyExchange;
     #private;
-}
-/**
- * KeyShareServerHello
- * ```
- * struct {
-      KeyShareEntry server_share;
-   } KeyShareServerHello;
-   ```
-   server_share:  A single KeyShareEntry value that is in the same group
-      as one of the client's shares.
- */
-export class KeyShareServerHello extends Struct {
-    /**
-     *
-     * @param {KeyShareEntry} server_share
-     */
-    constructor(server_share: KeyShareEntry);
-}
-/**
- *
- * ClientShares - contains keys and method to produce KeyShareClientHello
- */
-export class ClientShares {
-    static keys: any;
-    /**
-     *
-     * @returns {KeyShareClientHello}
-     */
-    static keyShareClientHello(): KeyShareClientHello;
 }
 /**
  * Collection of Key that contain (X25519, ECDH256, ECDH384 and ECDH521 using noble)
@@ -103,13 +134,15 @@ export class Key {
      */
     sharedKey(v: CryptoKey, l: number): Uint8Array;
     /**
-     * @return {Object} algorithm
+     * @return {{name:string, namedCurve:string}} {name, namedCurve} algorithm
      */
-    get algorithm(): any;
+    get algorithm(): {
+        name: string;
+        namedCurve: string;
+    };
     #private;
 }
 /**
- *
  * ServerShare - contains keys and method to produce KeyShareClientHello
  */
 export class ServerShare {
@@ -139,10 +172,46 @@ export class ServerShare {
  */
 export class KeyShareClientHello extends Struct {
     /**
-     *
-     * @param {...KeyShareEntry} clientShares -A list of offered KeyShareEntry values in descending order of client preference.
+     * @param {...KeyShareEntry} keyShareEntry -A list of offered KeyShareEntry values in descending order of client preference.
      */
-    constructor(...clientShares: KeyShareEntry[]);
+    static a(...keyShareEntry: KeyShareEntry[]): KeyShareClientHello;
+    /**
+     *
+     * @param {Uint8Array} data
+     */
+    static parse(data: Uint8Array): KeyShareEntry[];
+    /**
+     *
+     * @param {...KeyShareEntry} keyShareEntry -A list of offered KeyShareEntry values in descending order of client preference.
+     */
+    constructor(...keyShareEntry: KeyShareEntry[]);
+}
+/**
+ * KeyShareServerHello
+ * ```
+ * struct {
+      KeyShareEntry server_share;
+   } KeyShareServerHello;
+   ```
+   server_share:  A single KeyShareEntry value that is in the same group
+      as one of the client's shares.
+ */
+export class KeyShareServerHello extends Struct {
+    /**
+     *
+     * @param {KeyShareEntry} server_share
+     */
+    static a(server_share: KeyShareEntry): KeyShareServerHello;
+    /**
+     *
+     * @param {Uint8Array} data
+     */
+    static parse(data: Uint8Array): KeyShareServerHello;
+    /**
+     *
+     * @param {KeyShareEntry} server_share
+     */
+    constructor(server_share: KeyShareEntry);
 }
 /**
  * KeyShareHelloRetryRequest
@@ -155,7 +224,25 @@ export class KeyShareClientHello extends Struct {
       negotiate and is requesting a retried ClientHello/KeyShare for.
  */
 export class KeyShareHelloRetryRequest extends Struct {
-    constructor(selected_group: any);
+    /**
+     *
+     * @param {NamedGroup} selected_group
+     */
+    static a(selected_group: NamedGroup): KeyShareHelloRetryRequest;
+    static secp256r1: KeyShareHelloRetryRequest;
+    static secp384r1: KeyShareHelloRetryRequest;
+    static secp521r1: KeyShareHelloRetryRequest;
+    static x25519: KeyShareHelloRetryRequest;
+    /**
+     *
+     * @param {Uint8Array} data
+     */
+    static parse(data: Uint8Array): KeyShareHelloRetryRequest;
+    /**
+     *
+     * @param {NamedGroup} selected_group
+     */
+    constructor(selected_group: NamedGroup);
 }
 import { Struct } from "../../src/base.js";
 import { NamedGroup } from "../../src/extension/namedgroup.js";

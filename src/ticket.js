@@ -61,20 +61,20 @@ export class NewSessionTicket extends Struct {
    /**
     * 
     * @param {Uint8Array} ticket 
-    * @param {Uint8Array} extension 
-    * @returns 
+    * @param {...Extension} extension 
+    * @return
     */
-   static new(ticket, ...extensions) {
-      return new NewSessionTicket(ticket, ...extensions)
+   static a(ticket, ...extension) {
+      return new NewSessionTicket(ticket, ...extension)
    }
    payload = this.wrap
    handshake = this.wrap
    /**
     * 
     * @param {Uint8Array} ticket 
-    * @param {...Extension} extensions 
+    * @param {...Extension} extension
     */
-   constructor(ticket, ...extensions) {
+   constructor(ticket, ...extension) {
       const lifetime = new Uint32(7200)//in second
       const ageAdd = new Uint32(0)//in second
       const nonce = Minmax.min(0).max(255).byte(new Uint8(0))//new OpaqueVar(new Uint8(0), 0, 255);
@@ -84,11 +84,10 @@ export class NewSessionTicket extends Struct {
          ageAdd,
          nonce,
          opaqueTicket,
-         Extensions.new(0, 2**16-2, ...extensions)
+         Extensions.newSessionTicket(...extension)
       )
    }
    /**
-    * 
     * @return {Handshake} message
     */
    wrap(){
@@ -96,3 +95,4 @@ export class NewSessionTicket extends Struct {
    }
 }
 
+// npx -p typescript tsc ./src/ticket.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

@@ -8,10 +8,22 @@
  */
 
 import { Enum, Minmax, Struct, Uint16, Uint8 } from "./base.js";
-import { SignatureSchemeList, SignatureAlgorithm } from "./extension/signaturescheme.js";
+import { Extensions } from "./extension/extension.js";
+import { SignatureScheme } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
 
 class CertificateType extends Uint8 {
+    static X509 = CertificateType.a(0);
+    static RawPublicKey = CertificateType.a(2)
+    /** 
+     * @param {number} value 
+     * @returns 
+     */
+    static a(value){ return new CertificateType(value)}
+    /** 
+     * @param {number} value 
+     * @returns 
+     */
     constructor(value) { super(value) }
 }
 
@@ -36,13 +48,13 @@ export class CertificateEntry extends Struct {
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
      * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
      */
-    static new(certificate, extensions = new Uint16(0)) { return new CertificateEntry(certificate, extensions) }
+    static a(certificate, extensions =Extensions.certificateEntry()) { return new CertificateEntry(certificate, extensions) }
     /**
      * 
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
      * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
      */
-    constructor(certificate, extensions = new Uint16(0)) {
+    constructor(certificate, extensions = Extensions.certificateEntry()) {
         super(
             Minmax.min(1).max(2 ** 24 - 1).byte(certificate),//cert_data,
             extensions
@@ -122,7 +134,6 @@ export class Certificate extends Struct {
    ```
  */
 export class CertificateVerify extends Struct {
-    #signatureAlgorithm = SignatureAlgorithm
     /**
      * Create new CertificateVerify based on specific algorithm
      * 
@@ -134,22 +145,22 @@ export class CertificateVerify extends Struct {
     rsa_pkcs1_sha512(0x0601), */
 
     /* ECDSA algorithms */
-    static ecdsa_secp256r1_sha256 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp256r1_sha256)
-    static ecdsa_secp384r1_sha384 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp384r1_sha384)
-    static ecdsa_secp521r1_sha512 = sign(SignatureSchemeList.SignatureScheme.ecdsa_secp521r1_sha512)
+    static ecdsa_secp256r1_sha256 = sign(SignatureScheme.ecdsa_secp256r1_sha256)
+    static ecdsa_secp384r1_sha384 = sign(SignatureScheme.ecdsa_secp384r1_sha384)
+    static ecdsa_secp521r1_sha512 = sign(SignatureScheme.ecdsa_secp521r1_sha512)
 
     /* RSASSA-PSS algorithms with public key OID rsaEncryption */
-    static rsa_pss_rsae_sha256 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha256)
-    static rsa_pss_rsae_sha384 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384)
-    static rsa_pss_rsae_sha512 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha512)
+    static rsa_pss_rsae_sha256 = sign(SignatureScheme.rsa_pss_rsae_sha256)
+    static rsa_pss_rsae_sha384 = sign(SignatureScheme.rsa_pss_rsae_sha384)
+    static rsa_pss_rsae_sha512 = sign(SignatureScheme.rsa_pss_rsae_sha512)
     /* EdDSA algorithms */
     /* ed25519(0x0807),
     ed448(0x0808), */
 
     /* RSASSA-PSS algorithms with public key OID RSASSA-PSS */
-    static rsa_pss_pss_sha256 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha256)
-    static rsa_pss_pss_sha384 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_rsae_sha384)
-    static rsa_pss_pss_sha512 = sign(SignatureSchemeList.SignatureScheme.rsa_pss_pss_sha512)
+    static rsa_pss_pss_sha256 = sign(SignatureScheme.rsa_pss_pss_sha256)
+    static rsa_pss_pss_sha384 = sign(SignatureScheme.rsa_pss_rsae_sha384)
+    static rsa_pss_pss_sha512 = sign(SignatureScheme.rsa_pss_pss_sha512)
 
 
     payload = this.wrap;
@@ -157,7 +168,7 @@ export class CertificateVerify extends Struct {
 
     /**
      * 
-     * @param {SignatureAlgorithm} algorithm SignatureScheme algorithm
+     * @param {SignatureScheme} algorithm SignatureScheme algorithm
      * @param {Uint8Array} signature 
      */
     constructor(algorithm, signature) {
