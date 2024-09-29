@@ -58,10 +58,10 @@ export class ClientHello extends Struct {
      * ```js
      * const clientHello = ClientHello.new('serverName1','serverName2')
      * ```
-     * @param  {...string} serverNames
+     * @param  {...Uint8Array} serverNames
      * @returns {ClientHello}
      */
-    static a(...serverNames: string[]): ClientHello;
+    static a(...serverNames: Uint8Array[]): ClientHello;
     static sequence: {
         name: string;
         /**
@@ -81,9 +81,9 @@ export class ClientHello extends Struct {
      * ```js
      * const clientHello = ClientHello.new('serverName1','serverName2')
      * ```
-     * @param {...string} serverNames - i.e. 'smtp.gmail.com'
+     * @param {...Uint8Array} serverNames - i.e. 'smtp.gmail.com'
      */
-    constructor(...serverNames: string[]);
+    constructor(...serverNames: Uint8Array[]);
     /**@type {ClientShares} clientShares -  */
     clientShares: ClientShares;
     /**@type {SessionId} sessionId -  */

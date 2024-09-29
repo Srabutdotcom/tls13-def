@@ -169,14 +169,14 @@ export class EncryptedExtensions extends Struct {
 export class CertificateRequest extends Struct {
     /**
      * Create CertificateRequest
-     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
+     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
      */
-    static a(signature_algorithms?: SignatureSchemeList): CertificateRequest;
+    static a(signature_algorithms?: Uint8Array): CertificateRequest;
     /**
      *
-     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
+     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
      */
-    constructor(signature_algorithms?: SignatureSchemeList);
+    constructor(signature_algorithms?: Uint8Array);
     payload: () => Handshake;
     handshake: () => Handshake;
     /**

@@ -58,14 +58,14 @@ import { Struct } from "../../src/base.js";
 declare class SelectedVersion extends ProtocolVersion {
     /**
      *
-     * @param {ProtocolVersion} val
+     * @param {number} val
      */
-    static a(val: ProtocolVersion): SelectedVersion;
+    static a(val: number): SelectedVersion;
     /**
      *
-     * @param {ProtocolVersion} val
+     * @param {number} val
      */
-    constructor(val: ProtocolVersion);
+    constructor(val: number);
 }
 declare class Versions extends Minmax {
     /**

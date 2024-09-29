@@ -100,9 +100,11 @@ class SelectedVersion extends ProtocolVersion {
    static a(val) { return new SelectedVersion(val) }
    /**
     * 
-    * @param {ProtocolVersion} val 
+    * @param {number} val 
     */
    constructor(val) {
       super(val ?? ProtocolVersion.version.TLS13.value())
    }
 }
+
+//npx -p typescript tsc ./src/extension/supportedversion.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
