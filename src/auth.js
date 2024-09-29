@@ -7,7 +7,7 @@
  * *DONE - verified
  */
 
-import { Enum, Minmax, Struct, Uint16, Uint8 } from "./base.js";
+import { Enum, Minmax, Struct, Uint8 } from "./base.js";
 import { Extensions } from "./extension/extension.js";
 import { SignatureScheme } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
@@ -46,13 +46,13 @@ export class CertificateEntry extends Struct {
     /**
      * new CertificateEntry
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
-     * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
+     * @param {Uint8Array} extensions - optional with default value of Uint8Array([0,0])
      */
     static a(certificate, extensions =Extensions.certificateEntry()) { return new CertificateEntry(certificate, extensions) }
     /**
      * 
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
-     * @param {Uint16} extensions - optional with default value of Uint8Array([0,0])
+     * @param {Uint8Array} extensions - optional with default value of Uint8Array([0,0])
      */
     constructor(certificate, extensions = Extensions.certificateEntry()) {
         super(

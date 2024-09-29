@@ -172,7 +172,7 @@ export class TLSPlaintext extends Struct {
    /**
     * parse a Record or TLSPlaintext
     * @param {Uint8Array} record - Record or TLSPlaintext 
-    * @return {parsed} TLSPlaintext data structure
+    * @return {Object} TLSPlaintext data structure
     */
    static parse(record) {
       const data = { record }
@@ -327,7 +327,7 @@ class ChangeCipherSpec extends Uint8 {
    }
 }
 
-var parsed = {
+var _parsed = {
    record : new Uint8Array,
    type : new ContentType(22),
    version : ProtocolVersion.legacy,
