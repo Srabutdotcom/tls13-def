@@ -22,7 +22,7 @@ export class KeyExchange extends Minmax {
     * @param {Uint8Array} key - the KeyShare
     * @return {KeyExchange} description
     */
-   static a(key) { return KeyExchange.a(key) }
+   static a(key) { return new KeyExchange(key) }
    /**
     * @param {Uint8Array} key - the KeyShare
     */

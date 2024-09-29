@@ -81,9 +81,9 @@ Deno.test(
 Deno.test(
    "extension",
    async () => {
-      const sni = Extension.extensions.server_name.serverNames("example.ulfheim.net");
-      const clientShares = await Extension.extensions.key_share.client()
-      const serverShare = await Extension.extensions.key_share.server.x25519()
+      const sni = Extension.server_name.serverNames("example.ulfheim.net");
+      const clientShares = await Extension.key_share.client()
+      const serverShare = await Extension.key_share.server.x25519()
 
       assertEquals(sni instanceof Extension, true)
       assertEquals(clientShares instanceof Extension, true)
