@@ -15,7 +15,7 @@ Deno.test(
       const CCipSpec = TLSPlaintext.change_cipher_spec()
       assertEquals(Array.from(CCipSpec), [20, 3, 1, 0, 1, 1])
 
-      const hndsk = TLSPlaintext.handshake(ClientHello.a('smtp'))
+      const hndsk = TLSPlaintext.handshake(ClientHello.default('smtp'))
       assertEquals(hndsk.member[3].constructor.name, "Handshake")
 
       const hebet = TLSPlaintext.heartbeat(new Uint8Array([1, 5, 8]))
@@ -42,7 +42,7 @@ e5 60 e4 bd 43 d2 3d 8e 43 5a 7d ba fe b3 c0 6e 51 c1 3c ae 4d
 01 04 02 05 02 06 02 02 02 00 2d 00 02 01 01 00 1c 00 02 40 01`.split(/\s/).filter(e => e.length).map(e => Number(`0x${e}`));
 
       const rcd = TLSPlaintext.parse(new Uint8Array(clienthello))
-      assertEquals(rcd.length, 196)
+      assertEquals(rcd.length, 193)
    }
 )
 
