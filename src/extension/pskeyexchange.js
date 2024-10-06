@@ -7,7 +7,7 @@
 
 import { Minmax, Struct, Uint8 } from "../base.js";
 
-class PskKeyExchangeMode extends Uint8 {
+export class PskKeyExchangeMode extends Uint8 {
    #mode
    static psk_ke = new PskKeyExchangeMode(0)
    static psk_dhe_ke = new PskKeyExchangeMode(1)

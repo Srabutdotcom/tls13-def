@@ -41,7 +41,7 @@ export class SessionId extends Minmax {
    ```
 
    ```js
-   const clientHello = ClientHello.new('serverName1','serverName2')
+   const clientHello = ClientHello.default('serverName1','serverName2')
    ```
 
    When a client first connects to a server, it is REQUIRED to send the
@@ -55,20 +55,51 @@ export class SessionId extends Minmax {
 export class ClientHello extends Struct {
     /**
      * create ClientHello
-     * ```js
-     * const clientHello = ClientHello.new('serverName1','serverName2')
-     * ```
-     * @param  {...Uint8Array} serverNames
-     * @returns {ClientHello}
+     * @typedef {Object} Option
+     * @prop {ProtocolVersion} version
+     * @prop {Random} random - 32 byte random
+     * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
+     * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
+     * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+     * @prop {Extensions} param - Extension extensions<8..2^16-1>;
+     * @param {Option} option - description
+     *
      */
-    static a(...serverNames: Uint8Array[]): ClientHello;
+    static a(option: {
+        version: ProtocolVersion;
+        /**
+         * - 32 byte random
+         */
+        random: Random;
+        /**
+         * - opaque legacy_session_id<0..32>;
+         */
+        sessionId: SessionId;
+        /**
+         * - CipherSuite cipher_suites<2..2^16-2>;
+         */
+        ciphers: CipherSuites;
+        /**
+         * - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+         */
+        compression: LegacyCompressionMethods;
+        /**
+         * - Extension extensions<8..2^16-1>;
+         */
+        param: Extensions;
+    }): ClientHello;
+    /**
+     * ClientHello
+     * @param  {...string} serverNames
+     */
+    static default(...serverNames: string[]): ClientHello;
     static sequence: {
         name: string;
         /**
          * @param {Uint8Array} message - description
          * @param {number} pos - description
          **/
-        value(message: Uint8Array, pos: number): {};
+        value(message: Uint8Array, pos: number): any;
     }[];
     /**
      * parse a message of ClientHello
@@ -78,18 +109,38 @@ export class ClientHello extends Struct {
     static parse(message: Uint8Array): ClientHello;
     /**
      * create ClientHello
-     * ```js
-     * const clientHello = ClientHello.new('serverName1','serverName2')
-     * ```
-     * @param {...Uint8Array} serverNames - i.e. 'smtp.gmail.com'
+     * @typedef {Object} Option
+     * @prop {ProtocolVersion} version
+     * @prop {Random} random - 32 byte random
+     * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
+     * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
+     * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+     * @prop {Extensions} extensions - Extension extensions<8..2^16-1>;
+     * @param {Option} option - description
      */
-    constructor(...serverNames: Uint8Array[]);
-    /**@type {ClientShares} clientShares -  */
-    clientShares: ClientShares;
-    /**@type {SessionId} sessionId -  */
-    sessionId: SessionId;
-    /**@type {CipherSuites} cipherSuites -  */
-    cipherSuites: CipherSuites;
+    constructor(option: {
+        version: ProtocolVersion;
+        /**
+         * - 32 byte random
+         */
+        random: Random;
+        /**
+         * - opaque legacy_session_id<0..32>;
+         */
+        sessionId: SessionId;
+        /**
+         * - CipherSuite cipher_suites<2..2^16-2>;
+         */
+        ciphers: CipherSuites;
+        /**
+         * - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+         */
+        compression: LegacyCompressionMethods;
+        /**
+         * - Extension extensions<8..2^16-1>;
+         */
+        param: Extensions;
+    });
     /**
      * Wrapper of message to Handshake
      * @returns {Handshake} message
@@ -100,14 +151,58 @@ export class ClientHello extends Struct {
      * @returns {Handshake} message
      */
     handshake: () => Handshake;
+    /**@return {ProtocolVersion}  - Uint16 */
+    get version(): ProtocolVersion;
+    /**@return {Random} 32 byte random */
+    get random(): Random;
+    /**@return {SessionId} sessionId -  */
+    get sessionId(): SessionId;
+    /**@return {CipherSuites} cipherSuites -  */
+    get ciphers(): CipherSuites;
+    /**@return {LegacyCompressionMethods} compression method default to 0 */
+    get compression(): LegacyCompressionMethods;
+    /**@return {Extensions} extentions */
+    get extensions(): Extensions;
+    /**@return {Array<KeyShareEntry>} clientShares -  */
+    get clientShares(): KeyShareEntry[];
+    /**@return {Array<string>} hostnames */
+    get serverNames(): string[];
+    /**@return {Uint8Array} description */
+    get renegotiationInfo(): Uint8Array;
+    /**@return {Array<NamedGroup>} description */
+    get supportedGroups(): NamedGroup[];
+    /**@return {Uint8Array} description */
+    get sessionTicket(): Uint8Array;
+    /**@return {Array<ProtocolVersion>} description */
+    get supportedVersions(): ProtocolVersion[];
+    /**@return {Array<SignatureScheme>} description */
+    get signatureAlgorithms(): SignatureScheme[];
+    /**@return {Array<PskKeyExchangeMode>} description */
+    get pskKeyExchangeModes(): PskKeyExchangeMode[];
     /**
      * Wrapper of message to Handshake
      * @returns {Handshake} message
      */
     wrap(): Handshake;
+    #private;
 }
 import { Minmax } from "../src/base.js";
 import { Struct } from "../src/base.js";
-import { ClientShares } from "../src/extension/keyshare.js";
-import { CipherSuites } from "../src/keyexchange.js";
 import { Handshake } from "../src/handshake.js";
+import { ProtocolVersion } from "../src/keyexchange.js";
+import { Random } from "../src/keyexchange.js";
+import { CipherSuites } from "../src/keyexchange.js";
+
+/**
+ * opaque legacy_compression_methods<1..2^8-1>;
+ */
+declare class LegacyCompressionMethods extends Minmax {
+    static a(): LegacyCompressionMethods;
+    constructor();
+}
+import { Extensions } from "../src/extension/extension.js";
+import { NamedGroup } from "../src/extension/namedgroup.js"
+import { KeyShareEntry } from "../src/extension/keyshare.js";
+import { SignatureScheme } from "../src/extension/signaturescheme.js"
+import { pskKeyExchangeMode } from "../src/extension/pskeyexchange.js"
+export {};
