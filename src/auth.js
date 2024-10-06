@@ -33,10 +33,10 @@ class CertificateType extends Uint8 {
  *  struct {    
         select (certificate_type) {
             case RawPublicKey:
-            //From RFC 7250 ASN.1_subjectPublicKeyInfo 
-            opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
+                //From RFC 7250 ASN.1_subjectPublicKeyInfo 
+                opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
             case X509:
-            opaque cert_data<1..2^24-1>;
+                opaque cert_data<1..2^24-1>;
         };
         Extension extensions<0..2^16-1>;
     } CertificateEntry;
@@ -64,11 +64,11 @@ export class CertificateEntry extends Struct {
 /**
  * Certificate
  * ```
- *  struct {
+ * struct {
         opaque certificate_request_context<0..2^8-1>;
         CertificateEntry certificate_list<0..2^24-1>;
-    } Certificate;
-    ```
+   } Certificate;
+   ```
  */
 export class Certificate extends Struct {
     static typeDesc = {

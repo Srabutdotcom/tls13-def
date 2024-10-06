@@ -113,6 +113,8 @@ class KeyShareEntry extends Struct {
  * 
  */
 class KeyShareClientHello extends Struct {
+   /**@type {Array<KeyShareEntry>} #keyShareEntries - description */
+   #keyShareEntries = []
    /**
     * @param {...KeyShareEntry} keyShareEntry -A list of offered KeyShareEntry values in descending order of client preference.
     */
@@ -125,7 +127,9 @@ class KeyShareClientHello extends Struct {
       super(
          Minmax.min(0).max(2 ** 16 - 1).byte(...keyShareEntry)
       )
+      this.#keyShareEntries = keyShareEntry
    }
+   get keyShareEntries(){return this.#keyShareEntries}
    /**
     * 
     * @param {Uint8Array} data 
@@ -141,8 +145,8 @@ class KeyShareClientHello extends Struct {
          keys.push(key);
          if (pos >= data.length - 1) break
       }
-      return keys
-      //return KeyShareClientHello.a(...keys)
+      //return keys
+      return KeyShareClientHello.a(...keys)
    }
 }
 
@@ -157,6 +161,7 @@ class KeyShareClientHello extends Struct {
       negotiate and is requesting a retried ClientHello/KeyShare for.
  */
 class KeyShareHelloRetryRequest extends Struct {
+   #selected_group
    /**
     * 
     * @param {NamedGroup} selected_group 
@@ -174,7 +179,9 @@ class KeyShareHelloRetryRequest extends Struct {
     */
    constructor(selected_group) {
       super(selected_group)
+      this.#selected_group = selected_group
    }
+   get selected_group(){return this.#selected_group}
    /**
     * 
     * @param {Uint8Array} data 
@@ -195,6 +202,7 @@ class KeyShareHelloRetryRequest extends Struct {
       as one of the client's shares.
  */
 class KeyShareServerHello extends Struct {
+   #server_share
    /**
     * 
     * @param {KeyShareEntry} server_share
@@ -207,7 +215,9 @@ class KeyShareServerHello extends Struct {
    constructor(server_share) {
       if ((server_share instanceof KeyShareEntry) == false) throw TypeError(`Expected KeyShareEntry Object`)
       super(server_share)
+      this.#server_share= server_share
    }
+   get server_share(){return this.#server_share}
    /**
     * 
     * @param {Uint8Array} data 

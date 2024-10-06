@@ -27,48 +27,59 @@ export class DistinguishedName extends Minmax {
    }
 }
 /**
- * 
+ * CertificateAuthoritiesExtension
  * ```
  * struct {
-*     DistinguishedName authorities<3..2^16-1>;
+ *    DistinguishedName authorities<3..2^16-1>;
    } CertificateAuthoritiesExtension;
    ```
  */
 export class CertificateAuthoritiesExtension extends Struct {
+   #distinguishedName
    /**
     * Create CertificateAuthoritiesExtension
-    * @param {...DistinguishedName} authority 
+    * @param {...DistinguishedName} authorities
     */
-   static a(...authority){ return new CertificateAuthoritiesExtension(...authority)}
+   static a(...authorities){ return new CertificateAuthoritiesExtension(...authorities)}
    /**
     * 
-    * @param {...DistinguishedName} authority 
+    * @param {...DistinguishedName} authorities 
     */
-   constructor(...authority) {
+   constructor(...authorities) {
       super(
-         new Minmax(3, 2 ** 16 - 1, ...authority)
+         new Minmax(3, 2 ** 16 - 1, ...authorities)
       )
+      this.#distinguishedName = authorities
    }
+   get distinguishedName(){return this.#distinguishedName}
 }
 /**
- * opaque certificate_extension_oid<1..2^8-1>;
+ * Certificate_extension_oid
+ * `opaque certificate_extension_oid<1..2^8-1>;`
  */
 export class Certificate_extension_oid extends Minmax {
+   #oid
    /**
     * Create Certificate_extension_oid
-    * @param  {Uint8Array} oids 
+    * @param  {Uint8Array} oid 
     */
-   static a(oids){ return new Certificate_extension_oid(oids)}
+   static a(oid){ return new Certificate_extension_oid(oid)}
    /**
     * 
-    * @param  {Uint8Array} oids 
+    * @param  {Uint8Array} oid 
     */
-   constructor(oids) { super(1, 2 ** 8 - 1, oids) }
+   constructor(oid) { 
+      super(1, 2 ** 8 - 1, oid)
+      this.#oid = oid
+   }
+   get oid(){return this.#oid}
 }
 /**
- * opaque certificate_extension_values<0..2^16-1>;
+ * Certificate_extension_values
+ * `opaque certificate_extension_values<0..2^16-1>;`
  */
 export class Certificate_extension_values extends Minmax {
+   #certificate_extension_values
    /**
     * Create Certificate_extension_values
     * @param  {...Uint8Array} values 
@@ -78,7 +89,11 @@ export class Certificate_extension_values extends Minmax {
     * 
     * @param  {...Uint8Array} values 
     */
-   constructor(...values) { super(0, 2 ** 16 - 1, ...values) }
+   constructor(...values) { 
+      super(0, 2 ** 16 - 1, ...values)
+      this.#certificate_extension_values = values
+   }
+   get certificate_extension_values(){return this.#certificate_extension_values}
 }
 /**
  * OIDFilter
@@ -90,6 +105,8 @@ export class Certificate_extension_values extends Minmax {
    ```
  */
 export class OIDFilter extends Struct {
+   #oid
+   #certificate_extension_values
    /**
     * 
     * @param  {...Uint8Array} oids 
@@ -121,7 +138,11 @@ export class OIDFilter extends Struct {
          certificate_extension_oid,
          certificate_extension_values
       )
+      this.#oid = certificate_extension_oid
+      this.#certificate_extension_values = certificate_extension_values
    }
+   get oid(){return this.#oid}
+   get certificate_extension_values(){return this.#certificate_extension_values}
 }
 
 /**
@@ -133,6 +154,7 @@ export class OIDFilter extends Struct {
    ```
  */
 export class OIDFilterExtension extends Struct {
+   #oidFilters
    /**
     * Create OIDFilterExtension
     * @param  {...OIDFilter} OIDFilters 
@@ -147,7 +169,9 @@ export class OIDFilterExtension extends Struct {
       super(
          new Minmax(0, 2 ** 16 - 1, ...OIDFilters)
       )
+      this.#oidFilters = OIDFilters
    }
+   get oidFilters(){return this.#oidFilters}
 }
 
 /**
@@ -157,6 +181,7 @@ export class OIDFilterExtension extends Struct {
  * ```
  */
 export class PostHandshakeAuth extends Struct {
+   static a(){return new PostHandshakeAuth}
    constructor() { super() }
 }
 
@@ -169,6 +194,7 @@ export class PostHandshakeAuth extends Struct {
    ```
  */
 export class EncryptedExtensions extends Struct {
+   #extensions
    /**
     * Create EncryptedExtensions
     * @param {...Extension} extensions 
@@ -187,7 +213,9 @@ export class EncryptedExtensions extends Struct {
       super(
          Extensions.encryptedExtensions(...extensions)
       )
+      this.#extensions = extensions
    }
+   get extensions(){return this.#extensions}
    /**
     * 
     * @return {Handshake} message
@@ -218,6 +246,7 @@ export class EncryptedExtensions extends Struct {
    
  */
 export class CertificateRequest extends Struct {
+   #signature_algo
    /**
     * Create CertificateRequest
     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
@@ -234,7 +263,9 @@ export class CertificateRequest extends Struct {
          new Uint8(0),
          Extensions.certificateRequest(Extension.a(signature_algorithms, Extension.types.signature_algorithms))
       )
+      this.#signature_algo = signature_algorithms
    }
+   get signature_algo(){ return this.#signature_algo}
    /**
     * 
     * @return {Handshake} message
@@ -243,4 +274,6 @@ export class CertificateRequest extends Struct {
       return Handshake.certificate_request(this)
    }
 }
+
+//npx -p typescript tsc ./src/params.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 

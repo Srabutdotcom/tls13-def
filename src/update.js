@@ -110,24 +110,25 @@ request_update:  Indicates whether the recipient of the KeyUpdate
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
  */
 export class KeyUpdate extends Struct {
-   static {
-      const types = {
-         /**@type {Uint8[0]} update_not_requested */
-         update_not_requested: 0,
-         /**@type {Uint8[1]} update_requested */
-         update_requested: 1,
-         [Enum.max]: 255,
-         [Enum.class]: KeyUpdateRequest
-      }
-      /**
-       * @type {types} this.types - description
-       */
-      this.types = new Enum(types)
+   #keyUpdate
+   /**@static */
+   static typeDesc = {
+      /**@type {0} update_not_requested */
+      update_not_requested: 0,
+      /**@type {1} update_requested */
+      update_requested: 1,
+      [Enum.max]: 255,
+      [Enum.class]: KeyUpdateRequest
    }
-   static {
-      this.update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested)
-      this.update_requested = new KeyUpdate(KeyUpdate.types.update_requested)
-   }
+
+   /**
+    * @static
+    * @type {Enum(KeyUpdate.typeDesc)} types - description
+    */
+   static types = new Enum(KeyUpdate.typeDesc)
+
+   static update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested)
+   static update_requested = new KeyUpdate(KeyUpdate.types.update_requested)
    payload = this.wrap
    handshake = this.wrap
    /**
@@ -137,6 +138,7 @@ export class KeyUpdate extends Struct {
    constructor(request_update) {
       if ((request_update instanceof KeyUpdateRequest) == false) throw TypeError(`Expected KeyUpdateRequest type`)
       super(request_update)
+      this.#keyUpdate = request_update;
    }
    /**
     * 
@@ -145,7 +147,13 @@ export class KeyUpdate extends Struct {
    wrap() {
       return Handshake.key_update(this)
    }
+   /**
+    * 
+    * @return {'update_not_requested'|'update_requested'}
+    */
+   toString(){return KeyUpdate.types.key(this.#keyUpdate)}
 }
 
+// npx -p typescript tsc ./src/update.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 
 

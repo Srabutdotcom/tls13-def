@@ -1,13 +1,14 @@
 /**
+ * NewSessionTicket
+ * ```
  * struct {
- *
-          uint32 ticket_lifetime;
-          uint32 ticket_age_add;
-          opaque ticket_nonce<0..255>;
-          opaque ticket<1..2^16-1>;
-          Extension extensions<0..2^16-2>;
-      } NewSessionTicket;
-
+      uint32 ticket_lifetime;
+      uint32 ticket_age_add;
+      opaque ticket_nonce<0..255>;
+      opaque ticket<1..2^16-1>;
+      Extension extensions<0..2^16-2>;
+   } NewSessionTicket;
+   ```
    At any time after the server has received the client Finished
    message, it MAY send a NewSessionTicket message.  This message
    creates a unique association between the ticket value and a secret
@@ -43,7 +44,7 @@
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.1
  */
-export class NewSessionTicket extends Struct {
+   export class NewSessionTicket extends Struct {
     /**
      *
      * @param {Uint8Array} ticket

@@ -28,6 +28,7 @@ class PskKeyExchangeMode extends Uint8 {
          default: return TypeError(`Expected mode 0 or 1`)
       }
    }
+   toString(){return this.name}
 }
 
 /**
@@ -43,6 +44,7 @@ class PskKeyExchangeMode extends Uint8 {
    ```
  */
 export class PskKeyExchangeModes extends Struct {
+   #pskModes
    /**
     * the server MUST NOT supply a "key_share" values
     * @returns Uint8(0)
@@ -64,7 +66,9 @@ export class PskKeyExchangeModes extends Struct {
       super(
          Minmax.min(1).max(255).byte(...ke_mode)
       )
+      this.#pskModes = ke_mode
    }
+   get pskModes(){return this.#pskModes}
    /**
     * 
     * @param {Uint8Array} data 

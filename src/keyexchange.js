@@ -34,7 +34,7 @@ export class ProtocolVersion extends Uint16 {
       if (ver < 0x0300 || ver > 0x0304) throw TypeError(`Unexpected TLS version value`)
       super(ver)
    }
-   meaning() {
+   toString() {
       if (this.value() == 0x0300) return `SSL v3.0 - [0x0300]`;
       if (this.value() == 0x0301) return `TLS v1.0 - [0x0301]`;
       if (this.value() == 0x0302) return `TLS v1.1 - [0x0302]`;

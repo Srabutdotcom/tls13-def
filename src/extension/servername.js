@@ -61,6 +61,7 @@ export class ServerName extends Struct {
       const dec = new TextDecoder;
       return dec.decode(this.#hostname)
    }
+   toString(){return this.hostname}
 }
 /**
  * ServerNameList
@@ -84,6 +85,7 @@ export class ServerName extends Struct {
    ```
  */
 export class ServerNameList extends Struct {
+   #serverNames = []
    /**
     * ServerNameList
     * @param  {...string} serverName
@@ -100,7 +102,11 @@ export class ServerNameList extends Struct {
       super(
          Minmax.min(1).max(2 ** 16 - 1).byte(...server_name_list)//new OpaqueVar(server_name_list, 1, 2 ** 16 - 1)
       )
+      for(const serverName of server_name_list){
+         this.#serverNames.push(serverName.hostname)
+      }
    }
+   get serverNames(){return this.#serverNames}
 
    /**
     * 
@@ -115,12 +121,12 @@ export class ServerNameList extends Struct {
          // TODO throw Error if name_type !== 0 
          const length = Byte.get.BE.b16(data, pos); pos += 2;
          const hostname = data.subarray(pos, pos + length); pos += length;
-         //serverNames.push(ServerName.a(hostname));
-         serverNames.push({hostname})
+         serverNames.push(hostname);
+         //serverNames.push({hostname})
          if (pos >= lengthTotal - 1) break
       }
-      return serverNames
-      //return ServerNameList.list(...serverNames)
+      //return serverNames
+      return ServerNameList.list(...serverNames)
    }
 
 }

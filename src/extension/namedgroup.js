@@ -43,6 +43,7 @@ export class NamedGroup extends Uint16 {
     * @return {string} description
     */
    get name() { return NamedGroupList.namedGroup.key(this.#value) }
+   toString(){ return this.name}
 }
 
 /**
@@ -54,6 +55,7 @@ export class NamedGroup extends Uint16 {
    ```
  */
 export class NamedGroupList extends Struct {
+   #named_group_list
    /**
     * 
     * @return {NamedGroupList} 
@@ -115,7 +117,9 @@ export class NamedGroupList extends Struct {
       super(
          Minmax.min(2).max(65534).byte(...named_group_list)//new OpaqueVar(concat(...named_group_list), 2, 65534)
       )
+      this.#named_group_list = named_group_list
    }
+   get named_group_list(){return this.#named_group_list}
    /**
     * @param {Uint8Array} data 
     */
@@ -128,8 +132,8 @@ export class NamedGroupList extends Struct {
          named_group_list.push(namedGroup)
          if (pos >= data.length - 1) break
       }
-      return named_group_list
-      //return new NamedGroupList(...named_group_list)
+      //return named_group_list
+      return new NamedGroupList(...named_group_list)
    }
 }
 

@@ -10,42 +10,48 @@ export class DistinguishedName extends Minmax {
     constructor(...distinguishedName: Uint8Array[]);
 }
 /**
- *
+ * CertificateAuthoritiesExtension
  * ```
  * struct {
-*     DistinguishedName authorities<3..2^16-1>;
+ *    DistinguishedName authorities<3..2^16-1>;
    } CertificateAuthoritiesExtension;
    ```
  */
 export class CertificateAuthoritiesExtension extends Struct {
     /**
      * Create CertificateAuthoritiesExtension
-     * @param {...DistinguishedName} authority
+     * @param {...DistinguishedName} authorities
      */
-    static a(...authority: DistinguishedName[]): CertificateAuthoritiesExtension;
+    static a(...authorities: DistinguishedName[]): CertificateAuthoritiesExtension;
     /**
      *
-     * @param {...DistinguishedName} authority
+     * @param {...DistinguishedName} authorities
      */
-    constructor(...authority: DistinguishedName[]);
+    constructor(...authorities: DistinguishedName[]);
+    get distinguishedName(): DistinguishedName[];
+    #private;
 }
 /**
- * opaque certificate_extension_oid<1..2^8-1>;
+ * Certificate_extension_oid
+ * `opaque certificate_extension_oid<1..2^8-1>;`
  */
 export class Certificate_extension_oid extends Minmax {
     /**
      * Create Certificate_extension_oid
-     * @param  {Uint8Array} oids
+     * @param  {Uint8Array} oid
      */
-    static a(oids: Uint8Array): Certificate_extension_oid;
+    static a(oid: Uint8Array): Certificate_extension_oid;
     /**
      *
-     * @param  {Uint8Array} oids
+     * @param  {Uint8Array} oid
      */
-    constructor(oids: Uint8Array);
+    constructor(oid: Uint8Array);
+    get oid(): Uint8Array;
+    #private;
 }
 /**
- * opaque certificate_extension_values<0..2^16-1>;
+ * Certificate_extension_values
+ * `opaque certificate_extension_values<0..2^16-1>;`
  */
 export class Certificate_extension_values extends Minmax {
     /**
@@ -58,6 +64,8 @@ export class Certificate_extension_values extends Minmax {
      * @param  {...Uint8Array} values
      */
     constructor(...values: Uint8Array[]);
+    get certificate_extension_values(): Uint8Array[];
+    #private;
 }
 /**
  * OIDFilter
@@ -88,6 +96,9 @@ export class OIDFilter extends Struct {
      * @param {Certificate_extension_values} certificate_extension_values
      */
     constructor(certificate_extension_oid: Certificate_extension_oid, certificate_extension_values: Certificate_extension_values);
+    get oid(): Certificate_extension_oid;
+    get certificate_extension_values(): Certificate_extension_values;
+    #private;
 }
 /**
  * OIDFilterExtension
@@ -109,6 +120,8 @@ export class OIDFilterExtension extends Struct {
      * @param {...OIDFilter} OIDFilters
      */
     constructor(...OIDFilters: OIDFilter[]);
+    get oidFilters(): OIDFilter[];
+    #private;
 }
 /**
  * PostHandshakeAuth
@@ -117,6 +130,7 @@ export class OIDFilterExtension extends Struct {
  * ```
  */
 export class PostHandshakeAuth extends Struct {
+    static a(): PostHandshakeAuth;
     constructor();
 }
 /**
@@ -140,11 +154,13 @@ export class EncryptedExtensions extends Struct {
     constructor(...extensions: Extension[]);
     payload: () => Handshake;
     handshake: () => Handshake;
+    get extensions(): Extension[];
     /**
      *
      * @return {Handshake} message
      */
     wrap(): Handshake;
+    #private;
 }
 /**
  * CertificateRequest
@@ -169,21 +185,23 @@ export class EncryptedExtensions extends Struct {
 export class CertificateRequest extends Struct {
     /**
      * Create CertificateRequest
-     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
+     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    static a(signature_algorithms?: Uint8Array): CertificateRequest;
+    static a(signature_algorithms: SignatureSchemeList): CertificateRequest;
     /**
      *
-     * @param {Uint8Array} signature_algorithms - Uint8Array of signature algorithm
+     * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    constructor(signature_algorithms?: Uint8Array);
+    constructor(signature_algorithms: SignatureSchemeList);
     payload: () => Handshake;
     handshake: () => Handshake;
+    get signature_algo(): SignatureSchemeList;
     /**
      *
      * @return {Handshake} message
      */
     wrap(): Handshake;
+    #private;
 }
 import { Minmax } from "../src/base.js";
 import { Struct } from "../src/base.js";

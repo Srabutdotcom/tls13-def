@@ -46,6 +46,7 @@ class ContentType extends Uint8 {
    ```
  */
 export class TLSPlaintext extends Struct {
+   #fragment
    /**
     * A static enum representing type of content
     * @static
@@ -111,6 +112,13 @@ export class TLSPlaintext extends Struct {
    static invalid = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.invalid) }
 
    /**
+    * @param {Uint8Array} fragment 
+    * @param {ContentType} type 
+    * @return {TLSPlaintext} 
+    */
+   static a(fragment, type){ return new TLSPlaintext(fragment, type)}
+
+   /**
     * @param {Uint8Array} fragment - the data being transmitted
     * @param {ContentType} type - description
     * 
@@ -129,7 +137,10 @@ export class TLSPlaintext extends Struct {
          length, //*uint16
          fragment
       )
+      this.#fragment = fragment
    }
+
+   get fragment(){return this.#fragment}
    static sequence = [
       {
          name: "type",
@@ -155,7 +166,7 @@ export class TLSPlaintext extends Struct {
          }
       },
       {
-         name: "content",
+         name: "fragment",
          /**
           * 
           * @param {Uint8Array} record 
@@ -172,17 +183,16 @@ export class TLSPlaintext extends Struct {
    /**
     * parse a Record or TLSPlaintext
     * @param {Uint8Array} record - Record or TLSPlaintext 
-    * @return {Object} TLSPlaintext data structure
+    * @return {TLSPlaintext} TLSPlaintext data structure
     */
    static parse(record) {
-      const data = { record }
+      const data = {}
       let offset = 0;
       for (const { name, value } of TLSPlaintext.sequence) {
          data[name] = value(record, data['length'], data['type']);
          offset += data[name].length
       }
-      return data
-      //return new TLSPlaintext(data['content'], data['type'])
+      return TLSPlaintext.a(data['fragment'], data['type'])
    }
 }
 
@@ -327,34 +337,5 @@ class ChangeCipherSpec extends Uint8 {
    }
 }
 
-var _parsed = {
-   record : new Uint8Array,
-   type : new ContentType(22),
-   version : ProtocolVersion.legacy,
-   length : 0,
-   content: {
-      content: new Uint8Array,
-      type: new HandshakeType(1),
-      length: 0,
-      message: {
-         message: new Uint8Array,
-         version: ProtocolVersion.legacy,
-         random: Random.a(),
-         sessionId: new Uint8Array,
-         ciphers: CipherSuites.a(),
-         compression: new Uint8Array([1,0]),
-         extensions: {
-            server_name: [],
-            renegotiation_info: new Uint8Array,
-            key_share: [],
-            psk_key_exhange_modes : new Uint8Array,
-            session_ticket: new Uint8Array,
-            signature_algorithms: [],
-            supported_groups: [],
-            supported_versions: new Uint8Array,
-         }
-      }
-   }
-}
 
-// npx -p typescript tsc record.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../type
+// npx -p typescript tsc ./src/record.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

@@ -61,6 +61,7 @@ export class HandshakeType extends Uint8 {
    ```
  */
 export class Handshake extends Struct {
+   #message
    static typesDesc = {
       /**@type {0} hello_request_RESERVED */
       hello_request_RESERVED: 0,
@@ -165,7 +166,12 @@ export class Handshake extends Struct {
    }
 
    /**
-    * 
+    * @param {Uint8Array} message - with additional "type" property
+    * @param {HandshakeType} type - description
+    */
+   static a(message, type){ return new Handshake(message, type)}
+
+   /**
     * @param {Uint8Array} message - with additional "type" property
     * @param {HandshakeType} type - description
     */
@@ -176,7 +182,12 @@ export class Handshake extends Struct {
          length, //*uint24 
          message
       )
+      this.#message = message
    }
+   /**
+    * return message
+    */
+   get message(){return this.#message}
    static sequence = [
       {
          name: "type",
@@ -222,14 +233,13 @@ export class Handshake extends Struct {
     * @return {Handshake} Handshake data structure
     */
    static parse(content) {
-      const data = { content }
+      const data = { }
       let offset = 0;
       for (const { name, value } of Handshake.sequence) {
          data[name] = value(content, data['length'], data['type']);
          offset += data[name].length
       }
-      return data
-      //return new Handshake(data['message'], data['type'])
+      return Handshake.a(data['message'], data['type'])
    }
 }
 

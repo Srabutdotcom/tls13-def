@@ -22,6 +22,7 @@ Deno.test(
    () => {
       const updateRequested = KeyUpdate.update_requested;
       assertEquals(Array.from(updateRequested), [1])
+      assertEquals('update_requested', updateRequested.toString())
    }
 )
 

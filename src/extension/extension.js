@@ -32,7 +32,7 @@ class ExtensionType extends Uint16 {
     */
    get name() { return Extension.types.key(this.#value) ?? String(this.#value) }// covering for unknown type
    /**
-    * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} type 
+    * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"} type 
     * @returns {ServerNameList|NamedGroupList|SignatureSchemeList|PskKeyExchangeModes|KeyShareClientHello|KeyShareServerHello|KeyShareHelloRetryRequest|false}
     */
    klas(type) {
@@ -43,8 +43,8 @@ class ExtensionType extends Uint16 {
          case 43: return SupportedVersions
          case 45: return PskKeyExchangeModes
          case 51: {
-            if (type == "ClientHello") return KeyShareClientHello
-            if (type == "ServerHello") return KeyShareServerHello
+            if (type == "clientHello") return KeyShareClientHello
+            if (type == "serverHello") return KeyShareServerHello
             return KeyShareHelloRetryRequest
          }
          default: return false
@@ -189,11 +189,11 @@ export class Extension extends Struct {
    /**
     * Parse extensions data
     * @param {Uint8Array} extsData 
-    * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} klas - description
+    * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"} klas - description
     */
    static parse(extsData, klas) {
 
-      const extensions = {}
+      const extensions = []
       let pos = 0;
       while (true) {
          const type = ExtensionType.a(Byte.get.BE.b16(extsData, pos)); pos += 2
@@ -201,12 +201,11 @@ export class Extension extends Struct {
          const data = extsData.subarray(pos, pos + length); pos += length;
          const parser = type.klas(klas)
 
-         extensions[type.name] = parser ? parser.parse(data, klas) : data
-
+         //extensions[type.name] = parser ? parser.parse(data, klas) : data
+         extensions.push(Extension.a(parser ? parser.parse(data, klas) : data, type))
          if (pos >= extsData.length - 1) break;
       }
-      return extensions
-      //return Extensions.a(...extensions)
+      return Extensions[klas](...extensions)
    }
 }
 
@@ -259,6 +258,9 @@ export class Extensions extends Minmax {
     */
    constructor(m, ...extensions) {
       super(m, 2 ** 16 - 1, ...extensions)
+      for(const member of extensions){
+         this[member.name] = member.data;
+      }
    }
 }
 

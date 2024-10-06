@@ -9,7 +9,7 @@
    } TLSPlaintext;
    ```
  */
-export class TLSPlaintext extends Struct {
+   export class TLSPlaintext extends Struct {
     /**
      * A static enum representing type of content
      * @static
@@ -72,6 +72,12 @@ export class TLSPlaintext extends Struct {
      * @returns
      */
     static invalid: (fragment: Uint8Array) => TLSPlaintext;
+    /**
+     * @param {Uint8Array} fragment
+     * @param {ContentType} type
+     * @return {TLSPlaintext}
+     */
+    static a(fragment: Uint8Array, type: ContentType): TLSPlaintext;
     static sequence: {
         name: string;
         /**
@@ -86,37 +92,9 @@ export class TLSPlaintext extends Struct {
     /**
      * parse a Record or TLSPlaintext
      * @param {Uint8Array} record - Record or TLSPlaintext
-     * @return {parsed} TLSPlaintext data structure
+     * @return {TLSPlaintext} TLSPlaintext data structure
      */
-    static parse(record: Uint8Array): {
-        record: Uint8Array;
-        type: ContentType;
-        version: any;
-        length: number;
-        content: {
-            content: Uint8Array;
-            type: HandshakeType;
-            length: number;
-            message: {
-                message: Uint8Array;
-                version: any;
-                random: Random;
-                sessionId: Uint8Array;
-                ciphers: CipherSuites;
-                compression: Uint8Array;
-                extensions: {
-                    server_name: any[];
-                    renegotiation_info: Uint8Array;
-                    key_share: any[];
-                    psk_key_exhange_modes: Uint8Array;
-                    session_ticket: Uint8Array;
-                    signature_algorithms: any[];
-                    supported_groups: any[];
-                    supported_versions: Uint8Array;
-                };
-            };
-        };
-    };
+    static parse(record: Uint8Array): TLSPlaintext;
     /**
      * @param {Uint8Array} fragment - the data being transmitted
      * @param {ContentType} type - description
@@ -128,6 +106,8 @@ export class TLSPlaintext extends Struct {
        TLS 1.2).
      */
     constructor(fragment: Uint8Array, type: ContentType);
+    get fragment(): Uint8Array;
+    #private;
 }
 /**
  * content wrapper to be encrypted
@@ -240,9 +220,6 @@ declare class ChangeCipherSpec extends Uint8 {
     static a(): ChangeCipherSpec;
     constructor();
 }
-import { HandshakeType } from "../src/handshake.js";
-import { Random } from "../src/keyexchange.js";
-import { CipherSuites } from "../src/keyexchange.js";
 import { Uint8 } from "../src/base.js";
 import { Alert } from "../src/alert.js";
 import { Handshake } from "../src/handshake.js";

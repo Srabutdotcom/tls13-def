@@ -12,15 +12,16 @@ import { Extension, Extensions } from "./extension/extension.js";
 import { Handshake } from "./handshake.js";
 
 /**
+ * NewSessionTicket
+ * ```
  * struct {
- * 
-          uint32 ticket_lifetime;
-          uint32 ticket_age_add;
-          opaque ticket_nonce<0..255>;
-          opaque ticket<1..2^16-1>;
-          Extension extensions<0..2^16-2>;
-      } NewSessionTicket;
-
+      uint32 ticket_lifetime;
+      uint32 ticket_age_add;
+      opaque ticket_nonce<0..255>;
+      opaque ticket<1..2^16-1>;
+      Extension extensions<0..2^16-2>;
+   } NewSessionTicket;  
+   ```
    At any time after the server has received the client Finished
    message, it MAY send a NewSessionTicket message.  This message
    creates a unique association between the ticket value and a secret
@@ -77,8 +78,8 @@ export class NewSessionTicket extends Struct {
    constructor(ticket, ...extension) {
       const lifetime = new Uint32(7200)//in second
       const ageAdd = new Uint32(0)//in second
-      const nonce = Minmax.min(0).max(255).byte(new Uint8(0))//new OpaqueVar(new Uint8(0), 0, 255);
-      const opaqueTicket = Minmax.min(1).max(2**16-1).byte(ticket)//new OpaqueVar(ticket, 1, 2 ** 16 - 1);
+      const nonce = Minmax.min(0).max(255).byte(new Uint8(0))
+      const opaqueTicket = Minmax.min(1).max(2**16-1).byte(ticket)
       super(
          lifetime,
          ageAdd,

@@ -86,22 +86,21 @@ class LegacyCompressionMethods extends Minmax {
 
  */
 export class ClientHello extends Struct {
-   /**@type {ClientShares} clientShares -  */
-   clientShares
-   /**@type {SessionId} sessionId -  */
-   sessionId
-   /**@type {CipherSuites} cipherSuites -  */
-   cipherSuites
+   #clientShares
    /**
     * create ClientHello
-    * ```js
-    * const clientHello = ClientHello.new('serverName1','serverName2')
-    * ```
-    * @param  {...string} serverNames 
-    * @returns {ClientHello}
+    * @typedef {Object} Option
+    * @prop {ProtocolVersion} version 
+    * @prop {Random} random - 32 byte random
+    * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
+    * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
+    * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+    * @prop {Extensions} param - Extension extensions<8..2^16-1>;
+    * @param {Option} option - description
+    * 
     */
-   static a(...serverNames) {
-      return new ClientHello(...serverNames)
+   static a(option) {
+      return new ClientHello(option)
    }
    /**
     * Wrapper of message to Handshake
@@ -113,15 +112,11 @@ export class ClientHello extends Struct {
     * @returns {Handshake} message
     */
    handshake = this.wrap
-
    /**
-    * create ClientHello
-    * ```js
-    * const clientHello = ClientHello.new('serverName1','serverName2')
-    * ```
-    * @param {...string} serverNames - i.e. 'smtp.gmail.com'
+    * ClientHello
+    * @param  {...string} serverNames 
     */
-   constructor(...serverNames) {
+   static default(...serverNames) {
       //const compression = new Uint8Array([1, 0]);
       const exts = [
          Extension.server_name.serverNames(...serverNames),
@@ -132,18 +127,58 @@ export class ClientHello extends Struct {
          Extension.a(clientShares, Extension.types.key_share)
       ]
 
-      super(
-         ProtocolVersion.version.legacy, //Uint16
-         Random.a(), //32 bytes
-         SessionId.a(),
-         CipherSuites.a(),
-         LegacyCompressionMethods.a(),
-         Extensions.clientHello(...exts)
-      )
-      this.clientShares = clientShares
-      this.sessionId = this.member[2];
-      this.cipherSuites = this.member[3];
+      const option = {
+         version: ProtocolVersion.version.legacy, //Uint16
+         random: Random.a(), //32 bytes 
+         sessionId: SessionId.a(),
+         ciphers: CipherSuites.a(),
+         compression: LegacyCompressionMethods.a(),
+         extensions: Extensions.clientHello(...exts)
+      }
+
+      return ClientHello.a(option)
    }
+
+   /**
+    * create ClientHello
+    * @typedef {Object} Option
+    * @prop {ProtocolVersion} version 
+    * @prop {Random} random - 32 byte random
+    * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
+    * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
+    * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
+    * @prop {Extensions} param - Extension extensions<8..2^16-1>;
+    * @param {Option} option - description
+    */
+   constructor(option) {
+      const { version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions } = option
+      super(
+         version, //Uint16
+         random, //32 bytes
+         sessionId,
+         ciphers,
+         compression,
+         extensions
+      )
+      debugger;
+      //!SECTION this.clientShares = clientShares
+   }
+
+   /**@return {ClientShares} clientShares -  */
+   get clientShares() { return this.#clientShares }
+   /**@return {ProtocolVersion}  - Uint16 */
+   get version() { return this.member[0] }
+   /**@return {Random} 32 byte random */
+   get random() { return this.member[1] }
+   /**@return {SessionId} sessionId -  */
+   get sessionId() { return this.member[2] }
+   /**@return {CipherSuites} cipherSuites -  */
+   get ciphers() { return this.member[3] }
+   /**@return {LegacyCompressionMethods} compression method default to 0 */
+   get compression() { return this.member[4] }
+   /**@return {Extensions} extentions */
+   get extensions() { return this.member[5] }
+
    /**
     * Wrapper of message to Handshake
     * @returns {Handshake} message
@@ -223,7 +258,7 @@ export class ClientHello extends Struct {
             const length = Byte.get.BE.b16(message, pos);
             pos += 2
             const value = message.subarray(pos, pos + length);
-            return Extension.parse(value, "ClientHello")
+            return Extension.parse(value, "clientHello")
          }
       }
    ]
@@ -233,13 +268,13 @@ export class ClientHello extends Struct {
     * @return {ClientHello} ClientHello data structure
     */
    static parse(message) {
-      const data = { message }
+      const data = {}
       let offset = 0;
       for (const { name, value } of ClientHello.sequence) {
          data[name] = value(message, offset);
          offset += data[name].length
       }
-      return data
+      return ClientHello.a(data)
    }
 }
 

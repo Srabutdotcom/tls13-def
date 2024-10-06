@@ -41,13 +41,18 @@ export class SignatureScheme extends Uint16 {
     * @return {string}
     */
    get name(){return SignatureSchemeList.signatureScheme.key(this.#value)}
+   toString(){return this.name}
 }
 /**
  * SignatureSchemeList
  */
 export class SignatureSchemeList extends Struct {
+   #signatureAlgorithms
    static list() { return new SignatureSchemeList }
-   static a() { return new SignatureSchemeList }
+    /**
+    * @param  {...SignatureScheme} ss 
+    */
+   static a(...ss) { return new SignatureSchemeList(...ss) }
    static signatureScheme = new Enum({
       /* RSASSA-PKCS1-v1_5 algorithms */
       /* rsa_pkcs1_sha256(0x0401),
@@ -120,7 +125,9 @@ export class SignatureSchemeList extends Struct {
       super(
          Minmax.min(2).max(65534).byte(...supported_signature_algorithms)
       )// <2..2^16-2>)
+      this.#signatureAlgorithms = supported_signature_algorithms
    }
+   get signatureAlgorithms(){return this.#signatureAlgorithms}
    /**
     * @param {Uint8Array} data 
     */
@@ -133,8 +140,8 @@ export class SignatureSchemeList extends Struct {
          signatureSchemes.push(sigAlg)
          if (pos >= data.length - 1) break
       }
-      return signatureSchemes
-      //return new SignatureSchemeList(...signatureSchemes)
+      //return signatureSchemes
+      return new SignatureSchemeList(...signatureSchemes)
    }
 }
 

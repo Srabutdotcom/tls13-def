@@ -32,6 +32,8 @@ import { Byte } from "../deps.js"
    https://datatracker.ietf.org/doc/html/rfc8446#appendix-B.3.1.1
  */
 export class SupportedVersions extends Struct {
+   #version
+   #versions
    /**
     * @param {SelectedVersion|Versions} versions - description 
     */
@@ -56,13 +58,17 @@ export class SupportedVersions extends Struct {
     */
    constructor(versions) {
       super(versions)
+      if(versions instanceof SelectedVersion)this.#version = versions
+      if(versions instanceof Versions)this.#versions = versions.versions
    }
+   get version(){return this.#version}
+   get versions(){ return this.#versions}
    /**
     * @param {Uint8Array} data 
-    * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} klas - description
+    * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"} klas - description
     */
    static parse(data, klas) {
-      if (klas == "ClientHello") {
+      if (klas == "clientHello") {
          let pos = 0;
          const versions = []
          /* const length = Byte.get.BE.b8(data) */; pos += 1;
@@ -73,11 +79,12 @@ export class SupportedVersions extends Struct {
          }
          return SupportedVersions.a(Versions.a(...versions))
       }
-      return SelectedVersion.a(Byte.get.BE.b16(data))
+      return SupportedVersions.a(SelectedVersion.a(Byte.get.BE.b16(data)))
    }
 }
 
 class Versions extends Minmax {
+   #versions
    /**
     * 
     * @param  {...ProtocolVersion} versions 
@@ -89,7 +96,9 @@ class Versions extends Minmax {
     */
    constructor(...versions) {
       super(2, 254, ...versions)
+      this.#versions = versions
    }
+   get versions(){return this.#versions}
 }
 
 class SelectedVersion extends ProtocolVersion {
