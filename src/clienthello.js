@@ -160,7 +160,7 @@ export class ClientHello extends Struct {
          compression,
          extensions
       )
-      debugger;
+      
       //!SECTION this.clientShares = clientShares
    }
 
