@@ -8,7 +8,6 @@ import { CipherSuites } from "./keyexchange.js";
 import { Handshake } from "./handshake.js";
 import { Byte } from "./deps.js"
 
-
 var clientShares = await ClientShares.keyShareClientHello();
 
 /**
@@ -74,7 +73,7 @@ class LegacyCompressionMethods extends Minmax {
    ```
 
    ```js
-   const clientHello = ClientHello.new('serverName1','serverName2')
+   const clientHello = ClientHello.default('serverName1','serverName2')
    ```
 
    When a client first connects to a server, it is REQUIRED to send the
@@ -87,6 +86,14 @@ class LegacyCompressionMethods extends Minmax {
  */
 export class ClientHello extends Struct {
    #clientShares
+   #serverNames
+   #renegotiationInfo
+   #supportedGroups
+   #sessionTicket
+   #signatureAlgorithms
+   #supportedVersions
+   #pskKeyExchangeModes
+
    /**
     * create ClientHello
     * @typedef {Object} Option
@@ -147,7 +154,7 @@ export class ClientHello extends Struct {
     * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
     * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
     * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-    * @prop {Extensions} param - Extension extensions<8..2^16-1>;
+    * @prop {Extensions} extensions - Extension extensions<8..2^16-1>;
     * @param {Option} option - description
     */
    constructor(option) {
@@ -160,12 +167,17 @@ export class ClientHello extends Struct {
          compression,
          extensions
       )
+      this.#clientShares = undefined ?? extensions?.key_share.keyShareEntries;
+      this.#serverNames = undefined ?? extensions?.server_name.serverNames
+      this.#renegotiationInfo = undefined ?? extensions?.renegotiation_info
+      this.#supportedGroups = undefined ?? extensions?.supported_groups.named_group_list
+      this.#sessionTicket = undefined ?? extensions.session_ticket;
+      this.#supportedVersions = undefined ?? extensions.supported_versions.versions
+      this.#signatureAlgorithms = undefined ?? extensions.signature_algorithms.signatureAlgorithms
+      this.#pskKeyExchangeModes = undefined ?? extensions.psk_key_exchange_modes.pskModes
       
-      //!SECTION this.clientShares = clientShares
    }
 
-   /**@return {ClientShares} clientShares -  */
-   get clientShares() { return this.#clientShares }
    /**@return {ProtocolVersion}  - Uint16 */
    get version() { return this.member[0] }
    /**@return {Random} 32 byte random */
@@ -178,6 +190,22 @@ export class ClientHello extends Struct {
    get compression() { return this.member[4] }
    /**@return {Extensions} extentions */
    get extensions() { return this.member[5] }
+   /**@return {Array<KeyShareEntry>} clientShares -  */
+   get clientShares() { return this.#clientShares }
+   /**@return {Array<string>} hostnames */
+   get serverNames() { return this.#serverNames}
+   /**@return {Uint8Array} description */
+   get renegotiationInfo() {return this.#renegotiationInfo}
+   /**@return {Array<NamedGroup>} description */
+   get supportedGroups(){ return this.#supportedGroups}
+   /**@return {Uint8Array} description */
+   get sessionTicket() { return this.#sessionTicket}
+   /**@return {Array<ProtocolVersion>} description */
+   get supportedVersions() { return this.supportedVersions}
+   /**@return {Array<SignatureScheme>} description */
+   get signatureAlgorithms(){ return this.#signatureAlgorithms}
+   /**@return {Array<PskKeyExchangeMode>} description */
+   get pskKeyExchangeModes() { return this.#pskKeyExchangeModes}
 
    /**
     * Wrapper of message to Handshake

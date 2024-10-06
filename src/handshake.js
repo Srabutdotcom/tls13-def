@@ -185,6 +185,10 @@ export class Handshake extends Struct {
       this.#message = message
    }
    /**
+    * @return { HandshakeType }
+    */
+   get type(){return this.member[0]}
+   /**
     * return message
     */
    get message(){return this.#message}

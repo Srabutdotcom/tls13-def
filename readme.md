@@ -8,7 +8,7 @@
 import { ClientHello, ServerHello } from 'mod.js';
 
 //create ClientHello message
-const clientHello = ClientHello.new('smpt.hello.mail')
+const clientHello = ClientHello.default('smpt.hello.mail')
 //create record of clientHello
 const recordCH = TLSPlainText.handshake(clientHello)
 

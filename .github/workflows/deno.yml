@@ -36,7 +36,7 @@ jobs:
       #  run: deno fmt --check
 
       - name: Run linter
-        run: deno lint src/ --rules-exclude=no-var, no-explicit-any
+        run: deno lint src/ --rules-exclude=no-var, no-explicit-any DENO_FUTURE=1
 
       - name: Run tests
         run: deno test test/*.js

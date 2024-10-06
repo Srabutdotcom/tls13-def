@@ -138,7 +138,10 @@ export class TLSPlaintext extends Struct {
       )
       this.#fragment = fragment
    }
-
+   /**
+    * @return {ContentType} 
+    */
+   get type(){return this.member[0]}
    get fragment(){return this.#fragment}
    static sequence = [
       {

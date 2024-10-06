@@ -186,6 +186,7 @@ export class Extension extends Struct {
    get data() {
       return this.#data
    }
+   get type(){return this.#type}
    /**
     * Parse extensions data
     * @param {Uint8Array} extsData 
