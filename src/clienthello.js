@@ -293,7 +293,8 @@ export class ClientHello extends Struct {
          data[name] = value(message, offset);
          offset += data[name].length
       }
-      return ClientHello.a(data)
+      const {version, random, sessionId, ciphers, compression , extensions} = data
+      return ClientHello.a(version, random, sessionId, ciphers, compression , extensions)
    }
 }
 
