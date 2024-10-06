@@ -96,18 +96,10 @@ export class ClientHello extends Struct {
 
    /**
     * create ClientHello
-    * @typedef {Object} Option
-    * @prop {ProtocolVersion} version 
-    * @prop {Random} random - 32 byte random
-    * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
-    * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
-    * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-    * @prop {Extensions} param - Extension extensions<8..2^16-1>;
-    * @param {Option} option - description
-    * 
+    * @param {...Uint8Array} option - description
     */
-   static a(option) {
-      return new ClientHello(option)
+   static a(...option) {
+      return new ClientHello(...option)
    }
    /**
     * Wrapper of message to Handshake
@@ -134,31 +126,30 @@ export class ClientHello extends Struct {
          Extension.a(clientShares, Extension.types.key_share)
       ]
 
-      const option = {
-         version: ProtocolVersion.version.legacy, //Uint16
-         random: Random.a(), //32 bytes 
-         sessionId: SessionId.a(),
-         ciphers: CipherSuites.a(),
-         compression: LegacyCompressionMethods.a(),
-         extensions: Extensions.clientHello(...exts)
-      }
-
-      return ClientHello.a(option)
+      return ClientHello.a(
+         ProtocolVersion.version.legacy, //Uint16
+         Random.a(), //32 bytes 
+         SessionId.a(),
+         CipherSuites.a(),
+         LegacyCompressionMethods.a(),
+         Extensions.clientHello(...exts)
+      )
    }
 
    /**
     * create ClientHello
-    * @typedef {Object} Option
-    * @prop {ProtocolVersion} version 
-    * @prop {Random} random - 32 byte random
-    * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
-    * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
-    * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-    * @prop {Extensions} extensions - Extension extensions<8..2^16-1>;
-    * @param {Option} option - description
+    * @typedef {[
+    * ProtocolVersion,
+    * Random,
+    * SessionId,
+    * CipherSuites,
+    * LegacyCompressionMethods,
+    * Extensions
+    * ]} Options
+    * @param {...Uint8Array} option - description
     */
-   constructor(option) {
-      const { version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions } = option
+   constructor(...option) {
+      const [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions] = option
       super(
          version, //Uint16
          random, //32 bytes
@@ -175,7 +166,7 @@ export class ClientHello extends Struct {
       this.#supportedVersions = undefined ?? extensions.supported_versions.versions
       this.#signatureAlgorithms = undefined ?? extensions.signature_algorithms.signatureAlgorithms
       this.#pskKeyExchangeModes = undefined ?? extensions.psk_key_exchange_modes.pskModes
-      
+
    }
 
    /**@return {ProtocolVersion}  - Uint16 */
@@ -193,19 +184,19 @@ export class ClientHello extends Struct {
    /**@return {Array<KeyShareEntry>} clientShares -  */
    get clientShares() { return this.#clientShares }
    /**@return {Array<string>} hostnames */
-   get serverNames() { return this.#serverNames}
+   get serverNames() { return this.#serverNames }
    /**@return {Uint8Array} description */
-   get renegotiationInfo() {return this.#renegotiationInfo}
+   get renegotiationInfo() { return this.#renegotiationInfo }
    /**@return {Array<NamedGroup>} description */
-   get supportedGroups(){ return this.#supportedGroups}
+   get supportedGroups() { return this.#supportedGroups }
    /**@return {Uint8Array} description */
-   get sessionTicket() { return this.#sessionTicket}
+   get sessionTicket() { return this.#sessionTicket }
    /**@return {Array<ProtocolVersion>} description */
-   get supportedVersions() { return this.supportedVersions}
+   get supportedVersions() { return this.supportedVersions }
    /**@return {Array<SignatureScheme>} description */
-   get signatureAlgorithms(){ return this.#signatureAlgorithms}
+   get signatureAlgorithms() { return this.#signatureAlgorithms }
    /**@return {Array<PskKeyExchangeMode>} description */
-   get pskKeyExchangeModes() { return this.#pskKeyExchangeModes}
+   get pskKeyExchangeModes() { return this.#pskKeyExchangeModes }
 
    /**
     * Wrapper of message to Handshake

@@ -55,39 +55,9 @@ export class SessionId extends Minmax {
 export class ClientHello extends Struct {
     /**
      * create ClientHello
-     * @typedef {Object} Option
-     * @prop {ProtocolVersion} version
-     * @prop {Random} random - 32 byte random
-     * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
-     * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
-     * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-     * @prop {Extensions} param - Extension extensions<8..2^16-1>;
-     * @param {Option} option - description
-     *
+     * @param {...Uint8Array} option - description
      */
-    static a(option: {
-        version: ProtocolVersion;
-        /**
-         * - 32 byte random
-         */
-        random: Random;
-        /**
-         * - opaque legacy_session_id<0..32>;
-         */
-        sessionId: SessionId;
-        /**
-         * - CipherSuite cipher_suites<2..2^16-2>;
-         */
-        ciphers: CipherSuites;
-        /**
-         * - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-         */
-        compression: LegacyCompressionMethods;
-        /**
-         * - Extension extensions<8..2^16-1>;
-         */
-        param: Extensions;
-    }): ClientHello;
+    static a(...option: Uint8Array[]): ClientHello;
     /**
      * ClientHello
      * @param  {...string} serverNames
@@ -109,38 +79,17 @@ export class ClientHello extends Struct {
     static parse(message: Uint8Array): ClientHello;
     /**
      * create ClientHello
-     * @typedef {Object} Option
-     * @prop {ProtocolVersion} version
-     * @prop {Random} random - 32 byte random
-     * @prop {SessionId} sessionId - opaque legacy_session_id<0..32>;
-     * @prop {CipherSuites} ciphers - CipherSuite cipher_suites<2..2^16-2>;
-     * @prop {LegacyCompressionMethods} compression - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-     * @prop {Extensions} extensions - Extension extensions<8..2^16-1>;
-     * @param {Option} option - description
+     * @typedef {[
+     * ProtocolVersion,
+     * Random,
+     * SessionId,
+     * CipherSuites,
+     * LegacyCompressionMethods,
+     * Extensions
+     * ]} Options
+     * @param {...Uint8Array} option - description
      */
-    constructor(option: {
-        version: ProtocolVersion;
-        /**
-         * - 32 byte random
-         */
-        random: Random;
-        /**
-         * - opaque legacy_session_id<0..32>;
-         */
-        sessionId: SessionId;
-        /**
-         * - CipherSuite cipher_suites<2..2^16-2>;
-         */
-        ciphers: CipherSuites;
-        /**
-         * - new Uint8(0) opaque legacy_compression_methods<1..2^8-1>;
-         */
-        compression: LegacyCompressionMethods;
-        /**
-         * - Extension extensions<8..2^16-1>;
-         */
-        param: Extensions;
-    });
+    constructor(...option:Uint8Array[]);
     /**
      * Wrapper of message to Handshake
      * @returns {Handshake} message
@@ -201,8 +150,8 @@ declare class LegacyCompressionMethods extends Minmax {
     constructor();
 }
 import { Extensions } from "../src/extension/extension.js";
-import { NamedGroup } from "../src/extension/namedgroup.js"
+import { NamedGroup } from "../src/extension/namedgroup.js";
 import { KeyShareEntry } from "../src/extension/keyshare.js";
-import { SignatureScheme } from "../src/extension/signaturescheme.js"
-import { pskKeyExchangeMode } from "../src/extension/pskeyexchange.js"
+import { SignatureScheme } from "../src/extension/signaturescheme.js";
+import { PskKeyExchangeMode } from "../src/extension/pskeyexchange.js";
 export {};
