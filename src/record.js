@@ -8,11 +8,10 @@
 
 import { Alert } from "./alert.js";
 import { Enum, Struct, Uint16, Uint8 } from "./base.js";
-import { Handshake, HandshakeType } from "./handshake.js";
+import { Handshake } from "./handshake.js";
 import { ProtocolVersion } from "./keyexchange.js"
 import { Byte, concat } from "./deps.js"
-import { Random } from "./keyexchange.js";
-import { CipherSuites } from "./keyexchange.js";
+
 
 /**
  * Wrapper to TLSPlaintext.types value
