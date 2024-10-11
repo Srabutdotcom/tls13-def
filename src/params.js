@@ -14,8 +14,8 @@ import { SignatureSchemeList } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
 
 /**
- * 
  * opaque DistinguishedName<1..2^16-1>
+ * @extends {Minmax}
  */
 export class DistinguishedName extends Minmax {
    /**
@@ -33,6 +33,7 @@ export class DistinguishedName extends Minmax {
  *    DistinguishedName authorities<3..2^16-1>;
    } CertificateAuthoritiesExtension;
    ```
+   @extends {Struct}
  */
 export class CertificateAuthoritiesExtension extends Struct {
    #distinguishedName
@@ -56,6 +57,7 @@ export class CertificateAuthoritiesExtension extends Struct {
 /**
  * Certificate_extension_oid
  * `opaque certificate_extension_oid<1..2^8-1>;`
+ * @extends {Minmax}
  */
 export class Certificate_extension_oid extends Minmax {
    #oid
@@ -77,6 +79,7 @@ export class Certificate_extension_oid extends Minmax {
 /**
  * Certificate_extension_values
  * `opaque certificate_extension_values<0..2^16-1>;`
+ * @extends {Minmax}
  */
 export class Certificate_extension_values extends Minmax {
    #certificate_extension_values
@@ -103,6 +106,7 @@ export class Certificate_extension_values extends Minmax {
       opaque certificate_extension_values<0..2^16-1>;
    } OIDFilter;
    ```
+   @extends {Struct}
  */
 export class OIDFilter extends Struct {
    #oid
@@ -152,6 +156,7 @@ export class OIDFilter extends Struct {
       OIDFilter filters<0..2^16-1>;
    } OIDFilterExtension;
    ```
+   @extends {Struct}
  */
 export class OIDFilterExtension extends Struct {
    #oidFilters
@@ -179,6 +184,7 @@ export class OIDFilterExtension extends Struct {
  * ```
  * struct {} PostHandshakeAuth;
  * ```
+ * @extends {Struct}
  */
 export class PostHandshakeAuth extends Struct {
    static a(){return new PostHandshakeAuth}
@@ -192,6 +198,7 @@ export class PostHandshakeAuth extends Struct {
       Extension extensions<0..2^16-1>;
    } EncryptedExtensions;
    ```
+   @extends {Struct}
  */
 export class EncryptedExtensions extends Struct {
    #extensions
@@ -243,7 +250,7 @@ export class EncryptedExtensions extends Struct {
       MUST be specified, and other extensions may optionally be included
       if defined for this message.  Clients MUST ignore unrecognized
       extensions.
-   
+   @extends {Struct}
  */
 export class CertificateRequest extends Struct {
    #signature_algo

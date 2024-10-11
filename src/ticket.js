@@ -56,6 +56,7 @@ import { Handshake } from "./handshake.js";
    with a different SNI value.
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.1
+   @extends {Struct}
  */
 export class NewSessionTicket extends Struct {
    #Extension = Extension

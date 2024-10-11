@@ -31,7 +31,8 @@ export class KeyExchange extends Minmax {
       this.#key = key
    }
    /**
-    * @return {Uint8Array} description
+    * get key byte
+    * @return {Uint8Array} key in byte
     */
    get key() { return this.member[1] }
 }
@@ -47,8 +48,7 @@ export class KeyExchange extends Minmax {
    LINK https://datatracker.ietf.org/doc/html/rfc8446#section-4.2.8
  */
 class KeyShareEntry extends Struct {
-   #NamedGroup = NamedGroup
-   #group
+   #group = NamedGroup
    #key_exchange
    /**
     * @param {KeyExchange} key_exchange 
@@ -129,7 +129,7 @@ class KeyShareClientHello extends Struct {
       )
       this.#keyShareEntries = keyShareEntry
    }
-   get keyShareEntries(){return this.#keyShareEntries}
+   get keyShareEntries() { return this.#keyShareEntries }
    /**
     * 
     * @param {Uint8Array} data 
@@ -181,7 +181,7 @@ class KeyShareHelloRetryRequest extends Struct {
       super(selected_group)
       this.#selected_group = selected_group
    }
-   get selected_group(){return this.#selected_group}
+   get selected_group() { return this.#selected_group }
    /**
     * 
     * @param {Uint8Array} data 
@@ -215,9 +215,9 @@ class KeyShareServerHello extends Struct {
    constructor(server_share) {
       if ((server_share instanceof KeyShareEntry) == false) throw TypeError(`Expected KeyShareEntry Object`)
       super(server_share)
-      this.#server_share= server_share
+      this.#server_share = server_share
    }
-   get server_share(){return this.#server_share}
+   get server_share() { return this.#server_share }
    /**
     * 
     * @param {Uint8Array} data 
@@ -257,20 +257,75 @@ function ecdh(byte) {
 class Key {
    /**@type {CryptoKeyPair} #keypair - CryptoKeyPair */
    #keypair
+   /**@type {KeyShareEntry} #senderShare - Object contain group and sender public key */
+   #senderShare
+   /**@type {KeyShareEntry} #serverShare - Object contain group and server public key */
+   #serverShare
+   /**
+    * @returns key pair from X25519 group
+    */
+   static async x25519() {
+      return new Key(await cryptokey(Algo.x25519))
+   }
+   /**
+    * @returns key pair from secp521r1 group
+    */
+   static p521() {
+      return new Key(new P521())
+   }
+   /**
+    * @returns key pair from secp384r1 group
+    */
+   static async p384() {
+      return new Key(await cryptokey(Algo.ecdh["384"]))
+   }
+   /**
+    * @returns key pair from secp256r1 group
+    */
+   static async p256() {
+      return new Key(await cryptokey(Algo.ecdh["256"]))
+   }
+   /**
+    * 
+    * @param {Array<KeyShareEntry>} senderShares 
+    * @returns 
+    */
+   static async match(senderShares) {
+      const preferred = ['x25519', 'p521', 'p384', 'p256']
+      for (const group of preferred) {
+         for (const keyShare of senderShares) {
+            if (keyShare.group.name == group) {
+               /**@type {Key} serverKey - description */
+               const serverKey = await Key[group]();
+               serverKey.#senderShare = keyShare
+               return serverKey
+            }
+         }
+      }
+      throw TypeError(`Group is not found`)
+   }
+   
    /**
     * 
     * @param {CryptoKeyPair} v 
     */
    constructor(v) { this.#keypair = v }
    async keyShareEntry() {
-      if (this.#keypair instanceof P521) return this.#keypair.keyShareEntry()
+      if (this.#keypair instanceof P521) {
+         this.#serverShare = this.#keypair.keyShareEntry()
+         return this.#serverShare
+      }
       const arrayBufferPublicKey = await crypto.subtle.exportKey("raw", this.#keypair.publicKey);
       const { name, namedCurve } = this.#keypair.publicKey.algorithm;
 
-      if (name == "X25519") return new KeyShareEntry(NamedGroup.x25519, new Uint8Array(arrayBufferPublicKey));
+      if (name == "X25519") {
+         this.#serverShare = new KeyShareEntry(NamedGroup.x25519, new Uint8Array(arrayBufferPublicKey));
+         return this.#serverShare
+      }
       if (name == "ECDH") {
          const algo = namedCurve.split("-")[1];
-         return new KeyShareEntry(NamedGroup[`secp${algo}r1`], new Uint8Array(arrayBufferPublicKey));
+         this.#serverShare = new KeyShareEntry(NamedGroup[`secp${algo}r1`], new Uint8Array(arrayBufferPublicKey));
+         return this.#serverShare
       }
       return false
    }
@@ -301,6 +356,20 @@ class Key {
       if (this.#keypair instanceof P521) return { name: "ECDH", namedCurve: "P-521" }
       return this.#keypair.privateKey.algorithm
    }
+   get keypair() { return this.#keypair }
+   /**
+    * @param {KeyShareEntry} keyShareEntry - description
+    */
+   set senderShare(keyShareEntry) { this.#senderShare = keyShareEntry }
+   /**return senderShare */
+   get senderShare(){return this.#senderShare}
+   /**
+    * @param {KeyShareEntry} keyShareEntry - description
+    */
+   set serverShare(keyShareEntry) { this.#serverShare = keyShareEntry }
+   /**return serverShare */
+   get serverShare(){return this.#serverShare}
+
 }
 /**
  * Collection of Key that contain (X25519, ECDH256, ECDH384 and ECDH521 using noble)
@@ -341,7 +410,7 @@ class Keys {
    get x25519() { return this.#x25519 }
    /**
     * 
-    * @returns {KeyShareClientHello}
+    * @returns {Promise<KeyShareClientHello>}
     * Clients MUST NOT offer multiple KeyShareEntry values
    for the same group.  Clients MUST NOT offer any KeyShareEntry values
    for groups not listed in the client's "supported_groups" extension.
@@ -379,6 +448,9 @@ class ClientShares {
    }
 }
 
+/**
+ * secp521r1 private key object
+ */
 class P521 extends Uint8Array {
    constructor() {
       super(p521.utils.randomPrivateKey())
@@ -389,7 +461,7 @@ class P521 extends Uint8Array {
    /**
     * 
     * @param {Uint8Array} publicKey 
-    * @returns sharedSecret
+    * @returns {Uint8Array} sharedSecret
     */
    sharedKey(publicKey) {
       return p521.getSharedSecret(this, publicKey)
@@ -418,6 +490,7 @@ class ServerShare {
       return await ServerShare.keyShareServerHello()
    }
    static async keyShareServerHello() { return new KeyShareServerHello(await ServerShare.key.keyShareEntry()) }
+
 }
 
 export { ClientShares, KeyShareEntry, Keys, Key, ServerShare, KeyShareClientHello, KeyShareServerHello, KeyShareHelloRetryRequest }

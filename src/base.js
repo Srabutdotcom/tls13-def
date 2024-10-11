@@ -13,7 +13,7 @@ export class Struct extends Uint8Array {
    /**
     * @param  {...Uint8Array} uint8s  
     */
-   static a(...uint8s){return new Struct(...uint8s)}
+   static a(...uint8s) { return new Struct(...uint8s) }
    /**
     * @param  {...Uint8Array} uint8s  
     */
@@ -23,7 +23,7 @@ export class Struct extends Uint8Array {
       if (uint8s && uint8s.length > 0 && uint8s.some(e => !(e instanceof Uint8Array))) {
          throw TypeError(`all arguments must be Uint8Array`);
       }
-      
+
       this.#member = uint8s
    }
    /**
@@ -233,9 +233,11 @@ export class Uint32 extends Uint8Array {
  */
 export class Enum {
    /**
-    * @param {{any:any}} object 
+    * @param {{string:number}} object 
+    * @param {number} max - positive integer or Uint8Array
+    * @param {Function} _class - class to wrap the value
     */
-   static a(object){ return new Enum(object)}
+   static a(object, max = 255, _class = Uint8Array) { return new Enum(object, max , _class) }
    // store value -> key map
    #reverse = {}
    // property for sign of max value in Enum
@@ -249,17 +251,24 @@ export class Enum {
    // bytes length (if any)
    #byteLength
    /**
-    * @param {{any:any}} object 
+    * @param {{string:number}} object 
+    * @param {number} max - positive integer or Uint8Array
+    * @param {Function} _class - class to wrap the value
     */
-   constructor(object) {
+   constructor(object, max = 255, _class = Uint8Array) {
       if (Object.hasOwn(object, Enum.max)) {
          this.#maxvalue = Array.isArray(object[Enum.max]) ? 256 ** object[Enum.max].length - 1 : object[Enum.max]
+         this.#byteLength = maxBytes(this.#maxvalue)
+      } else {
+         this.#maxvalue = Array.isArray(max) ? 256 ** max.length - 1 : max
          this.#byteLength = maxBytes(this.#maxvalue)
       }
 
       if (Object.hasOwn(object, Enum.class)) {
          if (object[Enum.class]?.constructor.toString().match(/^class/) == false) throw TypeError(`expected class but got ${object[Enum.class]?.constructor}`)
          this.#class = object[Enum.class]
+      } else {
+         this.#class = _class
       }
 
       for (const prop in object) {
@@ -351,5 +360,5 @@ export class Uints {
    static Uint32(v) { class Length extends Uint32 { constructor(v) { super(v) } }; return new Length(v) }
 }
 
-// npx -p typescript tsc base.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ../dist
+// npx -p typescript tsc ./src/base.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist
 

@@ -15,6 +15,7 @@ import { Byte, concat } from "./deps.js"
 
 /**
  * Wrapper to TLSPlaintext.types value
+ * @extends {Uint8}
  */
 class ContentType extends Uint8 {
    /**
@@ -31,6 +32,17 @@ class ContentType extends Uint8 {
          default: return Handshake
       }
    }
+   get name(){
+      switch (this.value()) {
+         case 0: return 'Invalid'
+         case 20: return 'ChangeCipherSpec'
+         case 21: return 'Alert'
+         case 22: return 'Handshake'
+         case 23: return 'TLSCiphertext' // Application Data
+         default: return 'Invalid'
+      }      
+   }
+   toString(){ return this.name }
 }
 
 /**
@@ -43,6 +55,7 @@ class ContentType extends Uint8 {
       opaque fragment[TLSPlaintext.length];
    } TLSPlaintext;
    ```
+   @extends {Struct}
  */
 export class TLSPlaintext extends Struct {
    #fragment
@@ -64,15 +77,10 @@ export class TLSPlaintext extends Struct {
       application_data: 23,
       /**@type {24} heartbeat - description */
       heartbeat: 24, /* RFC 6520 */
-      [Enum.max]: 255,
-      [Enum.class]: ContentType
+
    }
-   /**
-    * A static enum representing type of content
-    * @static
-    * @enum { Uint8 }
-    */
-   static contentType = new Enum(TLSPlaintext.types)
+/**@type {TLSPlaintext.types} contentType - in the form of ContentType */
+   static contentType = new Enum(TLSPlaintext.types, 255, ContentType)
    /**
     * 
     * @param {Uint8Array} fragment 
@@ -209,6 +217,7 @@ export class TLSPlaintext extends Struct {
    } TLSInnerPlaintext;
    ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
+   @extends {Struct}
  */
 export class TLSInnerPlaintext extends Struct {
    /**
@@ -258,7 +267,7 @@ export class TLSInnerPlaintext extends Struct {
     * 
     * @param {TLSPlaintext} content 
     * @param {ContentType} type 
-    * @param {number} zeros 
+    * @param {number} zeros - the number of zero's length
     */
    constructor(content, type, zeros) {
       content = content_(content)
@@ -299,6 +308,7 @@ function zeros_(length) {
    } TLSCiphertext;
    ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
+   @extends {Struct}
  */
 export class TLSCiphertext extends Struct {
    /** @type {Uint8Array} header - [23, 3, 3, Length]    */
@@ -331,6 +341,7 @@ export class TLSCiphertext extends Struct {
  * produce Uint8[1]
  * ```
  * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
+ * @extends {Uint8}
  */
 class ChangeCipherSpec extends Uint8 {
    static a() { return new ChangeCipherSpec }

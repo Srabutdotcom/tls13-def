@@ -1,5 +1,6 @@
 /**
  * return messageHash using specified hash algorithm
+ * @extends {Uint8Array}
  */
 export class MessageHash extends Uint8Array {
     /**

@@ -17,6 +17,7 @@
    message is encrypted under keys derived from the
    client_early_traffic_secret.
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
+   @extends {Struct}
  */
    export class EndOfEarlyData extends Struct {
       static a(): EndOfEarlyData;
@@ -81,21 +82,23 @@
      its receiving keys.
   
      https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+     @extends {Struct}
    */
   export class KeyUpdate extends Struct {
       /**@static */
       static typeDesc: {
-          [x: symbol]: number | typeof KeyUpdateRequest;
           /**@type {0} update_not_requested */
           update_not_requested: 0;
           /**@type {1} update_requested */
           update_requested: 1;
       };
-      /**
-       * @static
-       * @type {Enum(KeyUpdate.typeDesc)} types - description
-       */
-      static types: Enum;
+      /**@type {KeyUpdate.typeDesc} types - converted to KeyUpdateRequest */
+      static types: {
+          /**@type {0} update_not_requested */
+          update_not_requested: 0;
+          /**@type {1} update_requested */
+          update_requested: 1;
+      };
       static update_not_requested: KeyUpdate;
       static update_requested: KeyUpdate;
       /**
@@ -117,6 +120,7 @@
       toString(): "update_not_requested" | "update_requested";
       #private;
   }
+    
   import { Struct } from "../src/base.js";
   import { Handshake } from "../src/handshake.js";
   declare class KeyUpdateRequest extends Uint8 {
@@ -126,7 +130,6 @@
        */
       constructor(v: 0 | 1);
   }
-  import { Enum } from "../src/base.js";
   import { Uint8 } from "../src/base.js";
   export {};
   

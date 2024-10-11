@@ -29,6 +29,7 @@ import { Handshake } from "./handshake.js";
    message is encrypted under keys derived from the
    client_early_traffic_secret.
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.5
+   @extends {Struct}
  */
 export class EndOfEarlyData extends Struct {
    static a() { return new EndOfEarlyData }
@@ -44,6 +45,11 @@ export class EndOfEarlyData extends Struct {
    }
 }
 
+/**
+ * KeyUpdateRequest
+ *
+ * @extends {Uint8}
+ */
 class KeyUpdateRequest extends Uint8 {
    /**
     * 
@@ -108,6 +114,7 @@ request_update:  Indicates whether the recipient of the KeyUpdate
    its receiving keys.
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
+   @extends {Struct}
  */
 export class KeyUpdate extends Struct {
    #keyUpdate
@@ -117,15 +124,10 @@ export class KeyUpdate extends Struct {
       update_not_requested: 0,
       /**@type {1} update_requested */
       update_requested: 1,
-      [Enum.max]: 255,
-      [Enum.class]: KeyUpdateRequest
    }
 
-   /**
-    * @static
-    * @type {Enum(KeyUpdate.typeDesc)} types - description
-    */
-   static types = new Enum(KeyUpdate.typeDesc)
+   /**@type {KeyUpdate.typeDesc} types - converted to KeyUpdateRequest */
+   static types = new Enum(KeyUpdate.typeDesc, 255, KeyUpdateRequest)
 
    static update_not_requested = new KeyUpdate(KeyUpdate.types.update_not_requested)
    static update_requested = new KeyUpdate(KeyUpdate.types.update_requested)

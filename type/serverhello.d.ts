@@ -24,33 +24,73 @@
       "illegal_parameter" alert.
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.1.3
-
+   @extends {Struct}
  */
-export class ServerHello extends Struct {
-    /**
-     *
-     * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
-     * @param {CipherSuite} cipher
-     * @param {Extension} serverShareExtension
-     */
-    static a(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension): ServerHello;
-    /**
-     *
-     * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
-     * @param {CipherSuite} cipher - selected cipher
-     * @param {Extension} serverShareExtension
-     */
-    constructor(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension);
-    payload: () => Handshake;
-    handshake: () => Handshake;
-    /**
-     *
-     * @return {Handshake} message
-     */
-    wrap(): Handshake;
-    #private;
-}
-import { Struct } from "../src/base.js";
-import { Handshake } from "../src/handshake.js";
-import { CipherSuite } from "../src/keyexchange.js";
-import { Extension } from "../src/extension/extension.js";
+   export class ServerHello extends Struct {
+      /**
+       *
+       * @param {TLSPlaintext} record
+       * @returns {Promise<ServerHello>}
+       */
+      static tlsPlaintext(record: TLSPlaintext): Promise<ServerHello>;
+      /**
+       * Promise to create ServerHello based on ClientHello message
+       * @param {ClientHello} message
+       */
+      static clientHello(message: ClientHello): Promise<ServerHello>;
+      /**
+       *
+       * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
+       * @param {CipherSuite} cipher
+       * @param {Extension} serverShareExtension
+       * @param {Key} key - Key object container
+       */
+      static a(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension, key: Uint8Array): ServerHello;
+      /**
+       *
+       * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
+       * @param {CipherSuite} cipher - selected cipher
+       * @param {Extension} serverShareExtension
+       */
+      constructor(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension);
+      payload: () => Handshake;
+      handshake: () => Handshake;
+      /**
+       *
+       * @return {Handshake} message
+       */
+      wrap(): Handshake;
+      get key(): Key;
+      /**@return {ProtocolVersion}  - Uint16 */
+      get version(): ProtocolVersion;
+      /**@return {Random} 32 byte random */
+      get random(): Random;
+      /**@return {SessionId} sessionId -  */
+      get sessionId(): SessionId;
+      /**@return {CipherSuite} cipherSuites -  */
+      get cipher(): CipherSuite;
+      /**@return {LegacyCompressionMethod} compression method default to 0 */
+      get compression(): LegacyCompressionMethod;
+      /**@return {Extensions} extentions */
+      get extensions(): Extensions;
+      #private;
+  }
+  import { Struct, Uint8 } from "../src/base.js";
+  import { Handshake } from "../src/handshake.js";
+  import { CipherSuite } from "../src/keyexchange.js";
+  import { Extension } from "../src/extension/extension.js";
+  import { Key } from "../src/extension/keyshare.js";
+  import { ProtocolVersion } from "../src/keyexchange.js";
+  import { Random } from "../src/keyexchange.js";
+
+  declare class LegacyCompressionMethod extends Uint8 {
+      static a(): LegacyCompressionMethod;
+      constructor();
+  }
+  import { Extensions } from "../src/extension/extension.js";
+  import { TLSPlaintext } from "../src/record.js";
+  import { ClientHello, SessionId } from "../src/clienthello.js";
+  
+  export {};
+  
+

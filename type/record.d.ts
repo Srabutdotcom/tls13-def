@@ -8,6 +8,7 @@
       opaque fragment[TLSPlaintext.length];
    } TLSPlaintext;
    ```
+   @extends {Struct}
  */
    export class TLSPlaintext extends Struct {
     /**
@@ -16,7 +17,6 @@
      * @enum { number }
      */
     static types: {
-        [x: symbol]: number | typeof ContentType;
         /**@type {0} invalid - description */
         invalid: 0;
         /**@type {20} change_cipher_spec - description */
@@ -30,12 +30,21 @@
         /**@type {24} heartbeat - description */
         heartbeat: 24;
     };
-    /**
-     * A static enum representing type of content
-     * @static
-     * @enum { Uint8 }
-     */
-    static contentType: Enum;
+    /**@type {TLSPlaintext.types} contentType - in the form of ContentType */
+    static contentType: {
+        /**@type {0} invalid - description */
+        invalid: 0;
+        /**@type {20} change_cipher_spec - description */
+        change_cipher_spec: 20;
+        /**@type {21} alert - description */
+        alert: 21;
+        /**@type {22} handshake - description */
+        handshake: 22;
+        /**@type {23} application_data - description */
+        application_data: 23;
+        /**@type {24} heartbeat - description */
+        heartbeat: 24;
+    };
     /**
      *
      * @param {Uint8Array} fragment
@@ -106,6 +115,10 @@
        TLS 1.2).
      */
     constructor(fragment: Uint8Array, type: ContentType);
+    /**
+     * @return {ContentType}
+     */
+    get type(): ContentType;
     get fragment(): Uint8Array;
     #private;
 }
@@ -120,6 +133,7 @@
    } TLSInnerPlaintext;
    ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
+   @extends {Struct}
  */
 export class TLSInnerPlaintext extends Struct {
     /**
@@ -168,7 +182,7 @@ export class TLSInnerPlaintext extends Struct {
      *
      * @param {TLSPlaintext} content
      * @param {ContentType} type
-     * @param {number} zeros
+     * @param {number} zeros - the number of zero's length
      */
     constructor(content: TLSPlaintext, type: ContentType, zeros: number);
 }
@@ -185,6 +199,7 @@ export class TLSInnerPlaintext extends Struct {
    } TLSCiphertext;
    ```
    https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
+   @extends {Struct}
  */
 export class TLSCiphertext extends Struct {
     /**
@@ -201,26 +216,29 @@ export class TLSCiphertext extends Struct {
     header: Uint8Array;
     encryptedRecord: Uint8Array;
 }
-import { Struct } from "../src/base.js";
+
 /**
  * Wrapper to TLSPlaintext.types value
+ * @extends {Uint8}
  */
 declare class ContentType extends Uint8 {
     get klas(): typeof Alert | typeof Handshake | typeof ChangeCipherSpec | typeof TLSCiphertext;
+    get name(): "Invalid" | "ChangeCipherSpec" | "Alert" | "Handshake" | "TLSCiphertext";
+    toString(): "Invalid" | "ChangeCipherSpec" | "Alert" | "Handshake" | "TLSCiphertext";
 }
-import { Enum } from "../src/base.js";
 /**
  * ChangeCipherSpec
  * ```
  * produce Uint8[1]
  * ```
  * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
+ * @extends {Uint8}
  */
 declare class ChangeCipherSpec extends Uint8 {
     static a(): ChangeCipherSpec;
     constructor();
 }
-import { Uint8 } from "../src/base.js";
+import { Uint8, Struct } from "../src/base.js";
 import { Alert } from "../src/alert.js";
 import { Handshake } from "../src/handshake.js";
 export {};

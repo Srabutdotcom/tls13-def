@@ -6,10 +6,10 @@
  */
 
 import { Minmax, Uint16 } from "./base.js";
-import { concat } from "./deps.js"
 
 /**
  * ProtocolVersion -> 0x0303 - TLS v1.2 or 0x0304 - TLS v1.3
+ * @extends {Uint16}
  */
 export class ProtocolVersion extends Uint16 {
    static version = {
@@ -46,6 +46,7 @@ export class ProtocolVersion extends Uint16 {
 
 /**
  * opaque Random[32]
+ * @extends {Uint8Array}
  */
 export class Random extends Uint8Array {
    /**
@@ -67,21 +68,30 @@ export class Random extends Uint8Array {
  * ```
  * uint8 CipherSuite[2];    Cryptographic suite selector 
  * ```
+ * @extends {Uint8Array}
  */
 export class CipherSuite extends Uint8Array {
    static TLS_AES_128_GCM_SHA256 = new CipherSuite(0x01)
    static TLS_AES_256_GCM_SHA384 = new CipherSuite(0x02)
    /**
-    * @param {0x01|0x02} code 
+    * @param {0x01|0x02|0x03|0x04|0x05} code 
+    */
+   static a(code){ return new CipherSuite(code)}
+   /**
+    * @param {0x01|0x02|0x03|0x04|0x05} code 
     */
    constructor(code = 0x01) { // default to [0x13, 0x01]-'TLS_AES_128_GCM_SHA256'
       super([0x13, code])
    }
-   meaning() {
-      if (this.at(1) == 0x01) return 'TLS_AES_128_GCM_SHA256[0x13, 0x01]'
-      if (this.at(1) == 0x02) return 'TLS_AES_256_GCM_SHA384[0x13, 0x02]'
+   get name() {
+      if (this.at(1) == 0x01) return 'TLS_AES_128_GCM_SHA256'
+      if (this.at(1) == 0x02) return 'TLS_AES_256_GCM_SHA384'
+      if (this.at(1) == 0x03) return 'TLS_CHACHA20_POLY1305_SHA256'
+      if (this.at(1) == 0x04) return 'TLS_AES_128_CCM_SHA256'
+      if (this.at(1) == 0x05) return 'TLS_AES_128_CCM_8_SHA256'
       throw TypeError(`Unknown cipher - ${this[1]}`)
    }
+   toString(){ return this.name }
    get AEAD() {
       if (this.at(1) == 0x01) return 128
       if (this.at(1) == 0x02) return 256
@@ -97,24 +107,48 @@ export class CipherSuite extends Uint8Array {
 /**
  * List of CipherSuite
  * CipherSuite cipher_suites<2..2^16-2>;
+ * @extends {Minmax}
  */
 export class CipherSuites extends Minmax {
-   ciphers = {
-      TLS_AES_128_GCM_SHA256: new CipherSuite(0x01),
-      TLS_AES_256_GCM_SHA384: new CipherSuite(0x02)
+   #ciphs
+   /**
+    * re-Create list of CipherSuite based on byte data
+    * @param {Uint8Array} cips 
+    */
+   static array(cips){
+      const ciphers = []
+      for(let i = 1; i< cips.length;i+=2){
+         ciphers.push(CipherSuite.a(cips[i]))
+      }
+      return CipherSuites.a(...ciphers)
    }
    /**
     * new CipherSuites 
-    * @param {Uint8Array} cips - cipherSuites 
+    * @param {...CipherSuite} cips - cipherSuites 
     * @return {CipherSuites} list of CipherSuite
     * */
-   static a(cips) { return new CipherSuites(cips) }
+   static a(...cips) { return new CipherSuites(...cips) }
    /**
-    * 
-    * @param {Uint8Array} cips - cipherSuites 
+    * Create list of CipherSuite
+    * @param {...CipherSuite} cips - cipherSuites 
     */
-   constructor(cips = concat(new CipherSuite(0x01), new CipherSuite(0x02))) {
-      super(2, 65534, cips)// <2..2^16-2>
+   constructor(...cips) {
+      cips = cips.length == 0 ? [ CipherSuite.TLS_AES_256_GCM_SHA384, CipherSuite.TLS_AES_128_GCM_SHA256] : cips
+      super(2, 65534, ...cips)// <2..2^16-2>
+      this.#ciphs = cips
+   }
+   get ciphs(){return this.#ciphs}
+   /**
+    * return the selected Cipher or false if not found
+    * @param {Array<CipherSuite>} ciphs - preferred CipherSuite ordered from the most preferred
+    * @returns {CipherSuite|false} CipherSuite or false
+    */
+   match(ciphs){
+      const ciphNames = this.#ciphs.map(e=>e.name)
+      for(const ciph of ciphs){
+         if(ciphNames.includes(ciph.name)) return ciph
+      }
+      return false
    }
 }
 

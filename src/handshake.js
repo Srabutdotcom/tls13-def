@@ -17,6 +17,12 @@ import { Certificate, CertificateVerify, Finished } from "./auth.js";
 import { MessageHash } from "./msghash.js";
 import { Byte } from "./deps.js"
 
+
+/**
+ * HandshakeType
+ *
+ * @extends {Uint8}
+ */
 export class HandshakeType extends Uint8 {
    /**
     * @param {number} v 
@@ -59,6 +65,7 @@ export class HandshakeType extends Uint8 {
       };
    } Handshake;
    ```
+   @extends {Struct}
  */
 export class Handshake extends Struct {
    #message
@@ -104,10 +111,9 @@ export class Handshake extends Struct {
       /**@type {254} message_hash */
       message_hash: 254,
       /**@type {255} [Enum.max] */
-      [Enum.max]: 255,
-      [Enum.class]: HandshakeType
    }
-   static types = new Enum(Handshake.typesDesc)
+   /**@type {Handshake.typesDesc} types - value converted to HandshakeType */
+   static types = new Enum(Handshake.typesDesc, 255, HandshakeType)
 
    /**@param {Uint8Array} msg - the message of handshake */
    static client_hello = function (msg) {

@@ -169,19 +169,23 @@ export class Uint32 extends Uint8Array {
  */
 export class Enum {
     /**
-     * @param {{any:any}} object
+     * @param {{string:number}} object
+     * @param {number} max - positive integer or Uint8Array
+     * @param {Function} _class - class to wrap the value
      */
     static a(object: {
-        any: any;
-    }): Enum;
+        string: number;
+    }, max?: number, _class?: Function): Enum;
     static max: symbol;
     static class: symbol;
     /**
-     * @param {{any:any}} object
+     * @param {{string:number}} object
+     * @param {number} max - positive integer or Uint8Array
+     * @param {Function} _class - class to wrap the value
      */
     constructor(object: {
-        any: any;
-    });
+        string: number;
+    }, max?: number, _class?: Function);
     /**
      * return keys or properties
      * @returns {any[]} [any]

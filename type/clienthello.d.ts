@@ -6,9 +6,10 @@
  * ```js
  * import { assertEquals } from "jsr:@std/assert/equals";
  * import { SessionId } from "./clienthello.js"
- * const seId = SessionId.new();
+ * const seId = SessionId.a();
  * assertEquals(seId.length, 33)
  * ```
+ * @extends {Minmax}
  */
 export class SessionId extends Minmax {
     /**
@@ -50,7 +51,7 @@ export class SessionId extends Minmax {
    HelloRetryRequest.
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.1.2
-
+   @extends {Struct}
  */
 export class ClientHello extends Struct {
     /**
@@ -77,19 +78,6 @@ export class ClientHello extends Struct {
      * @return {ClientHello} ClientHello data structure
      */
     static parse(message: Uint8Array): ClientHello;
-    /**
-     * create ClientHello
-     * @typedef {[
-     * ProtocolVersion,
-     * Random,
-     * SessionId,
-     * CipherSuites,
-     * LegacyCompressionMethods,
-     * Extensions
-     * ]} Options
-     * @param {...Uint8Array} option - description
-     */
-    constructor(...option:Uint8Array[]);
     /**
      * Wrapper of message to Handshake
      * @returns {Handshake} message

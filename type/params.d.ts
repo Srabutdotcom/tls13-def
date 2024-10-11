@@ -1,6 +1,6 @@
 /**
- *
  * opaque DistinguishedName<1..2^16-1>
+ * @extends {Minmax}
  */
 export class DistinguishedName extends Minmax {
     /**
@@ -16,6 +16,7 @@ export class DistinguishedName extends Minmax {
  *    DistinguishedName authorities<3..2^16-1>;
    } CertificateAuthoritiesExtension;
    ```
+   @extends {Struct}
  */
 export class CertificateAuthoritiesExtension extends Struct {
     /**
@@ -34,6 +35,7 @@ export class CertificateAuthoritiesExtension extends Struct {
 /**
  * Certificate_extension_oid
  * `opaque certificate_extension_oid<1..2^8-1>;`
+ * @extends {Minmax}
  */
 export class Certificate_extension_oid extends Minmax {
     /**
@@ -52,6 +54,7 @@ export class Certificate_extension_oid extends Minmax {
 /**
  * Certificate_extension_values
  * `opaque certificate_extension_values<0..2^16-1>;`
+ * @extends {Minmax}
  */
 export class Certificate_extension_values extends Minmax {
     /**
@@ -75,6 +78,7 @@ export class Certificate_extension_values extends Minmax {
       opaque certificate_extension_values<0..2^16-1>;
    } OIDFilter;
    ```
+   @extends {Struct}
  */
 export class OIDFilter extends Struct {
     /**
@@ -107,6 +111,7 @@ export class OIDFilter extends Struct {
       OIDFilter filters<0..2^16-1>;
    } OIDFilterExtension;
    ```
+   @extends {Struct}
  */
 export class OIDFilterExtension extends Struct {
     /**
@@ -128,6 +133,7 @@ export class OIDFilterExtension extends Struct {
  * ```
  * struct {} PostHandshakeAuth;
  * ```
+ * @extends {Struct}
  */
 export class PostHandshakeAuth extends Struct {
     static a(): PostHandshakeAuth;
@@ -140,6 +146,7 @@ export class PostHandshakeAuth extends Struct {
       Extension extensions<0..2^16-1>;
    } EncryptedExtensions;
    ```
+   @extends {Struct}
  */
 export class EncryptedExtensions extends Struct {
     /**
@@ -180,19 +187,19 @@ export class EncryptedExtensions extends Struct {
       MUST be specified, and other extensions may optionally be included
       if defined for this message.  Clients MUST ignore unrecognized
       extensions.
-   
+   @extends {Struct}
  */
 export class CertificateRequest extends Struct {
     /**
      * Create CertificateRequest
      * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    static a(signature_algorithms: SignatureSchemeList): CertificateRequest;
+    static a(signature_algorithms?: Uint8Array): CertificateRequest;
     /**
      *
      * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    constructor(signature_algorithms: SignatureSchemeList);
+    constructor(signature_algorithms?: SignatureSchemeList);
     payload: () => Handshake;
     handshake: () => Handshake;
     get signature_algo(): SignatureSchemeList;

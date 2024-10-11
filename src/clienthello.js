@@ -18,9 +18,10 @@ var clientShares = await ClientShares.keyShareClientHello();
  * ```js
  * import { assertEquals } from "jsr:@std/assert/equals";
  * import { SessionId } from "./clienthello.js"
- * const seId = SessionId.new();
+ * const seId = SessionId.a();
  * assertEquals(seId.length, 33)
  * ```
+ * @extends {Minmax}
  */
 export class SessionId extends Minmax {
    #sid
@@ -82,7 +83,7 @@ class LegacyCompressionMethods extends Minmax {
    HelloRetryRequest. 
 
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.1.2
-
+   @extends {Struct}
  */
 export class ClientHello extends Struct {
    #clientShares
@@ -146,7 +147,7 @@ export class ClientHello extends Struct {
     * LegacyCompressionMethods,
     * Extensions
     * ]} Options
-    * @param {...Uint8Array} option - description
+    * @param {...Uint8Array} option - [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions]
     */
    constructor(...option) {
       const [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions] = option
@@ -253,7 +254,7 @@ export class ClientHello extends Struct {
             const length = Byte.get.BE.b16(message, pos);
             pos += 2
             const value = message.subarray(pos, pos + length);
-            return CipherSuites.a(value)
+            return CipherSuites.array(value)
          }
       },
       {

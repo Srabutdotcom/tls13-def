@@ -116,6 +116,28 @@ export class Keys {
  */
 export class Key {
     /**
+     * @returns key pair from X25519 group
+     */
+    static x25519(): Promise<Key>;
+    /**
+     * @returns key pair from secp521r1 group
+     */
+    static p521(): Key;
+    /**
+     * @returns key pair from secp384r1 group
+     */
+    static p384(): Promise<Key>;
+    /**
+     * @returns key pair from secp256r1 group
+     */
+    static p256(): Promise<Key>;
+    /**
+     *
+     * @param {Array<KeyShareEntry>} clientShares
+     * @returns
+     */
+    static match(clientShares: Array<KeyShareEntry>): Promise<Key>;
+    /**
      *
      * @param {CryptoKeyPair} v
      */
@@ -140,6 +162,11 @@ export class Key {
         name: string;
         namedCurve: string;
     };
+    get keypair(): CryptoKeyPair;
+    /**
+     * @param {KeyShareEntry} keyShareEntry - description
+     */
+    set clientShare(keyShareEntry: KeyShareEntry);
     #private;
 }
 /**

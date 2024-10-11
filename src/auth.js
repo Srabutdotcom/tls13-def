@@ -12,6 +12,12 @@ import { Extensions } from "./extension/extension.js";
 import { SignatureScheme } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
 
+
+/**
+ * CertificateType Byte with value either 1 or 2
+ *
+ * @extends {Uint8}
+ */
 class CertificateType extends Uint8 {
     static X509 = CertificateType.a(0);
     static RawPublicKey = CertificateType.a(2)
@@ -29,6 +35,7 @@ class CertificateType extends Uint8 {
 
 /**
  * CertificateEntry
+ * 
  * ```
  *  struct {    
         select (certificate_type) {
@@ -41,18 +48,25 @@ class CertificateType extends Uint8 {
         Extension extensions<0..2^16-1>;
     } CertificateEntry;
    ```
+ * @extends {Struct}
  */
 export class CertificateEntry extends Struct {
     /**
      * new CertificateEntry
+     *
+     * @static
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
-     * @param {Uint8Array} extensions - optional with default value of Uint8Array([0,0])
+     * @param {Uint8Array} [extensions=Extensions.certificateEntry()] - optional with default value of Uint8Array([0,0])
+     * @returns {CertificateEntry}
      */
     static a(certificate, extensions =Extensions.certificateEntry()) { return new CertificateEntry(certificate, extensions) }
     /**
-     * 
+     * new CertificateEntry
+     *
+     * @static
      * @param {Uint8Array} certificate - type either "ASN1 SPKI" or "X509"
-     * @param {Uint8Array} extensions - optional with default value of Uint8Array([0,0])
+     * @param {Uint8Array} [extensions=Extensions.certificateEntry()] - optional with default value of Uint8Array([0,0])
+     * @returns {CertificateEntry}
      */
     constructor(certificate, extensions = Extensions.certificateEntry()) {
         super(
@@ -61,14 +75,17 @@ export class CertificateEntry extends Struct {
         )
     }
 }
+
 /**
  * Certificate
+ * 
  * ```
  * struct {
         opaque certificate_request_context<0..2^8-1>;
         CertificateEntry certificate_list<0..2^24-1>;
    } Certificate;
    ```
+ * @extends {Struct}
  */
 export class Certificate extends Struct {
     static typeDesc = {
@@ -78,10 +95,9 @@ export class Certificate extends Struct {
         OpenPGP: 1,
         /**@type {2} RawPublicKey - description */
         RawPublicKey: 2, /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
-        [Enum.max]: 255,
-        [Enum.class]: CertificateType
     }
-    static types = new Enum(Certificate.typeDesc)
+    /**@type {Certificate.typeDesc} types - description */
+    static types = new Enum(Certificate.typeDesc, 255, CertificateType)
 
     /**
      * Create Certificate
@@ -132,6 +148,7 @@ export class Certificate extends Struct {
      opaque signature<0..2^16-1>;
    } CertificateVerify;
    ```
+ * @extends {Struct}
  */
 export class CertificateVerify extends Struct {
     /**
@@ -192,6 +209,7 @@ export class CertificateVerify extends Struct {
     opaque verify_data[Hash.length];
    } Finished;
    ```
+ * @extends {Struct}
  */
 export class Finished extends Struct {
     /**
