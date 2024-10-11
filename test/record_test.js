@@ -47,7 +47,7 @@ e5 60 e4 bd 43 d2 3d 8e 43 5a 7d ba fe b3 c0 6e 51 c1 3c ae 4d
    }
 )
 
-const clienthello = `16 03 01 00 c4 01 00 00 c0 03 03 cb
+/* const clienthello = `16 03 01 00 c4 01 00 00 c0 03 03 cb
 34 ec b1 e7 81 63 ba 1c 38 c6 da cb 19 6a 6d ff a2 1a 8d 99 12
 ec 18 a2 ef 62 83 02 4d ec e7 00 00 06 13 01 13 03 13 02 01 00
 00 91 00 00 00 0b 00 09 00 00 06 73 65 72 76 65 72 ff 01 00 01
@@ -61,7 +61,7 @@ e5 60 e4 bd 43 d2 3d 8e 43 5a 7d ba fe b3 c0 6e 51 c1 3c ae 4d
       //const rcd = TLSPlaintext.parse(new Uint8Array(clienthello));
       const sh = await ServerHello.tlsPlaintext(new Uint8Array(clienthello))
       debugger;
-
+ */
 
 
 

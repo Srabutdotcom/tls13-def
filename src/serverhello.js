@@ -102,7 +102,6 @@ export class ServerHello extends Struct {
          LegacyCompressionMethod.a(),
          extensions
       )
-      this.#key = key
    }
    /**
     * 
