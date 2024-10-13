@@ -45,14 +45,21 @@
        * @param {Extension} serverShareExtension
        * @param {Key} key - Key object container
        */
-      static a(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension, key: Uint8Array): ServerHello;
+      static a(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension, key: any): ServerHello;
+      static sequence: {
+          name: string;
+          /**
+           * @param {Uint8Array} message - description
+           * @param {number} pos - description
+           **/
+          value(message: Uint8Array, pos: number): any;
+      }[];
+      static parse(message: any): ServerHello;
       /**
        *
-       * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
-       * @param {CipherSuite} cipher - selected cipher
-       * @param {Extension} serverShareExtension
+       * @param {[ProtocolVersion, Random, SessionId, CipherSuite, LegacyCompressionMethod, Extensions]} option
        */
-      constructor(sessionId: Uint8Array, cipher: CipherSuite, serverShareExtension: Extension);
+      constructor(option_0: ProtocolVersion, option_1: Random, option_2: SessionId, option_3: CipherSuite, option_4: LegacyCompressionMethod, option_5: Extensions);
       payload: () => Handshake;
       handshake: () => Handshake;
       /**
@@ -60,7 +67,13 @@
        * @return {Handshake} message
        */
       wrap(): Handshake;
+      /**@type {Key} v - Key Object */
+      set key(v: Key);
       get key(): Key;
+      set supportedVersion(v: ProtocolVersion);
+      get supportedVersion(): ProtocolVersion;
+      set serverShare(v: KeyShareEntry);
+      get serverShare(): KeyShareEntry;
       /**@return {ProtocolVersion}  - Uint16 */
       get version(): ProtocolVersion;
       /**@return {Random} 32 byte random */
@@ -79,7 +92,7 @@
   import { Handshake } from "../src/handshake.js";
   import { CipherSuite } from "../src/keyexchange.js";
   import { Extension } from "../src/extension/extension.js";
-  import { Key } from "../src/extension/keyshare.js";
+  import { Key, KeyShareEntry } from "../src/extension/keyshare.js";
   import { ProtocolVersion } from "../src/keyexchange.js";
   import { Random } from "../src/keyexchange.js";
 
