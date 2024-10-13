@@ -44,7 +44,7 @@ export class ServerHello extends Struct {
    /**@type {ProtocolVersion} #supportedVersion */
    #supportedVersion 
    /**@type {KeyShareEntry} #serverShare - description */
-   #serverShare
+   #serverShare = KeyShareEntry
 
    /**
     * 
