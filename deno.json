@@ -1,6 +1,6 @@
 {
   "name": "@tls/def",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "exports": "./src/mod.js",
   "publish": {
     "exclude": ["dist/"]
