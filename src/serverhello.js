@@ -1,15 +1,13 @@
 // deno-lint-ignore-file no-slow-types
 // @ts-self-types="../type/serverhello.d.ts"
-import { Uint8 } from "./base.js";
-import { Struct } from "./base.js";
-import { ClientHello } from "./clienthello.js";
+import { Uint8, Struct } from "./base.js";
+import { ClientHello, SessionId } from "./clienthello.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { Handshake } from "./handshake.js";
-import { ProtocolVersion, Random } from "./keyexchange.js";
-import { CipherSuite } from "./keyexchange.js";
+import { ProtocolVersion, Random, CipherSuite } from "./keyexchange.js";
 import { TLSPlaintext } from "./record.js";
-import { Key } from "./extension/keyshare.js";
-import { KeyShareServerHello } from "./extension/keyshare.js";
+import { Key, KeyShareServerHello, KeyShareEntry } from "./extension/keyshare.js";
+import { Byte } from "./deps.js"
 
 /**
  * ServerHello data structure
@@ -43,6 +41,11 @@ export class ServerHello extends Struct {
    #cipherSuite = CipherSuite
    /**@type {Key} #key - Key object container */
    #key
+   /**@type {ProtocolVersion} #supportedVersion */
+   #supportedVersion 
+   /**@type {KeyShareEntry} #serverShare - description */
+   #serverShare
+
    /**
     * 
     * @param {TLSPlaintext} record 
@@ -77,24 +80,11 @@ export class ServerHello extends Struct {
     * @param {Key} key - Key object container
     */
    static a(sessionId, cipher, serverShareExtension, key){
-      const serverHello = new ServerHello(sessionId, cipher, serverShareExtension)
-      serverHello.key = key 
-      return serverHello
-   }
-   payload = this.wrap
-   handshake = this.wrap
-   /**
-    * 
-    * @param {Uint8Array} sessionId - opaque legacy_session_id_echo<0..32>;
-    * @param {CipherSuite} cipher - selected cipher
-    * @param {Extension} serverShareExtension 
-    */
-   constructor(sessionId, cipher, serverShareExtension){
       const extensions = Extensions.serverHello(
          Extension.supported_versions.server,
          serverShareExtension
       )
-      super(
+      const serverHello = new ServerHello(
          ProtocolVersion.version.legacy,
          Random.a(),
          sessionId,
@@ -102,6 +92,27 @@ export class ServerHello extends Struct {
          LegacyCompressionMethod.a(),
          extensions
       )
+      serverHello.key = key 
+      return serverHello
+   }
+   payload = this.wrap
+   handshake = this.wrap
+   /**
+    * 
+    * @param {[ProtocolVersion, Random, SessionId, CipherSuite, LegacyCompressionMethod, Extensions]} option
+    */
+   constructor(...option){
+      const [version, random, sessionId, cipher, compression = LegacyCompressionMethod.a(), extensions] = option
+      super(
+         version,
+         random,
+         sessionId,
+         cipher,
+         compression,
+         extensions
+      )
+      this.#serverShare = extensions.key_share.server_share
+      this.#supportedVersion = extensions.supported_versions
    }
    /**
     * 
@@ -113,6 +124,10 @@ export class ServerHello extends Struct {
    /**@type {Key} v - Key Object */
    set key(v){this.#key = v}
    get key(){return this.#key}
+   set supportedVersion(v){this.#supportedVersion = v}
+   get supportedVersion(){ return this.#supportedVersion}
+   set serverShare(v){this.#serverShare = v}
+   get serverShare(){return this.#serverShare}
    /**@return {ProtocolVersion}  - Uint16 */
    get version() { return this.member[0] }
    /**@return {Random} 32 byte random */
@@ -125,6 +140,85 @@ export class ServerHello extends Struct {
    get compression() { return this.member[4] }
    /**@return {Extensions} extentions */
    get extensions() { return this.member[5] }
+   
+   static sequence = [
+      {
+         name: "version",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const value = Byte.get.BE.b16(message);
+            return ProtocolVersion.a(value)
+         }
+      },
+      {
+         name: "random",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const value = message.subarray(2, 34);
+            return Random.a(value)
+         }
+      },
+      {
+         name: "sessionId",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message) {
+            const length = Byte.get.BE.b8(message, 34);
+            if (length > 0) {
+               const value = message.subarray(35, 67)//34+33
+               return SessionId.a(value)
+            }
+            return new Uint8(0)
+         }
+      },
+      {
+         name: "cipher",
+         value(message, pos){
+            const value = message.subarray(pos, pos+2);
+            if(value.at(0)!==0x13)throw TypeError(`illegal_parameter`)
+            return CipherSuite.a(value.at(1));
+         }
+      },
+      {
+         name: "compression",
+         value(message, pos){
+            const value = message.subarray(pos, pos+1);
+            if(value.at(0)!==0)throw TypeError(`illegal_parameter`)
+            return LegacyCompressionMethod.a()
+         }
+      },
+      {
+         name: "extensions",
+         /**
+          * @param {Uint8Array} message - description 
+          * @param {number} pos - description
+          **/
+         value(message, pos) {
+            const length = Byte.get.BE.b16(message, pos);
+            pos += 2
+            const value = message.subarray(pos, pos + length);
+            return Extension.parse(value, "serverHello")
+         }
+      }
+   ]
+   static parse(message) {
+      const data = {}
+      let offset = 0;
+      for (const { name, value } of ServerHello.sequence) {
+         data[name] = value(message, offset);
+         offset += data[name].length
+      }
+      const {version, random, sessionId, cipher, compression , extensions} = data
+      return new ServerHello(version, random, sessionId, cipher, compression , extensions)
+   }
 }
 
 class LegacyCompressionMethod extends Uint8 {

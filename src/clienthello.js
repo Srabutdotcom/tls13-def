@@ -139,15 +139,7 @@ export class ClientHello extends Struct {
 
    /**
     * create ClientHello
-    * @typedef {[
-    * ProtocolVersion,
-    * Random,
-    * SessionId,
-    * CipherSuites,
-    * LegacyCompressionMethods,
-    * Extensions
-    * ]} Options
-    * @param {...Uint8Array} option - [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions]
+    * @param {[ProtocolVersion,Random,SessionId,CipherSuites,LegacyCompressionMethods,Extensions]} option - [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions]
     */
    constructor(...option) {
       const [version, random, sessionId, ciphers, compression = LegacyCompressionMethods.a(), extensions] = option
@@ -193,7 +185,7 @@ export class ClientHello extends Struct {
    /**@return {Uint8Array} description */
    get sessionTicket() { return this.#sessionTicket }
    /**@return {Array<ProtocolVersion>} description */
-   get supportedVersions() { return this.supportedVersions }
+   get supportedVersions() { return this.#supportedVersions }
    /**@return {Array<SignatureScheme>} description */
    get signatureAlgorithms() { return this.#signatureAlgorithms }
    /**@return {Array<PskKeyExchangeMode>} description */
@@ -294,8 +286,8 @@ export class ClientHello extends Struct {
          data[name] = value(message, offset);
          offset += data[name].length
       }
-      const {version, random, sessionId, ciphers, compression , extensions} = data
-      return ClientHello.a(version, random, sessionId, ciphers, compression , extensions)
+      const { version, random, sessionId, ciphers, compression, extensions } = data
+      return ClientHello.a(version, random, sessionId, ciphers, compression, extensions)
    }
 }
 

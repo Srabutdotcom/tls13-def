@@ -32,7 +32,7 @@ class ContentType extends Uint8 {
          default: return Handshake
       }
    }
-   get name(){
+   get name() {
       switch (this.value()) {
          case 0: return 'Invalid'
          case 20: return 'ChangeCipherSpec'
@@ -40,9 +40,9 @@ class ContentType extends Uint8 {
          case 22: return 'Handshake'
          case 23: return 'TLSCiphertext' // Application Data
          default: return 'Invalid'
-      }      
+      }
    }
-   toString(){ return this.name }
+   toString() { return this.name }
 }
 
 /**
@@ -79,7 +79,7 @@ export class TLSPlaintext extends Struct {
       heartbeat: 24, /* RFC 6520 */
 
    }
-/**@type {TLSPlaintext.types} contentType - in the form of ContentType */
+   /**@type {TLSPlaintext.types} contentType - in the form of ContentType */
    static contentType = new Enum(TLSPlaintext.types, 255, ContentType)
    /**
     * 
@@ -123,7 +123,7 @@ export class TLSPlaintext extends Struct {
     * @param {ContentType} type 
     * @return {TLSPlaintext} 
     */
-   static a(fragment, type){ return new TLSPlaintext(fragment, type)}
+   static a(fragment, type) { return new TLSPlaintext(fragment, type) }
 
    /**
     * @param {Uint8Array} fragment - the data being transmitted
@@ -149,8 +149,11 @@ export class TLSPlaintext extends Struct {
    /**
     * @return {ContentType} 
     */
-   get type(){return this.member[0]}
-   get fragment(){return this.#fragment}
+   get type() { return this.member[0] }
+   get version() { return this.member[1] }
+   get recordLength() { return this.member[2] }
+   get fragment() { return this.#fragment }
+   get message() { return this.fragment.message }
    static sequence = [
       {
          name: "type",
@@ -185,7 +188,7 @@ export class TLSPlaintext extends Struct {
           * @returns 
           */
          value(record, length, type) {
-            const content = record.subarray(5, length);
+            const content = record.subarray(5, 5 + length);
             return type.klas.parse(content)
          }
       }
