@@ -140,6 +140,15 @@ export class ServerHello extends Struct {
    get compression() { return this.member[4] }
    /**@return {Extensions} extentions */
    get extensions() { return this.member[5] }
+
+   /**@type {256|384} sha - hash bits length: 256|384 */
+   get sha(){ return this.cipher.SHA}
+   /**@type {32 | 48} shaLength - hash byte length: 32|48*/
+   get shaLength(){return this.sha / 8}
+   /**@type {128|256} aead - AEAD or key bits length: 128|256 */
+   get aead(){ return this.cipher.AEAD}
+   /**@type {16|32} aeadLength - AEAD or key byte length: 16|32 */
+   get aeadLength(){ return this.aead / 8}
    
    static sequence = [
       {

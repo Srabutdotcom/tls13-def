@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-slow-types
 // @ts-self-types="../type/base.d.ts"
-import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint } from "@aicone/byte";
-import { getUint8, getUint16, getUint24, getUint32 } from "@aicone/byte";
+import { concat, Uint8BE, Uint16BE, Uint24BE, Uint32BE, maxBytes, uint } from "./deps.js";
+import { getUint8, getUint16, getUint24, getUint32 } from "./deps.js";
 
 /**
  * Struct definition
