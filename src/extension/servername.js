@@ -16,7 +16,7 @@ import { Byte, uint8array } from "../deps.js"
 
 class HostName extends Uint8 {
    static a = new HostName
-   constructor(){super(0)}
+   constructor() { super(0) }
 }
 
 /**
@@ -61,7 +61,7 @@ export class ServerName extends Struct {
       const dec = new TextDecoder;
       return dec.decode(this.#hostname)
    }
-   toString(){return this.hostname}
+   toString() { return this.hostname }
 }
 /**
  * ServerNameList
@@ -92,7 +92,8 @@ export class ServerNameList extends Struct {
     * @return ServerNameList 
     */
    static list(...serverName) {
-      serverName = serverName.map(name => new ServerName(name));
+      if (serverName.length == 0) throw TypeError(`Expected at least one servername`)
+      serverName = serverName.map(name => new ServerName(name))
       return new ServerNameList(...serverName)
    }
    /**
@@ -102,17 +103,18 @@ export class ServerNameList extends Struct {
       super(
          Minmax.min(1).max(2 ** 16 - 1).byte(...server_name_list)//new OpaqueVar(server_name_list, 1, 2 ** 16 - 1)
       )
-      for(const serverName of server_name_list){
+      for (const serverName of server_name_list) {
          this.#serverNames.push(serverName.hostname)
       }
    }
-   get serverNames(){return this.#serverNames}
+   get serverNames() { return this.#serverNames }
 
    /**
     * 
     * @param {Uint8Array} data 
     */
    static parse(data) {
+      if (data.length == 0) return new Uint8Array;
       let pos = 0;
       const serverNames = []
       const lengthTotal = Byte.get.BE.b16(data); pos += 2;
@@ -128,5 +130,6 @@ export class ServerNameList extends Struct {
       //return serverNames
       return ServerNameList.list(...serverNames)
    }
-
 }
+
+//npx -p typescript tsc ./src/extension/servername.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

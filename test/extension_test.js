@@ -7,7 +7,7 @@ import { NamedGroupList } from "../src/extension/namedgroup.js";
 import { ClientShares, ServerShare } from "../src/extension/keyshare.js";
 import { KeyShareClientHello, KeyShareServerHello } from "../src/extension/keyshare.js";
 import { Extensions, Extension } from "../src/extension/extension.js";
-import { KeyExchange } from "../src/extension/keyshare.js";
+import { KeyExchange, Key } from "../src/extension/keyshare.js";
 
 
 Deno.test(
@@ -93,4 +93,3 @@ Deno.test(
       assertEquals(Array.from(extensions), [0, 0])
    }
 )
-

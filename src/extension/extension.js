@@ -11,6 +11,7 @@ import { NamedGroupList } from "./namedgroup.js";
 import { Enum, Struct, Uint16, Minmax } from "../base.js";
 import { ServerNameList } from "./servername.js"
 import { uint8array, Byte } from "../deps.js"
+import { RecordSizeLimit } from "./recordsizelimit.js";
 
 class ExtensionType extends Uint16 {
    #value
@@ -40,6 +41,7 @@ class ExtensionType extends Uint16 {
          case 0: return ServerNameList
          case 10: return NamedGroupList
          case 13: return SignatureSchemeList
+         case 28: return RecordSizeLimit
          case 43: return SupportedVersions
          case 45: return PskKeyExchangeModes
          case 51: {
@@ -100,6 +102,8 @@ export class Extension extends Struct {
       server_certificate_type: 20,                /* RFC 7250 */
       /** @type {21} :     padding */
       padding: 21,                                /* RFC 7685 */
+      /** @type {28} :     record_size_limit */
+      record_size_limit: 28,                      /* RFC 8449 */
       /** @type {35} :     session_ticket */
       session_ticket: 35,                         /* [RFC5077][RFC8447] */
       /** @type {41} :     pre_shared_key */
@@ -125,11 +129,8 @@ export class Extension extends Struct {
       /** @type {51} :     key_share */
       key_share: 51,                              /* RFC 8446 */
       renegotiation_info: 65281,                  /* RFC 5746 */
-      /** @type {65535} :     Max */
-      [Enum.max]: 65535,
-      [Enum.class]: ExtensionType
    }
-   static types = new Enum(Extension.typeDesc)
+   static types = new Enum(Extension.typeDesc, 65535, ExtensionType)
    /**
     * new Extension
     * @param {ExtensionType} extensionType 
@@ -186,11 +187,11 @@ export class Extension extends Struct {
    get data() {
       return this.#data
    }
-   get type(){return this.#type}
+   get type() { return this.#type }
    /**
     * Parse extensions data
     * @param {Uint8Array} extsData 
-    * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"} klas - description
+    * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"|"encryptedExtensions"|"certificateRequest"|"certificateEntry"|"newSessionTicket"} klas - description
     */
    static parse(extsData, klas) {
 
@@ -201,11 +202,11 @@ export class Extension extends Struct {
          const length = Byte.get.BE.b16(extsData, pos); pos += 2
          const data = extsData.subarray(pos, pos + length); pos += length;
          const parser = type.klas(klas)
-
-         //extensions[type.name] = parser ? parser.parse(data, klas) : data
-         extensions.push(Extension.a(parser ? parser.parse(data, klas) : data, type))
+         const extension = Extension.a(parser ? parser.parse(data, klas) : data, type); 
+         extensions.push(extension)
          if (pos >= extsData.length - 1) break;
       }
+      if (klas == "keyShareHelloRetryRequest") return extensions[0]
       return Extensions[klas](...extensions)
    }
 }
@@ -237,12 +238,12 @@ export class Extensions extends Minmax {
     * @param  {...Extension} extensions 
     * @return
     */
-   static certificateEntry(...extensions) { return new Extensions(0, ...extensions) }
+   static certificateEntry = Extensions.encryptedExtensions/* (...extensions) { return new Extensions(0, ...extensions) }
    /**
     * @param  {...Extension} extensions 
     * @return
     */
-   static newSessionTicket(...extensions) { return new Extensions(0, ...extensions) }
+   static newSessionTicket = Extensions.encryptedExtensions/*(...extensions) { return new Extensions(0, ...extensions) }
    /**
     * @param  {...Extension} extensions 
     * @return
@@ -259,7 +260,7 @@ export class Extensions extends Minmax {
     */
    constructor(m, ...extensions) {
       super(m, 2 ** 16 - 1, ...extensions)
-      for(const member of extensions){
+      for (const member of extensions) {
          this[member.name] = member.data;
       }
    }

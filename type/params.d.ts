@@ -155,6 +155,14 @@ export class EncryptedExtensions extends Struct {
      */
     static a(...extensions: Extension[]): EncryptedExtensions;
     /**
+     * Parse EncryptedExtensions
+     *
+     * @static
+     * @param {Uint8Array} octet
+     * @returns {Extension}
+     */
+    static parse(octet: Uint8Array): Extension;
+    /**
      *
      * @param {...Extension} extensions
      */
@@ -199,7 +207,7 @@ export class CertificateRequest extends Struct {
      *
      * @param {SignatureSchemeList} signature_algorithms - Uint8Array of signature algorithm
      */
-    constructor(signature_algorithms?: SignatureSchemeList);
+    constructor(signature_algorithms?: Uint8Array);
     payload: () => Handshake;
     handshake: () => Handshake;
     get signature_algo(): SignatureSchemeList;

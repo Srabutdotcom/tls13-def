@@ -12,6 +12,7 @@ import { Minmax, Struct } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { SignatureSchemeList } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
+import { Byte } from "./deps.js"
 
 /**
  * opaque DistinguishedName<1..2^16-1>
@@ -229,6 +230,20 @@ export class EncryptedExtensions extends Struct {
     */
    wrap(){
       return Handshake.encrypted_extensions(this)
+   }
+
+   
+   /**
+    * Parse EncryptedExtensions
+    *
+    * @static
+    * @param {Uint8Array} octet
+    * @returns {Extension}
+    */
+   static parse(octet){
+      const length = Byte.get.BE.b16(octet);
+      const content = octet.subarray(2, 2 + length);
+      return Extension.parse(content, "encryptedExtensions")
    }
 }
 

@@ -15,9 +15,8 @@
    } Extension;
    ```
  */
-export class Extension extends Struct {
+   export class Extension extends Struct {
     static typeDesc: {
-        [x: symbol]: 65535 | typeof ExtensionType;
         /** @type {0} :     server_name */
         server_name: 0;
         /** @type {1} :     max_fragment_length */
@@ -42,6 +41,8 @@ export class Extension extends Struct {
         server_certificate_type: 20;
         /** @type {21} :     padding */
         padding: 21;
+        /** @type {28} :     record_size_limit */
+        record_size_limit: 28;
         /** @type {35} :     session_ticket */
         session_ticket: 35;
         /** @type {41} :     pre_shared_key */
@@ -102,9 +103,9 @@ export class Extension extends Struct {
     /**
      * Parse extensions data
      * @param {Uint8Array} extsData
-     * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} klas - description
+     * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"|"encryptedExtensions"|"certificateRequest"|"certificateEntry"|"newSessionTicket"} klas - description
      */
-    static parse(extsData: Uint8Array, klas: "ClientHello" | "ServerHello" | "KeyShareHelloRetryRequest"): {};
+    static parse(extsData: Uint8Array, klas: "clientHello" | "serverHello" | "keyShareHelloRetryRequest" | "encryptedExtensions" | "certificateRequest" | "certificateEntry" | "newSessionTicket"): Extension | Extensions;
     /**
      *
      * @param {ExtensionType} extensionType
@@ -114,6 +115,7 @@ export class Extension extends Struct {
     /**@return {string} description */
     get name(): string;
     get data(): Uint8Array;
+    get type(): ExtensionType;
     #private;
 }
 /**
@@ -139,17 +141,9 @@ export class Extensions extends Minmax {
      * @param  {...Extension} extensions
      * @return
      */
-    static certificateEntry(...extensions: Extension[]): Extensions;
-    /**
-     * @param  {...Extension} extensions
-     * @return
-     */
-    static newSessionTicket(...extensions: Extension[]): Extensions;
-    /**
-     * @param  {...Extension} extensions
-     * @return
-     */
-    static clientHello(...extensions: Extension[]): Extensions;
+    static certificateEntry: typeof Extensions.encryptedExtensions;
+    static newSessionTicket: typeof Extensions.encryptedExtensions;
+    static clientHello(...extensions: any[]): Extensions;
     /**
      * @param  {...Extension} extensions
      * @return
@@ -161,7 +155,7 @@ export class Extensions extends Minmax {
      */
     constructor(m: number, ...extensions: Extension[]);
 }
-import { Struct } from "../../src/base.js";
+
 declare class ExtensionType extends Uint16 {
     /**
      * @param {number} v
@@ -173,13 +167,13 @@ declare class ExtensionType extends Uint16 {
      */
     get name(): string;
     /**
-     * @param {"ClientHello"|"ServerHello"|"KeyShareHelloRetryRequest"} type
+     * @param {"clientHello"|"serverHello"|"keyShareHelloRetryRequest"} type
      * @returns {ServerNameList|NamedGroupList|SignatureSchemeList|PskKeyExchangeModes|KeyShareClientHello|KeyShareServerHello|KeyShareHelloRetryRequest|false}
      */
-    klas(type: "ClientHello" | "ServerHello" | "KeyShareHelloRetryRequest"): ServerNameList | NamedGroupList | SignatureSchemeList | PskKeyExchangeModes | KeyShareClientHello | KeyShareServerHello | KeyShareHelloRetryRequest | false;
+    klas(type: "clientHello" | "serverHello" | "keyShareHelloRetryRequest"): ServerNameList | NamedGroupList | SignatureSchemeList | PskKeyExchangeModes | KeyShareClientHello | KeyShareServerHello | KeyShareHelloRetryRequest | false;
     #private;
 }
-import { Enum } from "../../src/base.js";
+import { Enum, Struct } from "../../src/base.js";
 import { Minmax } from "../../src/base.js";
 import { Uint16 } from "../../src/base.js";
 import { ServerNameList } from "../../src/extension/servername.js";
