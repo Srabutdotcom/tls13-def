@@ -138,53 +138,53 @@
 export class TLSInnerPlaintext extends Struct {
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static alert: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static alert: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static application_data: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static application_data: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static change_cipher_spec: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static change_cipher_spec: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static handshake: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static handshake: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static heartbeat: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static heartbeat: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {number} zeros
      * @returns
      */
-    static invalid: (content: TLSPlaintext, zeros: number) => TLSInnerPlaintext;
+    static invalid: (content: Uint8Array, zeros: number) => TLSInnerPlaintext;
     /**
      *
-     * @param {TLSPlaintext} content
+     * @param {Uint8Array} content
      * @param {ContentType} type
      * @param {number} zeros - the number of zero's length
      */
-    constructor(content: TLSPlaintext, type: ContentType, zeros: number);
+    constructor(content: Uint8Array, type: ContentType, zeros: number);
 }
 /**
  * Application Data

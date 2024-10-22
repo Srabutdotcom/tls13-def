@@ -26,6 +26,13 @@
      */
     static a(certificate: Uint8Array, extensions?: Uint8Array): CertificateEntry;
     /**
+     *
+     * @param {Uint8Array} octet
+     * @param {number} pos
+     * @returns
+     */
+    static parse(octet: Uint8Array, pos: number): CertificateEntry;
+    /**
      * new CertificateEntry
      *
      * @static
@@ -70,6 +77,19 @@ export class Certificate extends Struct {
      * @returns {Certificate}
      */
     static certificateEntries(...certs: CertificateEntry[]): Certificate;
+    static sequence: ({
+        name: string;
+        value(octet?: Uint8Array): CertificateRequestContext;
+    } | {
+        name: string;
+        value(octet: any): CertificateEntry[];
+    })[];
+    /**
+     *
+     * @param {Uint8Array} octet
+     * @returns
+     */
+    static parse(octet: Uint8Array): Certificate;
     /**
      *
      * @param {CertificateEntry[]} certificate_list - list of CertificateEntry
@@ -83,6 +103,8 @@ export class Certificate extends Struct {
     * @return {Handshake} message
     */
     wrap(): Handshake;
+    get certificate_list(): CertificateEntry[];
+    #private;
 }
 /**
  * CertificateVerify
@@ -200,7 +222,7 @@ export class Finished extends Struct {
      * @param {Uint8Array} verify_data
      * @returns
      */
-    static "new"(verify_data: Uint8Array): Finished;
+    static a(verify_data: Uint8Array): Finished;
     /**
      *
      * @param {Uint8Array} verify_data - with length the same as hash length
@@ -214,6 +236,28 @@ export class Finished extends Struct {
     */
     wrap(): Handshake;
 }
-import { Struct } from "../src/base.js";
+
+/**
+ * ```
+ * opaque certificate_request_context<0..2^8-1>;
+ * ```
+ */
+declare class CertificateRequestContext extends Minmax {
+    /**
+     *
+     * @param {Uint8Array} context
+     * @returns {CertificateRequestContext}
+     */
+    static context(context: Uint8Array): CertificateRequestContext;
+    /**
+     *
+     * @param {Uint8Array} context
+     * @returns {CertificateRequestContext}
+     */
+    constructor(context: Uint8Array);
+    get certificate_request_context(): Uint8Array;
+    #private;
+}
+import { Struct, Minmax } from "../src/base.js";
 import { Handshake } from "../src/handshake.js";
 import { SignatureScheme } from "../src/extension/signaturescheme.js";

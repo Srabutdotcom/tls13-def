@@ -11,6 +11,8 @@ import { Enum, Minmax, Struct, Uint8 } from "./base.js";
 import { Extensions } from "./extension/extension.js";
 import { SignatureScheme } from "./extension/signaturescheme.js";
 import { Handshake } from "./handshake.js";
+import { Byte } from "./deps.js"
+import { Extension } from "./extension/extension.js";
 
 
 /**
@@ -31,6 +33,30 @@ class CertificateType extends Uint8 {
      * @returns 
      */
     constructor(value) { super(value) }
+}
+/**
+ * ```
+ * opaque certificate_request_context<0..2^8-1>;
+ * ```
+ */
+class CertificateRequestContext extends Minmax {
+    #certificate_request_context
+    /**
+     * 
+     * @param {Uint8Array} context 
+     * @returns {CertificateRequestContext}
+     */
+    static context(context){ return new CertificateRequestContext(context)}
+    /**
+     * 
+     * @param {Uint8Array} context 
+     * @returns {CertificateRequestContext}
+     */
+    constructor(context){
+        super(0, 255, context)
+        this.#certificate_request_context = context
+    }
+    get certificate_request_context(){return this.#certificate_request_context}
 }
 
 /**
@@ -74,6 +100,21 @@ export class CertificateEntry extends Struct {
             extensions
         )
     }
+    /**
+     * 
+     * @param {Uint8Array} octet 
+     * @param {number} pos 
+     * @returns 
+     */
+    static parse(octet, pos){
+        let offset = pos;
+        let length = Byte.get.BE.b24(octet, offset);offset+=3;
+        const certificate = octet.subarray(offset, offset+length);offset+=length;
+        length = Byte.get.BE.b16(octet, offset); offset+=2
+        if(length ==0)return CertificateEntry.a(certificate);
+        const extensions = Extension.parse(octet.subarray(offset, offset+length));
+        return CertificateEntry.a(certificate, extensions)
+    }
 }
 
 /**
@@ -88,6 +129,7 @@ export class CertificateEntry extends Struct {
  * @extends {Struct}
  */
 export class Certificate extends Struct {
+    #certificate_list
     static typeDesc = {
         /**@type {0} X509 - description */
         X509: 0,
@@ -114,7 +156,9 @@ export class Certificate extends Struct {
              */
             contexts(reqContexts) {
                 const certificate_request_context = Minmax.min(0).max(2 ** 8 - 1).byte(reqContexts);
-                return new Certificate(certificate_list, certificate_request_context)
+                const certificate = new Certificate(certificate_list, certificate_request_context)
+                certificate.certificate_list = certs 
+                return certificate
             }
         }
     }
@@ -130,6 +174,7 @@ export class Certificate extends Struct {
             certificate_request_context,
             certificate_list
         )
+        //this.#certificate_list = certificate_list
     }
     /**
     * 
@@ -137,6 +182,53 @@ export class Certificate extends Struct {
     */
     wrap() {
         return Handshake.certificate(this)
+    }
+    get certificate_list(){return this.#certificate_list}
+    
+    /**
+     * Add array of certificate
+     *
+     * @type {Uint8Array}
+     */
+    set certificate_list(v){this.#certificate_list = v}
+    static sequence = [
+        {
+            name: "certificate_request_context",
+            value(octet = new Uint8Array){
+                const length = Byte.get.BE.b8(octet);
+                return CertificateRequestContext.context(octet.subarray(1, 1+length));
+            }
+        },
+        {
+            name: "certificate_list",
+            value(octet, pos){
+                const length = Byte.get.BE.b24(octet, pos);pos+=3
+                const certs =  octet.subarray(pos, pos+length)
+                const list = []
+                let offset = 0
+                while (true){
+                    const certificateEntry = CertificateEntry.parse(certs, offset);
+                    offset += certificateEntry.length;
+                    list.push(certificateEntry)
+                    if(offset>= certs.length-1)break;
+                }
+                return list
+            }
+        }
+    ]
+    /**
+     * 
+     * @param {Uint8Array} octet 
+     * @returns 
+     */
+    static parse(octet){
+        const data = {}
+        let offset = 0;
+        for (const { name, value } of Certificate.sequence) {
+            data[name] = value(octet, offset);
+            offset+= data[name].length
+        }
+        return Certificate.certificateEntries(...data["certificate_list"]).contexts(data["certificate_request_context"].certificate_request_context)
     }
 }
 
@@ -217,7 +309,7 @@ export class Finished extends Struct {
      * @param {Uint8Array} verify_data 
      * @returns 
      */
-    static new(verify_data) { return new Finished(verify_data) }
+    static a(verify_data) { return new Finished(verify_data) }
     payload = this.wrap
     handshake = this.wrap
 

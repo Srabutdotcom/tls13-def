@@ -225,42 +225,42 @@ export class TLSPlaintext extends Struct {
 export class TLSInnerPlaintext extends Struct {
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
    static alert = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.alert, zeros) }
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
    static application_data = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.application_data, zeros) }
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
    static change_cipher_spec = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.change_cipher_spec, zeros) }
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
    static handshake = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.handshake, zeros) }
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
    static heartbeat = function (content, zeros) { return new TLSInnerPlaintext(content, TLSPlaintext.contentType.heartbeat, zeros) }
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {number} zeros 
     * @returns 
     */
@@ -268,23 +268,17 @@ export class TLSInnerPlaintext extends Struct {
 
    /**
     * 
-    * @param {TLSPlaintext} content 
+    * @param {Uint8Array} content 
     * @param {ContentType} type 
     * @param {number} zeros - the number of zero's length
     */
    constructor(content, type, zeros) {
-      content = content_(content)
       type = contentType_(type);
       zeros = zeros_(zeros)
       const args = [content, type]
       if (zeros && zeros.length) args.push(zeros)
       super(...args)
    }
-}
-
-function content_(content) {
-   if (content instanceof TLSPlaintext == false) throw TypeError(`Content must be TLSPlaintext class`);
-   return content
 }
 
 function contentType_(type) {

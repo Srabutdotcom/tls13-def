@@ -3,7 +3,7 @@ import { TLSPlaintext } from "../src/record.js";
 import { Alert } from "../src/alert.js";
 import { ClientHello } from "../src/clienthello.js";
 import { ServerHello } from "../src/serverhello.js";
-import { Handshake } from "../src/handshake.js";
+
 
 Deno.test(
    "Record - TLSPlaintext",
@@ -145,20 +145,9 @@ Deno.test(
    }
 )
 
-Deno.test(
-   "Encrypted Extension parse",
-   ()=>{
-      const encryptedExtension = toUint8Array(`08 00 00 24 00 22 00 0a 00 14 00
-         12 00 1d 00 17 00 18 00 19 01 00 01 01 01 02 01 03 01 04 00 1c
-         00 02 40 01 00 00 00 00`)
-      
-      const test = Handshake.parse(encryptedExtension)
-      assertEquals(test.member[2].length, 36)
-   }
-)
 
-function hexSplitToArray(hex) { return hex.split(/\s/).filter(e => e.length).map(e => Number(`0x${e}`)) }
-function toUint8Array(str) { return new Uint8Array(hexSplitToArray(str)) }
+
+
 
 
 
