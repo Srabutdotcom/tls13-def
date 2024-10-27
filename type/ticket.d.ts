@@ -45,28 +45,93 @@
    https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.1
    @extends {Struct}
  */
-   export class NewSessionTicket extends Struct {
-    /**
-     *
-     * @param {Uint8Array} ticket
-     * @param {...Extension} extension
-     * @return
-     */
-    static a(ticket: Uint8Array, ...extension: Extension[]): NewSessionTicket;
-    /**
-     *
-     * @param {Uint8Array} ticket
-     * @param {...Extension} extension
-     */
-    constructor(ticket: Uint8Array, ...extension: Extension[]);
-    payload: () => Handshake;
-    handshake: () => Handshake;
-    /**
-     * @return {Handshake} message
-     */
-    wrap(): Handshake;
-    #private;
+export class NewSessionTicket extends Struct {
+   /**
+       * @param {Uint32} lifetime - default: Uint32(7200) - Indicates the lifetime in seconds as a 32-bit
+         unsigned integer in network byte order from the time of ticket
+         issuance.  Servers MUST NOT use any value greater than
+         604800 seconds (7 days).  The value of zero indicates that the
+         ticket should be discarded immediately.  Clients MUST NOT cache
+         tickets for longer than 7 days, regardless of the ticket_lifetime,
+         and MAY delete tickets earlier based on local policy.  A server
+         MAY treat a ticket as valid for a shorter period of time than what
+         is stated in the ticket_lifetime.
+       * @param {Uint32} ageAdd - default: Uint32(0) - A securely generated, random 32-bit value that is
+         used to obscure the age of the ticket that the client includes in
+         the "pre_shared_key" extension.  The client-side ticket age is
+         added to this value modulo 2^32 to obtain the value that is
+         transmitted by the client.  The server MUST generate a fresh value
+         for each ticket it sends.
+       * @param {Uint8Array} nonce - opaque ticket_nonce<0..255>; Uint8Array A per-ticket value that is unique across all tickets
+         issued on this connection.
+       * @param {Uint8Array} ticket - opaque ticket<1..2^16-1>; The value of the ticket to be used as the PSK identity.  The
+         ticket itself is an opaque label.  It MAY be either a database
+         lookup key or a self-encrypted and self-authenticated value.
+       * @param {Uint8Array} extensions - Extension extensions<0..2^16-2>;
+       * @return
+       */
+   static a(
+      lifetime: Uint32,
+      ageAdd: Uint32,
+      nonce: Uint8Array,
+      ticket: Uint8Array,
+      extensions: Uint8Array,
+   ): NewSessionTicket;
+   static sequence: {
+      name: string;
+      value(octet: any): any;
+   }[];
+   /**
+    * Parse NewSessionTicket
+    *
+    * @static
+    * @param {Uint8Array} octet
+    * @returns {NewSessionTicket}
+    */
+   static parse(octet: Uint8Array): NewSessionTicket;
+   /**
+       * @constructor
+       * @param {Uint32} lifetime - default: Uint32(7200) - Indicates the lifetime in seconds as a 32-bit
+         unsigned integer in network byte order from the time of ticket
+         issuance.  Servers MUST NOT use any value greater than
+         604800 seconds (7 days).  The value of zero indicates that the
+         ticket should be discarded immediately.  Clients MUST NOT cache
+         tickets for longer than 7 days, regardless of the ticket_lifetime,
+         and MAY delete tickets earlier based on local policy.  A server
+         MAY treat a ticket as valid for a shorter period of time than what
+         is stated in the ticket_lifetime.
+       * @param {Uint32} ageAdd - default: Uint32(0) - A securely generated, random 32-bit value that is
+         used to obscure the age of the ticket that the client includes in
+         the "pre_shared_key" extension.  The client-side ticket age is
+         added to this value modulo 2^32 to obtain the value that is
+         transmitted by the client.  The server MUST generate a fresh value
+         for each ticket it sends.
+       * @param {Uint8Array} nonce - opaque ticket_nonce<0..255>; Uint8Array A per-ticket value that is unique across all tickets
+         issued on this connection.
+       * @param {Uint8Array} ticket - opaque ticket<1..2^16-1>; The value of the ticket to be used as the PSK identity.  The
+         ticket itself is an opaque label.  It MAY be either a database
+         lookup key or a self-encrypted and self-authenticated value.
+       * @param {Uint8Array} extensions - Extension extensions<0..2^16-2>;
+       */
+   constructor(
+      lifetime: Uint32,
+      ageAdd: Uint32,
+      nonce: Uint8Array,
+      ticket: Uint8Array,
+      extensions?: Uint8Array,
+   );
+   payload: () => Handshake;
+   handshake: () => Handshake;
+   get lifetime(): Uint32;
+   get ageAdd(): Uint32;
+   get nonce(): Uint8Array;
+   get ticket(): Uint8Array;
+   get extensions(): Uint8Array;
+   /**
+    * @return {Handshake} message
+    */
+   wrap(): Handshake;
+   #private;
 }
-import { Struct } from "../src/base.js";
+import { Struct, Uint32 } from "../src/base.js";
 import { Handshake } from "../src/handshake.js";
-import { Extension } from "../src/extension/extension.js";

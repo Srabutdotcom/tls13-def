@@ -219,6 +219,7 @@ function extensionType_(extType) {
  * Extension extensions<2..2^16-1>;
  */
 export class Extensions extends Minmax {
+   #list = []
    /**
     * @param {number} m - positive integer - represents minimum length
     * @param  {...Extension} extensions 
@@ -263,7 +264,9 @@ export class Extensions extends Minmax {
       for (const member of extensions) {
          this[member.name] = member.data;
       }
+      this.#list = extensions
    }
+   get list(){return this.#list}
 }
 
 //npx -p typescript tsc ./src/extension/extension.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

@@ -154,6 +154,8 @@ export class Extensions extends Minmax {
      * @param  {...Extension} extensions
      */
     constructor(m: number, ...extensions: Extension[]);
+    get list(): any[];
+    #private;
 }
 
 declare class ExtensionType extends Uint16 {

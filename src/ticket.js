@@ -7,9 +7,10 @@
  * *DONE - verified
  */
 
-import { Minmax, Struct, Uint32, Uint8 } from "./base.js";
+import { Struct, Uint32, Uint8 } from "./base.js";
 import { Extension, Extensions } from "./extension/extension.js";
 import { Handshake } from "./handshake.js";
+import { Byte } from "./deps.js"
 
 /**
  * NewSessionTicket
@@ -59,41 +60,142 @@ import { Handshake } from "./handshake.js";
    @extends {Struct}
  */
 export class NewSessionTicket extends Struct {
-   #Extension = Extension
+   #lifetime
+   #ageAdd
+   #nonce
+   #ticket
+   #extensions
    /**
-    * 
-    * @param {Uint8Array} ticket 
-    * @param {...Extension} extension 
+    * @param {Uint32} lifetime - default: Uint32(7200) - Indicates the lifetime in seconds as a 32-bit
+      unsigned integer in network byte order from the time of ticket
+      issuance.  Servers MUST NOT use any value greater than
+      604800 seconds (7 days).  The value of zero indicates that the
+      ticket should be discarded immediately.  Clients MUST NOT cache
+      tickets for longer than 7 days, regardless of the ticket_lifetime,
+      and MAY delete tickets earlier based on local policy.  A server
+      MAY treat a ticket as valid for a shorter period of time than what
+      is stated in the ticket_lifetime.
+    * @param {Uint32} ageAdd - default: Uint32(0) - A securely generated, random 32-bit value that is
+      used to obscure the age of the ticket that the client includes in
+      the "pre_shared_key" extension.  The client-side ticket age is
+      added to this value modulo 2^32 to obtain the value that is
+      transmitted by the client.  The server MUST generate a fresh value
+      for each ticket it sends.
+    * @param {Uint8Array} nonce - opaque ticket_nonce<0..255>; Uint8Array A per-ticket value that is unique across all tickets
+      issued on this connection.
+    * @param {Uint8Array} ticket - opaque ticket<1..2^16-1>; The value of the ticket to be used as the PSK identity.  The
+      ticket itself is an opaque label.  It MAY be either a database
+      lookup key or a self-encrypted and self-authenticated value.
+    * @param {Uint8Array} extensions - Extension extensions<0..2^16-2>;
     * @return
     */
-   static a(ticket, ...extension) {
-      return new NewSessionTicket(ticket, ...extension)
+   static a(lifetime, ageAdd, nonce , ticket, extensions) {
+      return new NewSessionTicket(lifetime, ageAdd, nonce, ticket, extensions)
    }
    payload = this.wrap
    handshake = this.wrap
    /**
-    * 
-    * @param {Uint8Array} ticket 
-    * @param {...Extension} extension
+    * @constructor
+    * @param {Uint32} lifetime - default: Uint32(7200) - Indicates the lifetime in seconds as a 32-bit
+      unsigned integer in network byte order from the time of ticket
+      issuance.  Servers MUST NOT use any value greater than
+      604800 seconds (7 days).  The value of zero indicates that the
+      ticket should be discarded immediately.  Clients MUST NOT cache
+      tickets for longer than 7 days, regardless of the ticket_lifetime,
+      and MAY delete tickets earlier based on local policy.  A server
+      MAY treat a ticket as valid for a shorter period of time than what
+      is stated in the ticket_lifetime.
+    * @param {Uint32} ageAdd - default: Uint32(0) - A securely generated, random 32-bit value that is
+      used to obscure the age of the ticket that the client includes in
+      the "pre_shared_key" extension.  The client-side ticket age is
+      added to this value modulo 2^32 to obtain the value that is
+      transmitted by the client.  The server MUST generate a fresh value
+      for each ticket it sends.
+    * @param {Uint8Array} nonce - opaque ticket_nonce<0..255>; Uint8Array A per-ticket value that is unique across all tickets
+      issued on this connection.
+    * @param {Uint8Array} ticket - opaque ticket<1..2^16-1>; The value of the ticket to be used as the PSK identity.  The
+      ticket itself is an opaque label.  It MAY be either a database
+      lookup key or a self-encrypted and self-authenticated value.
+    * @param {Uint8Array} extensions - Extension extensions<0..2^16-2>;
     */
-   constructor(ticket, ...extension) {
-      const lifetime = new Uint32(7200)//in second
-      const ageAdd = new Uint32(0)//in second
-      const nonce = Minmax.min(0).max(255).byte(new Uint8(0))
-      const opaqueTicket = Minmax.min(1).max(2**16-1).byte(ticket)
+   constructor(lifetime = new Uint32(7200), ageAdd = new Uint32(0), nonce = new Uint8(0), ticket, extensions = Extensions.newSessionTicket()) {
       super(
-         lifetime,
-         ageAdd,
-         nonce,
-         opaqueTicket,
-         Extensions.newSessionTicket(...extension)
+         lifetime, // lifetime
+         ageAdd, // ageAdd
+         nonce, // nonce
+         ticket, // opaqueTicket
+         extensions 
       )
+      this.#lifetime = lifetime
+      this.#ageAdd = ageAdd
+      this.#nonce = nonce
+      this.#ticket = ticket
+      this.#extensions = extensions
    }
+   get lifetime(){return this.#lifetime}
+   get ageAdd(){return this.#ageAdd}
+   get nonce(){return this.#nonce}
+   get ticket(){return this.#ticket}
+   get extensions(){return this.#extensions}
    /**
     * @return {Handshake} message
     */
-   wrap(){
+   wrap() {
       return Handshake.new_session_ticket(this)
+   }
+   static sequence = [
+      {
+         name: "ticket_lifetime",
+         value(octet) {
+            return octet.subarray(0,4);
+         }
+      },
+      {
+         name: "ticket_age_add",
+         value(octet) {
+            return octet.subarray(0,4);;
+         }
+      },
+      {
+         name: "ticket_nonce",
+         value(octet) {
+            const length = Byte.get.BE.b8(octet);
+            return octet.subarray(0, 1 + length);
+         }
+      },
+      {
+         name: "ticket",
+         value(octet) {
+            const length = Byte.get.BE.b16(octet);
+            return octet.subarray(0, 2 + length);
+         }
+      },
+      {
+         name: "extensions",
+         value(octet) {
+            const length = Byte.get.BE.b16(octet);
+            const value = octet.subarray(2, 2 + length);
+            return Extension.parse(value, "newSessionTicket")
+         }
+      },
+   ]
+   
+   /**
+    * Parse NewSessionTicket
+    *
+    * @static
+    * @param {Uint8Array} octet
+    * @returns {NewSessionTicket}
+    */
+   static parse(octet) {
+      const data = {}
+      let offset = 0;
+      for (const { name, value } of NewSessionTicket.sequence) {
+         data[name] = value(octet.subarray(offset));
+         offset += data[name].length
+      }
+      const { ticket_lifetime, ticket_age_add, ticket_nonce, ticket, extensions } = data
+      return NewSessionTicket.a(ticket_lifetime, ticket_age_add, ticket_nonce, ticket, extensions)
    }
 }
 
