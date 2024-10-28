@@ -16,7 +16,7 @@ import { CertificateRequest, EncryptedExtensions } from "./params.js";
 import { Certificate, CertificateVerify, Finished } from "./auth.js";
 import { MessageHash } from "./msghash.js";
 import { Byte } from "./deps.js"
-
+import { TLSContentType } from "./contentype.js";
 
 /**
  * HandshakeType
@@ -253,5 +253,7 @@ export class Handshake extends Struct {
       return Handshake.a(data['message'], data['type'])
    }
 }
+
+TLSContentType.register(TLSContentType.TYPES.HANDSHAKE, Handshake.parse)
 
 // npx -p typescript tsc ./src/handshake.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

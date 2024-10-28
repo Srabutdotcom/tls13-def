@@ -10,8 +10,9 @@ import { Alert } from "./alert.js";
 import { Enum, Struct, Uint16, Uint8 } from "./base.js";
 import { Handshake } from "./handshake.js";
 import { ProtocolVersion } from "./keyexchange.js"
-import { Byte, concat } from "./deps.js"
-
+import { Byte } from "./deps.js"
+import { ChangeCipherSpec } from "./changecipherspec.js";
+import { TLSContentType } from "./contentype.js";
 
 /**
  * Wrapper to TLSPlaintext.types value
@@ -86,48 +87,48 @@ export class TLSPlaintext extends Struct {
     * @param {Uint8Array} fragment 
     * @returns 
     */
-   static alert = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.alert) }
+   static alert = function (fragment) { return new TLSPlaintext(fragment, TLSContentType.ALERT) }
    /**
     * 
     * @param {Uint8Array} fragment 
     * @returns 
     */
-   static application_data = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.application_data) }
+   static application_data = function (fragment) { return new TLSPlaintext(fragment, TLSContentType.APPLICATION_DATA) }
    /**
     * 
     * @param {ChangeCipherSpec} payload 
     * @returns {TLSPlaintext}
     */
-   static change_cipher_spec = function (payload = ChangeCipherSpec.a()) { return new TLSPlaintext(payload, TLSPlaintext.contentType.change_cipher_spec) }
+   static change_cipher_spec = function (payload = ChangeCipherSpec.a()) { return new TLSPlaintext(payload, TLSContentType.CHANGE_CIPHER_SPEC) }
    /**
     * 
     * @param {Uint8Array} msg 
     * @returns 
     */
-   static handshake = function (msg) { return new TLSPlaintext(msg.wrap(), TLSPlaintext.contentType.handshake) }
+   static handshake = function (msg) { return new TLSPlaintext(msg.wrap(), TLSContentType.HANDSHAKE) }
    /**
     * 
     * @param {Uint8Array} fragment 
     * @returns 
     */
-   static heartbeat = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.heartbeat) }
+   static heartbeat = function (fragment) { return new TLSPlaintext(fragment, TLSContentType.HEARTBEAT) }
    /**
     * 
     * @param {Uint8Array} fragment 
     * @returns 
     */
-   static invalid = function (fragment) { return new TLSPlaintext(fragment, TLSPlaintext.contentType.invalid) }
+   static invalid = function (fragment) { return new TLSPlaintext(fragment, TLSContentType.INVALID) }
 
    /**
     * @param {Uint8Array} fragment 
-    * @param {ContentType} type 
+    * @param {TLSContentType} type 
     * @return {TLSPlaintext} 
     */
    static a(fragment, type) { return new TLSPlaintext(fragment, type) }
 
    /**
     * @param {Uint8Array} fragment - the data being transmitted
-    * @param {ContentType} type - description
+    * @param {TLSContentType} type - description
     * 
     * In order to maximize backward
       compatibility, a record containing an initial ClientHello SHOULD have
@@ -147,65 +148,26 @@ export class TLSPlaintext extends Struct {
       this.#fragment = fragment
    }
    /**
-    * @return {ContentType} 
+    * @return {TLSContentType} 
     */
    get type() { return this.member[0] }
    get version() { return this.member[1] }
    get recordLength() { return this.member[2] }
    get fragment() { return this.#fragment }
    get message() { return this.fragment.message }
-   static sequence = [
-      {
-         name: "type",
-         value(record) {
-            const value = Byte.get.BE.b8(record);
-            const type = TLSPlaintext.contentType.key(value);
-            if (!type) throw TypeError(`illegal_parameter - Unexpected content type - ${value}`)
-            return new ContentType(value)
-         }
-      },
-      {
-         name: "version",
-         value(record) {
-            const value = Byte.get.BE.b16(record, 1);
-            //for now skip version checking
-            return ProtocolVersion.a(value)
-         }
-      },
-      {
-         name: "length",
-         value(record) {
-            return Byte.get.BE.b16(record, 3);
-         }
-      },
-      {
-         name: "fragment",
-         /**
-          * 
-          * @param {Uint8Array} record 
-          * @param {number} length 
-          * @param {ContentType} type 
-          * @returns 
-          */
-         value(record, length, type) {
-            const content = record.subarray(5, 5 + length);
-            return type.klas.parse(content)
-         }
-      }
-   ]
+
    /**
     * parse a Record or TLSPlaintext
     * @param {Uint8Array} record - Record or TLSPlaintext 
     * @return {TLSPlaintext} TLSPlaintext data structure
     */
    static parse(record) {
-      const data = {}
       let offset = 0;
-      for (const { name, value } of TLSPlaintext.sequence) {
-         data[name] = value(record, data['length'], data['type']);
-         offset += data[name].length
-      }
-      return TLSPlaintext.a(data['fragment'], data['type'])
+      const type = TLSContentType.fromUint8Array(record.subarray(offset, 1)); offset += type.length;
+      const version = ProtocolVersion.fromUint8Array(record.subarray(offset, offset + 2)); offset += version.length
+      const length = Byte.get.BE.b16(record.subarray(offset, offset+2)); offset += 2
+      const fragment = type.parser(record.subarray(offset, offset+length)); offset+=length;
+      return TLSPlaintext.a(fragment, type)
    }
 }
 
@@ -292,60 +254,6 @@ function zeros_(length) {
    return false
 }
 
-/**
- * Application Data
- * 
- * encryptedRecord wrapper
- * ```
- * struct {
-      ContentType opaque_type = application_data;  23 
-      ProtocolVersion legacy_record_version = 0x0303;  TLS v1.2 
-      uint16 length;
-      opaque encrypted_record[TLSCiphertext.length];
-   } TLSCiphertext;
-   ```
-   https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
-   @extends {Struct}
- */
-export class TLSCiphertext extends Struct {
-   /** @type {Uint8Array} header - [23, 3, 3, Length]    */
-   header
-   /**
-    * 
-    * @param {Uint8Array} encryptedRecord 
-    */
-   static a(encryptedRecord) { return new TLSCiphertext(encryptedRecord) }
-   /**
-    * 
-    * @param {Uint8Array} encryptedRecord 
-    */
-   constructor(encryptedRecord) {
-      const length = new Uint16(encryptedRecord.length);
-      super(
-         TLSPlaintext.contentType.application_data, /* type.application_data[23] */
-         ProtocolVersion.version.legacy, /* TLS v1.2 */
-         length, //*uint16
-         encryptedRecord
-      )
-      this.encryptedRecord = encryptedRecord;
-      this.header = concat(TLSPlaintext.contentType.application_data, ProtocolVersion.version.legacy, length)
-   }
-}
-
-/**
- * ChangeCipherSpec 
- * ```
- * produce Uint8[1]
- * ```
- * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
- * @extends {Uint8}
- */
-class ChangeCipherSpec extends Uint8 {
-   static a() { return new ChangeCipherSpec }
-   constructor() {
-      super(1)
-   }
-}
 
 
 // npx -p typescript tsc ./src/record.js --declaration --allowJs --emitDeclarationOnly --lib ESNext --outDir ./dist

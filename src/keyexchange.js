@@ -6,6 +6,7 @@
  */
 
 import { Minmax, Uint16 } from "./base.js";
+import { Byte } from "./deps.js"
 
 /**
  * ProtocolVersion -> 0x0303 - TLS v1.2 or 0x0304 - TLS v1.3
@@ -41,6 +42,17 @@ export class ProtocolVersion extends Uint16 {
       if (this.value() == 0x0303) return `TLS v1.2 - legacy_version[0x0303]`
       if (this.value() == 0x0304) return `TLS v1.3 - [0x0304]`;
       throw TypeError(`Uknown version ${this.value}`)
+   }
+   
+   /**
+    * ProtocolVersion from Uint8Array
+    *
+    * @static
+    * @param {Uint8Array} uint8array
+    * @returns {ProtocolVersion}
+    */
+   static fromUint8Array(uint8array){
+      return ProtocolVersion.a(Byte.get.BE.b16(uint8array))
    }
 }
 

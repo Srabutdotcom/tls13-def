@@ -4,7 +4,7 @@
  * @extends {Uint8}
  */
 export class HandshakeType extends Uint8 {
-    get klas(): TypeError | typeof ClientHello | typeof ServerHello | typeof NewSessionTicket | typeof EndOfEarlyData | typeof EncryptedExtensions | typeof Certificate | typeof CertificateRequest | typeof CertificateVerify | typeof Finished | typeof KeyUpdate;
+    get klas(): TypeError | typeof ClientHello | typeof ServerHello | typeof NewSessionTicket | typeof KeyUpdate | typeof EncryptedExtensions | typeof CertificateRequest | typeof Certificate | typeof CertificateVerify | typeof Finished;
 }
 /**
  * Handshake
@@ -166,6 +166,7 @@ export class Handshake extends Struct {
      * @return { HandshakeType }
      */
     get type(): HandshakeType;
+    get handshakeLength(): Uint8Array;
     /**
      * return message
      */
@@ -182,5 +183,4 @@ import { CertificateVerify } from "../src/auth.js";
 import { Finished } from "../src/auth.js";
 import { Struct } from "../src/base.js";
 import { NewSessionTicket } from "../src/ticket.js";
-import { EndOfEarlyData } from "../src/update.js";
 

@@ -16,6 +16,14 @@ export class ProtocolVersion extends Uint16 {
      * @return {ProtocolVersion} description
      */
     static a(ver: number): ProtocolVersion;
+    /**
+     * ProtocolVersion from Uint8Array
+     *
+     * @static
+     * @param {Uint8Array} uint8array
+     * @returns {ProtocolVersion}
+     */
+    static fromUint8Array(uint8array: Uint8Array): ProtocolVersion;
     toString(): "SSL v3.0 - [0x0300]" | "TLS v1.0 - [0x0301]" | "TLS v1.1 - [0x0302]" | "TLS v1.2 - legacy_version[0x0303]" | "TLS v1.3 - [0x0304]";
 }
 /**

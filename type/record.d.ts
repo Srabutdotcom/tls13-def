@@ -83,21 +83,10 @@
     static invalid: (fragment: Uint8Array) => TLSPlaintext;
     /**
      * @param {Uint8Array} fragment
-     * @param {ContentType} type
+     * @param {TLSContentType} type
      * @return {TLSPlaintext}
      */
-    static a(fragment: Uint8Array, type: ContentType): TLSPlaintext;
-    static sequence: {
-        name: string;
-        /**
-         *
-         * @param {Uint8Array} record
-         * @param {number} length
-         * @param {ContentType} type
-         * @returns
-         */
-        value(record: Uint8Array, length: number, type: ContentType): any;
-    }[];
+    static a(fragment: Uint8Array, type: TLSContentType): TLSPlaintext;
     /**
      * parse a Record or TLSPlaintext
      * @param {Uint8Array} record - Record or TLSPlaintext
@@ -106,7 +95,7 @@
     static parse(record: Uint8Array): TLSPlaintext;
     /**
      * @param {Uint8Array} fragment - the data being transmitted
-     * @param {ContentType} type - description
+     * @param {TLSContentType} type - description
      *
      * In order to maximize backward
        compatibility, a record containing an initial ClientHello SHOULD have
@@ -114,12 +103,15 @@
        ClientHello or a ServerHello MUST have version 0x0303 (reflecting
        TLS 1.2).
      */
-    constructor(fragment: Uint8Array, type: ContentType);
+    constructor(fragment: Uint8Array, type: TLSContentType);
     /**
-     * @return {ContentType}
+     * @return {TLSContentType}
      */
-    get type(): ContentType;
+    get type(): TLSContentType;
+    get version(): Uint8Array;
+    get recordLength(): Uint8Array;
     get fragment(): Uint8Array;
+    get message(): any;
     #private;
 }
 /**
@@ -186,59 +178,18 @@ export class TLSInnerPlaintext extends Struct {
      */
     constructor(content: Uint8Array, type: ContentType, zeros: number);
 }
-/**
- * Application Data
- *
- * encryptedRecord wrapper
- * ```
- * struct {
-      ContentType opaque_type = application_data;  23
-      ProtocolVersion legacy_record_version = 0x0303;  TLS v1.2
-      uint16 length;
-      opaque encrypted_record[TLSCiphertext.length];
-   } TLSCiphertext;
-   ```
-   https://datatracker.ietf.org/doc/html/rfc8446#section-5.2
-   @extends {Struct}
- */
-export class TLSCiphertext extends Struct {
-    /**
-     *
-     * @param {Uint8Array} encryptedRecord
-     */
-    static a(encryptedRecord: Uint8Array): TLSCiphertext;
-    /**
-     *
-     * @param {Uint8Array} encryptedRecord
-     */
-    constructor(encryptedRecord: Uint8Array);
-    /** @type {Uint8Array} header - [23, 3, 3, Length]    */
-    header: Uint8Array;
-    encryptedRecord: Uint8Array;
-}
 
 /**
  * Wrapper to TLSPlaintext.types value
  * @extends {Uint8}
  */
 declare class ContentType extends Uint8 {
-    get klas(): typeof Alert | typeof Handshake | typeof ChangeCipherSpec | typeof TLSCiphertext;
+    get klas(): any;
     get name(): "Invalid" | "ChangeCipherSpec" | "Alert" | "Handshake" | "TLSCiphertext";
     toString(): "Invalid" | "ChangeCipherSpec" | "Alert" | "Handshake" | "TLSCiphertext";
 }
-/**
- * ChangeCipherSpec
- * ```
- * produce Uint8[1]
- * ```
- * https://www.rfc-editor.org/rfc/rfc5246#section-7.1
- * @extends {Uint8}
- */
-declare class ChangeCipherSpec extends Uint8 {
-    static a(): ChangeCipherSpec;
-    constructor();
-}
+
 import { Uint8, Struct } from "../src/base.js";
-import { Alert } from "../src/alert.js";
-import { Handshake } from "../src/handshake.js";
+import { ChangeCipherSpec } from "../src/changecipherspec.js";
+import { TLSContentType } from "../src/contentype.js";
 export {};
