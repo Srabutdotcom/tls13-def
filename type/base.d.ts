@@ -5,13 +5,9 @@
  */
 export class Struct extends Uint8Array {
     /**
-     * @param  {...Uint8Array} uint8s
+     * @param  {...(Uint8Array|number)} items
      */
-    static a(...uint8s: Uint8Array[]): Struct;
-    /**
-     * @param  {...Uint8Array} uint8s
-     */
-    constructor(...uint8s: Uint8Array[]);
+    constructor(...items: (Uint8Array | number)[]);
     /**
      *
      * @returns {Uint8Array[]} array of Uint8Array
@@ -90,7 +86,13 @@ export class Uint8 extends Uint8Array {
      *
      * @param {number} v
      */
-    static a(v: number): Uint8;
+    static of(v: number): Uint8;
+    
+    /**
+     * get value from 8 bits
+     * @param {Uint8Array} octet -
+     * @return {number} */
+    static toValue(octet: Uint8Array): number;
     /**
      *
      * @param {number} int
@@ -112,7 +114,13 @@ export class Uint16 extends Uint8Array {
      *
      * @param {number} v
      */
-    static a(v: number): Uint16;
+    static of(v: number): Uint16;
+    
+    /**
+     * get value from 16 bits
+     * @param {Uint8Array} octet -
+     * @return {number} */
+    static toValue(octet: Uint8Array): number;
     /**
      *
      * @param {number} int
@@ -133,7 +141,13 @@ export class Uint24 extends Uint8Array {
     /**
      * @param {number} v
      */
-    static a(v: number): Uint24;
+    static of(v: number): Uint24;
+    
+    /**
+     * get value from 24 bits
+     * @param {Uint8Array} octet -
+     * @return {number} */
+    static toValue(octet: Uint8Array): number;
     /**
      * @param {number} int
      */
@@ -152,7 +166,13 @@ export class Uint32 extends Uint8Array {
     /**
      * @param {number} v
      */
-    static a(v: number): Uint32;
+    static of(v: number): Uint32;
+    
+    /**
+     * get value from 32 bits
+     * @param {Uint8Array} octet -
+     * @return {number} */
+    static toValue(octet: Uint8Array): number;
     /**
      *
      * @param {number} int

@@ -11,20 +11,17 @@ import { getUint8, getUint16, getUint24, getUint32 } from "./deps.js";
 export class Struct extends Uint8Array {
    #member
    /**
-    * @param  {...Uint8Array} uint8s  
+    * @param  {...(Uint8Array|number)} items
     */
-   static a(...uint8s) { return new Struct(...uint8s) }
-   /**
-    * @param  {...Uint8Array} uint8s  
-    */
-   constructor(...uint8s) {
-      super(uint8s && uint8s.length > 0 ? concat(...uint8s) : undefined);
-
-      if (uint8s && uint8s.length > 0 && uint8s.some(e => !(e instanceof Uint8Array))) {
-         throw TypeError(`all arguments must be Uint8Array`);
-      }
-
-      this.#member = uint8s
+   constructor(...items) {
+      items = !items? new Uint8Array : !items.length? new Uint8Array : items.map(e=>
+         {
+             if(e instanceof Uint8Array) return e
+             if(typeof e == "number") return Uint8Array.of(e)
+             throw TypeError(`expected all arguments are Uint8Array or number`)
+         })
+      super(concat(...items));
+      this.#member = items
    }
    /**
     * 
@@ -136,13 +133,12 @@ export class Uint8 extends Uint8Array {
     * 
     * @param {number} v 
     */
-   static a(v) { return new Uint8(v) }
+   static of(v) { return new Uint8(v) }
    /**
     * 
     * @param {number} int 
     */
    constructor(int) {
-      int = uint(int)
       super(Uint8BE(int, 1).buffer)
    }
    /**
@@ -150,6 +146,11 @@ export class Uint8 extends Uint8Array {
     * @returns {number}
     */
    value() { return getUint8(this) }
+   /**
+    * get value from 8 bits
+    * @param {Uint8Array} octet - 
+    * @return {number} */
+   static toValue(octet){ return getUint8(octet)}
 }
 
 /**
@@ -162,13 +163,12 @@ export class Uint16 extends Uint8Array {
     * 
     * @param {number} v 
     */
-   static a(v) { return new Uint16(v) }
+   static of(v) { return new Uint16(v) }
    /**
     * 
     * @param {number} int 
     */
    constructor(int) {
-      int = uint(int)
       super(Uint16BE(int).buffer)
    }
    /**
@@ -176,9 +176,12 @@ export class Uint16 extends Uint8Array {
     * @returns {number}
     */
    value() { return getUint16(this) }
+   /**
+    * get value from 16 bits
+    * @param {Uint8Array} octet - 
+    * @return {number} */
+   static toValue(octet){ return getUint16(octet)}
 }
-
-
 
 /**
  * number definition 3 bytes
@@ -189,18 +192,22 @@ export class Uint24 extends Uint8Array {
    /**
     * @param {number} v 
     */
-   static a(v) { return new Uint24(v) }
+   static of(v) { return new Uint24(v) }
    /**
     * @param {number} int 
     */
    constructor(int) {
-      int = uint(int)
       super(Uint24BE(int).buffer)
    }
    /**
     * @returns {number}
     */
    value() { return getUint24(this) }
+   /**
+    * get value from 24 bits
+    * @param {Uint8Array} octet - 
+    * @return {number} */
+   static toValue(octet){ return getUint24(octet)}
 }
 
 /**
@@ -212,13 +219,12 @@ export class Uint32 extends Uint8Array {
    /**
     * @param {number} v 
     */
-   static a(v) { return new Uint32(v) }
+   static of(v) { return new Uint32(v) }
    /**
     * 
     * @param {number} int 
     */
    constructor(int) {
-      int = uint(int)
       super(Uint32BE(int).buffer)
    }
    /**
@@ -226,6 +232,11 @@ export class Uint32 extends Uint8Array {
     * @returns {number}
     */
    value() { return getUint32(this) }
+   /**
+    * get value from 32 bits
+    * @param {Uint8Array} octet - 
+    * @return {number} */
+   static toValue(octet){ return getUint32(octet)}
 }
 
 /**

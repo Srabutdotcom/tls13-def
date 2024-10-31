@@ -1,16 +1,19 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@aicone/byte@0.3.4": "0.3.4",
-    "jsr:@aicone/byte@~0.3.4": "0.3.4",
+    "jsr:@aicone/byte@0.4.0": "0.4.0",
+    "jsr:@aicone/byte@~0.3.4": "0.3.9",
     "jsr:@std/assert@*": "1.0.6",
     "jsr:@std/assert@^1.0.2": "1.0.6",
     "jsr:@std/internal@^1.0.4": "1.0.4",
     "npm:@noble/curves@1.6.0": "1.6.0"
   },
   "jsr": {
-    "@aicone/byte@0.3.4": {
-      "integrity": "9862ab3248b10c904c780cbfb2b3a3d147675b8271b09ec39867e5163048d038"
+    "@aicone/byte@0.3.9": {
+      "integrity": "3301e88d6fd037c771ffed6400a1d833d2020cee8a98fb12c0dcbc76d2f8cc6c"
+    },
+    "@aicone/byte@0.4.0": {
+      "integrity": "d270cef4b044caf3e7bebce8618dbdac3096e0eb9091345e44aeed3530098d43"
     },
     "@std/assert@1.0.6": {
       "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207",

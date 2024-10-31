@@ -1,5 +1,5 @@
 import { assertEquals, equal } from "@std/assert";
-import { Alert } from "../src/mod.js";
+import { Alert } from "../src/alert.js";
 import { concat } from "@aicone/byte"
 
 Deno.test(
